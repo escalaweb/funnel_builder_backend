@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"  crossorigin="anonymous">
+
+
+ <style>
+
+     .principalTitle {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #140C28;
+}
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+  .principalTitle {
+    text-align: center;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .principalTitle {
+    text-align: center;
+  }
+}
+
+.commonTexts {
+  font-size: 14px;
+  line-height: 15px;
+  margin-bottom: 15px;
+  color: #70707B;
+}
+
+.advisorText {
+  font-size: 12px;
+  font-weight: 400;
+  color: #C5C5C5;
+}
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+  .advisorText {
+    text-align: center !important;
+    width: 100%;
+    display: block;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .advisorText {
+    text-align: center !important;
+    width: 100%;
+    display: block;
+  }
+}
+
+.hiperLink {
+  color: #70707B;
+  text-decoration: none;
+  -webkit-transition: all 0.2s ease-in-out !important;
+  -o-transition: all 0.2s ease-in-out !important;
+  transition: all 0.2s ease-in-out !important;
+  font-size: 14px;
+  font-weight: bold;
+}
+.hiperLink:hover {
+  color: #ec516d;
+}
+
+.footerSection {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 12.5px;
+}
+
+.button {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  margin-bottom: 0;
+  margin-top: 25px;
+}
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+  .button {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .button {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+}
+.button .btn {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-line-pack: center;
+      align-content: center;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  padding: 7.5px 15px;
+  width: -webkit-fit-content !important;
+  width: -moz-fit-content !important;
+  width: fit-content !important;
+  border-radius: 360px;
+  -webkit-transition: all 0.2s ease-in-out !important;
+  -o-transition: all 0.2s ease-in-out !important;
+  transition: all 0.2s ease-in-out !important;
+  margin-right: 10px;
+  margin-bottom: 15px;
+  z-index: 1;
+}
+.button .btn ion-icon,
+.button .btn i,
+.button .btn svg {
+  display: block;
+  margin-top: auto;
+  margin-bottom: auto;
+  font-size: 22px;
+  margin-right: 10px;
+}
+.button .btn.fullWidth {
+  width: 100% !important;
+  margin: 0;
+  border-radius: 0;
+}
+.button .btn[disabled=true],
+.button .btn[disabled] {
+  color: grey !important;
+  background-color: grey !important;
+}
+.button .btn[disabled=true] ion-icon,
+.button .btn[disabled=true] i,
+.button .btn[disabled=true] svg,
+.button .btn[disabled] ion-icon,
+.button .btn[disabled] i,
+.button .btn[disabled] svg {
+  color: grey !important;
+}
+.button .btn.singleIcon ion-icon,
+.button .btn.singleIcon i,
+.button .btn.singleIcon svg {
+  display: block;
+  margin-top: auto;
+  margin-bottom: auto;
+  font-size: 22px;
+  margin-right: 0 !important;
+}
+.button .btn.primary {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  text-transform: capitalize;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  background-color: #e5193d;
+  color: #fff;
+  border: none;
+  margin-bottom: 0;
+}
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+  .button .btn.primary {
+    margin: 0 auto;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .button .btn.primary {
+    margin: 0 auto;
+  }
+}
+.button .btn.primary:hover {
+  background-color: #ec516d !important;
+  color: white !important;
+}
+
+#parentContainer {
+  background-color: #F9F9F9;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+#parentContainer .container {
+  margin: auto;
+  padding: 75px 0;
+}
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+  #parentContainer .container {
+    padding: 50px 0;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  #parentContainer .container {
+    padding: 50px 0;
+  }
+}
+#parentContainer .container .sectionInner1.infoSection {
+  background-color: #FCFBFA;
+  margin: auto;
+  margin-bottom: 50px;
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  border-radius: 15px;
+  -webkit-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  -o-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+  #parentContainer .container .sectionInner1.infoSection {
+    width: 95%;
+    padding: 40px 5%;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  #parentContainer .container .sectionInner1.infoSection {
+    width: 90%;
+    padding: 40px 25px;
+  }
+}
+@media only screen and (min-width: 991px) and (max-width: 1491px) {
+  #parentContainer .container .sectionInner1.infoSection {
+    width: 75%;
+    padding: 50px;
+  }
+}
+@media only screen and (min-width: 1492px) {
+  #parentContainer .container .sectionInner1.infoSection {
+    width: 65%;
+    padding: 50px;
+  }
+}
+#parentContainer .container .sectionInner2.footerSection {
+  margin: auto;
+}
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+  #parentContainer .container .sectionInner2.footerSection {
+    width: 95%;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  #parentContainer .container .sectionInner2.footerSection {
+    width: 90%;
+  }
+}
+@media only screen and (min-width: 991px) and (max-width: 1491px) {
+  #parentContainer .container .sectionInner2.footerSection {
+    width: 75%;
+  }
+}
+@media only screen and (min-width: 1492px) {
+  #parentContainer .container .sectionInner2.footerSection {
+    width: 65%;
+  }
+}
+#parentContainer .container .sectionInner2.footerSection .elements .advisorText {
+  text-align: left;
+}
+
+
+ </style>
+
+</head>
+
+<body>
+
+    <section class="parentContainer" id="parentContainer">
+
+        <div
+        style="flex-direction: column;"
+        class="container">
+
+            <div class="sectionInner1 infoSection card">
+
+                <div class="elements">
+
+
+                    {{#if name}}
+                    <h1 class="principalTitle">
+                        Hola {{ name }}
+                    </h1>
+                    {{/if}}
+
+                    {{#if text}}
+                    <p class="commonTexts">
+                        {{{ text }}}
+                    </p>
+                    {{/if}}
+
+
+                </div>
+
+            </div>
+
+            <footer class="sectionInner2 footerSection">
+
+                <div class="elements">
+
+                    <small class="advisorText">
+
+                        Copyright © 2021–2022 Wam music, Inc.
+
+                    </small>
+
+                </div>
+
+
+            </footer>
+
+
+        </div>
+
+    </section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+</body>
+
+</html>
