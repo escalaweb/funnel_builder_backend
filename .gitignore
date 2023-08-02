@@ -1,8 +1,8 @@
 # compiled output
 /dist
+/src/dist
 /node_modules
 
-/mongo
 
 pruebas.html
 pruebas.json
@@ -10,7 +10,7 @@ pruebas.json
 .env
 .env.prod
 
-.dynamodb-data
+/dynamodb-data
 
 # Logs
 logs
