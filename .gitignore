@@ -10,6 +10,8 @@ pruebas.json
 .env
 .env.prod
 
+.dynamodb-data
+
 # Logs
 logs
 *.log

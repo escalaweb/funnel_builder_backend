@@ -10,9 +10,7 @@
 
 # Description
 
-A progressive backend system developed with nestjs + mongodb + docker and other tools.
-
-This is a clean project ready to be used for any available project.
+---
 
 # Installation
 
@@ -43,9 +41,6 @@ $ yarn start:dev
 
 ### 5. Initializes the endpoint seed to have default users and roles
 
-```bash
-$ run endpoint POST http://localhost:{yourPort}/seed
-```
 
 ## Recomendations
 
