@@ -36,7 +36,7 @@ $ docker-compose up -d
 ### 4. Start project
 
 ```bash
-$ yarn start:dev
+$ yarn dev
 ```
 
 ### 5. Initializes the endpoint seed to have default users and roles
