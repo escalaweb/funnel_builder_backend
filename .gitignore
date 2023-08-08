@@ -12,6 +12,11 @@ pruebas.json
 .env.prod
 .env.staging
 
+/.build
+.build
+
+pruebas.js
+
 /dynamodb-data
 
 # Logs

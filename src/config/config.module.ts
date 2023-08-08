@@ -9,15 +9,13 @@ import { _MYSQL_CONNECTION_MODULE } from '../database/mysql-config';
 // import { _MYSQL_CONNECTION_MODULE } from '../database/mysql-config';
 // import { DynamooseDbModule } from '../database/dynamoose-config';
 
-console.log('prueba', process.env.NODE_ENV);
-
 @Global()
 @Module({
     imports: [
         ConfigModule.forRoot({
             load: [EnvConfigurations],
         }),
-        _MYSQL_CONNECTION_MODULE
+        // _MYSQL_CONNECTION_MODULE
         // _DYNAMOOSE_MODULE
 
 

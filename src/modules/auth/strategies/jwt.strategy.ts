@@ -106,34 +106,34 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
         // });
 
-        const args: _argsFind<FindOneOptions> = {
-            findObject: {
-                where: {
-                    username_id: newPayload.username_id
-                }
-            }
-        }
+        // const args: _argsFind<FindOneOptions> = {
+        //     findObject: {
+        //         where: {
+        //             username_id: newPayload.username_id
+        //         }
+        //     }
+        // }
 
-        await this._usersService.findOne(args).then(async (response) => {
+        // await this._usersService.findOne(args).then(async (response) => {
 
-            if (response.statusCode != 200 || (response.data === undefined || response.data === null)) {
+        //     if (response.statusCode != 200 || (response.data === undefined || response.data === null)) {
 
-                let user: User_I = {
-                    username_id: newPayload.username_id,
-                }
+        //         let user: User_I = {
+        //             username_id: newPayload.username_id,
+        //         }
 
-                await this._usersService.create({
-                    username_id: newPayload.username_id,
-                }).then();
+        //         await this._usersService.create({
+        //             username_id: newPayload.username_id,
+        //         }).then();
 
 
-            } else {
+        //     } else {
 
-                newPayload._id = response.data._id;
+        //         newPayload._id = response.data._id;
 
-            }
+        //     }
 
-        })
+        // })
 
 
         return newPayload;
