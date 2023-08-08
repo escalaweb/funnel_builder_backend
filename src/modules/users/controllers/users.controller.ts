@@ -9,10 +9,9 @@ export class UsersController {
 
     constructor(private readonly usersService: UsersService) { }
 
-      @Post()
-      test() {
-        return this.usersService.test();
-      }
+    @Post()
+    test() {
+    }
 
     // @Get()
     // @Auth()
@@ -24,7 +23,7 @@ export class UsersController {
     // @Auth()
     @Auth_SameID()
     findOne(@Param('id') id: string) {
-        return this.usersService.findOne(id);
+        // return this.usersService.findOne(id);
     }
 
     //   @Patch(':id')

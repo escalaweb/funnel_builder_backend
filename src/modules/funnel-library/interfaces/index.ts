@@ -1,10 +1,9 @@
-import { schemaKey_I } from "../../../common/interfaces/_dynamoose.interface";
+import { schemaKeys_I } from "../../../common/interfaces";
 import { DateTypeModel_I } from "../../../common/schemas/date.schema";
-import { FunnelBody_I } from "../../funnels/interfaces";
 
 
 
-export interface FunnelLibrary_I extends schemaKey_I{
+export interface FunnelLibrary_I extends schemaKeys_I{
 
     // _id: string;
     name: string;

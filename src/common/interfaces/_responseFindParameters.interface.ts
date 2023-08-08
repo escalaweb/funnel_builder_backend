@@ -1,13 +1,17 @@
-import { PopulateRequest } from "../helpers/dynamoose.helper.service";
 
 
-
-
-export interface _argsAggregateFind {
-
+export interface PopulateRequest {
+    path: string;
+    model: string;
+    populate?: PopulateRequest[];
 }
-    export interface _argsFind {
-    findObject: any;
+
+
+
+
+
+export interface _argsFind<T = any> {
+    findObject: T;
     populate?: PopulateRequest[];
     select?: any;
 }

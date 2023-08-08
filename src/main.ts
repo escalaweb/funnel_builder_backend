@@ -53,6 +53,9 @@ async function bootstrap() {
         logger.log(`App Nestjs running on port: ${Config.get(_Configuration_Keys.PORT)}`);
     });
 
+
+
+
 }
 bootstrap();
 

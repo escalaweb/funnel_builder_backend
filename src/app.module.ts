@@ -11,10 +11,10 @@ import { AuthModule, FileManagerModule, FunnelLibraryModule, FunnelsModule, Plan
         CommonModule,
         AuthModule,
         // FileManagerModule,
-        // UsersModule,
         // FunnelLibraryModule,
         // FunnelsModule,
         // PlannerModule,
+        UsersModule,
         TestModule,
     ],
 })

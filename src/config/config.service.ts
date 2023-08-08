@@ -8,6 +8,8 @@ const dotenv = require("dotenv");
 // dotenv.config();
 
 
+export type typeEnviroments = 'development' | 'production' | 'staging' | 'none';
+
 
 @Injectable()
 export class ConfigProjectService {
@@ -18,35 +20,64 @@ export class ConfigProjectService {
         private readonly _configService: ConfigService
     ) {
 
-        let path: string = process.cwd();
-        let isEnviroment: string = '';
+        let path: string = `${process.cwd()}/src/config/env/`;
+        let isEnviroment: typeEnviroments = 'none';
 
-        if (fs.existsSync(path + "/.env")) {
+        console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 
-            isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+        switch (process.env.NODE_ENV) {
 
-            dotenv.config({ path: path + "/.env" })
 
-            this.envConfig = parse(fs.readFileSync(path + "/.env"));
+            case "development":
+                // isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+                dotenv.config({ path: path + ".env" })
+                this.envConfig = parse(fs.readFileSync(path + ".env"));
 
-        } else if (fs.existsSync( path + "/.env.prod" )) {
+                break;
+            case "staging":
+                // isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+                dotenv.config({ path: path + ".env.staging" })
+                this.envConfig = parse(fs.readFileSync(path + ".env.staging"));
 
-            isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+                break;
+            case "production":
+                // isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+                dotenv.config({ path: path + ".env.prod" })
+                this.envConfig = parse(fs.readFileSync(path + ".env.prod"));
 
-            dotenv.config({ path: path + "/.env.prod" })
+                break;
 
-            this.envConfig = parse(fs.readFileSync(path + "/.env.prod"));
+            default:
+                break;
 
         }
 
-        if (isEnviroment != '') {
-            this.setTypeEnviroment(isEnviroment)
-            return;
-        }
+        // if (fs.existsSync(path + "/.env")) {
+
+        //     isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+
+        //     dotenv.config({ path: path + "/.env" })
+
+        //     this.envConfig = parse(fs.readFileSync(path + "/.env"));
+
+        // } else if (fs.existsSync(path + "/.env.prod")) {
+
+        //     isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+
+        //     dotenv.config({ path: path + "/.env.prod" })
+
+        //     this.envConfig = parse(fs.readFileSync(path + "/.env.prod"));
+
+        // }
+
+        // if (isEnviroment != 'none') {
+        //     this.setTypeEnviroment(isEnviroment)
+        //     return;
+        // }
 
         isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT)
 
-        if( isEnviroment != ''){
+        if (isEnviroment != 'none') {
 
             this.setTypeEnviroment(isEnviroment)
             return;
@@ -55,64 +86,35 @@ export class ConfigProjectService {
 
         // entonces es docker
 
-        /*
-        if (fs.existsSync(path + "/.env")) {
-            console.log('dev exist')
-            dotenv.config({ path: path + "/.env" })
 
-            this.envConfig = parse(fs.readFileSync(path + "/.env"));
-
-            global._prod = false;
-
-        } else if (fs.existsSync(path + "/.env.prod")) {
-            console.log('prod exist')
-            dotenv.config({ path: path + "/.env.prod" })
-
-            this.envConfig = parse(fs.readFileSync(path + "/.env.prod"));
-
-            global._prod = false;
-
-        } else {
-
-            console.log(".env or .env.prod file does not exist");
-            return process.exit(0);
-
-        }
-        isDevelopmentEnv = this._configService.get(_Configuration_Keys.ENVIROMENT);
-
-        // return process.exit(0);
-
-        if (isDevelopmentEnv === 'developer') {
-
-            this.envConfig = parse(fs.readFileSync(path + "/.env"));
-
-            global._prod = false;
-
-        } else if (isDevelopmentEnv === 'production') {
-
-            this.envConfig = parse(fs.readFileSync(path + "/.env.prod"));
-
-            global._prod = true;
-
-        }
-
-        console.log('Global Prod', global._prod);
-        */
     }
 
+    setTypeEnviroment(typeEnviroment: typeEnviroments) {
 
-    setTypeEnviroment(isDevelopmentEnv: string) {
+        switch (typeEnviroment) {
+            case "development":
+                global._prod = false;
+                global._staging = false;
+                global._local = true;
+                break;
 
-        if (isDevelopmentEnv === 'developer') {
+            case "production":
+                global._prod = true;
+                global._staging = false;
+                global._local = true;
+                break;
 
-            global._prod = false;
+            case "staging":
+                global._prod = false;
+                global._staging = true;
+                global._local = false;
+                break;
 
-        } else if (isDevelopmentEnv === 'production') {
-
-            global._prod = true;
-
-        }else{
-             global._prod = false;
+            default:
+                global._prod = false;
+                global._staging = false;
+                global._local = true;
+                break;
         }
 
 

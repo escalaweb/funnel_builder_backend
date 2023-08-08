@@ -1,19 +1,12 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { CreateFunnelDto } from '../dto/create-funnel.dto';
-import { UpdateFunnelDto } from '../dto/update-funnel.dto';
-import { InjectModel, Model } from 'nestjs-dynamoose';
+import { Injectable } from "@nestjs/common";
 
-import { ProcessDataService, DateProcessService } from '../../../common/adapters';
-import { schemaKey_I } from '../../../common/interfaces/_dynamoose.interface';
-import { FunnelBody_I } from '../interfaces';
-import { FunnelLibrary_I } from '../../funnel-library/interfaces';
-import { _response_I } from '../../../common/interfaces';
-import { FunnelLibraryService } from '../../funnel-library/services/funnel-library.service';
-import { AuthPayload_I } from '../../auth/interfaces/_jwt-payload.interface';
-import { ModelRegistry } from '../../../common/helpers/dynamoose.helper.service';
+
 
 @Injectable()
 export class FunnelsService {
+
+
+    /*
 
     constructor(
         @InjectModel('Funnels')
@@ -167,4 +160,6 @@ export class FunnelsService {
     // remove(id: number) {
     //     return `This action removes a #${id} funnel`;
     // }
+
+    */
 }

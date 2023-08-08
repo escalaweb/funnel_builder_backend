@@ -14,19 +14,19 @@ export class FunnelsController {
     create(@Body() createFunnelDto: CreateFunnelDto[], @Param('id') id: string, @Request() req: any) {
 
         const user: AuthPayload_I = req.user;
-        return this.funnelsService.create(createFunnelDto, id, user);
+        // return this.funnelsService.create(createFunnelDto, id, user);
     }
 
     @Get('all/:id')
     @Auth()
     findAll( @Param('id') id: string, @Request() req: any ) {
-        return this.funnelsService.findAll( id, req.user );
+        // return this.funnelsService.findAll( id, req.user );
     }
 
     @Get(':id/:funnelId')
     @Auth()
     findOne(@Param('id') id: string, @Param('funnelId') funnelId: string, @Request() req: any) {
-        return this.funnelsService.findOne(id, funnelId, req.user);
+        // return this.funnelsService.findOne(id, funnelId, req.user);
     }
 
     // @Patch(':id')

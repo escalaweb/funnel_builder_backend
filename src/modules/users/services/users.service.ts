@@ -1,75 +1,88 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
-import { InjectModel, Model } from 'nestjs-dynamoose';
 import { ProcessDataService, DateProcessService } from '../../../common/adapters';
-import { _argsFind, _response_I } from '../../../common/interfaces';
-import { schemaKey_I } from '../../../common/interfaces/_dynamoose.interface';
+import { _argsFind, _argsPagination, _response_I } from '../../../common/interfaces';
 
-import { validate as isUUID } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, EntityManager, FindOneOptions, Repository, getConnection } from 'typeorm';
+import { User_Ety } from '../models/entities/user.entity';
 import { User_I } from '../interfaces';
-import { AuthPayload_I } from '../../auth/interfaces/_jwt-payload.interface';
-import * as dynamoose from 'dynamoose';
-import { ModelRegistry } from '../../../common/helpers/dynamoose.helper.service';
 
 @Injectable()
 export class UsersService {
 
     constructor(
-        @InjectModel('Users')
-        private userModel: Model<User_I, schemaKey_I>,
 
-        // @InjectModel('Tests')
-        // private testsModel: Model<any, any>,
-        // @InjectModel('Tests2')
-        // private tests2Model: Model<any, any>,
+        @InjectRepository(User_Ety)
+        private readonly _Users_et_repository: Repository<User_Ety>,
 
         private readonly _processData: ProcessDataService,
-        private readonly _dateService: DateProcessService
+        private readonly _dateService: DateProcessService,
+        private readonly dataSource: DataSource,
+
     ) {
 
-        ModelRegistry.register("Users", this.userModel);
-     }
+        // ModelRegistry.register("Users", this._Users_et_repository);
+        // this.test();
 
-     async test(){
+    }
 
-//         let _Response: _response_I<any>;
 
-//         await this._processData.process_create<any, any>(this.tests2Model,
-//         {
-//             "test2id": "999",
-//             "book": "book",
-//             "user": "1"
-//         }
-//         ).then(response => {
+    async test(){
 
-//             _Response = response;
+        await this.create({
+            username_id: "ewqdsdsdf",
+        }).then( resp => {
+            console.log('creado', resp);
+        })
 
-//             _Response.message = [
-//                 {
-//                     text: 'Datos de usuario guardados',
-//                     type: 'global'
-//                 }
-//             ]
+    }
 
-//         }, err => {
-//             _Response = err;
-//             throw new HttpException(_Response, _Response.statusCode);
-//         })
+    async test_transaction() {
 
-//         return _Response;
+        // await this.dataSource.manager.transaction(async (transactionalEntityManager: EntityManager) => {
+        //     // Aquí puedes realizar tus operaciones dentro de la transacción
 
-// //     const user = await this.testsModel.get("2" as any); // {"id": 2, "name": "Bob", "parent": 1}
-// //     const populatedUser = await user.populate();
+        //     let createdAt_FK = this._datesService.create_noSv();
 
-// // console.log('aaa', populatedUser);
-     }
+        //     let lastAccessAt_FK = this._datesService.create_noSv();
 
-    async create(createUserDto: User_I): Promise<_response_I<User_I[]>> {
+        //     await transactionalEntityManager.save(createdAt_FK).then((resp) => {
+        //         createdAt_FK = resp;
+        //     });
+        //     await transactionalEntityManager.save(lastAccessAt_FK).then((resp) => {
+        //         lastAccessAt_FK = resp;
+        //     });
 
-        let _Response: _response_I<User_I[]>;
+        //     let user = this._Users_et_repository.create(
+        //         {
+        //             username_id: "ewqdsdsdf",
+        //             createdAt_FK: createdAt_FK,
+        //             lastAccessAt_FK: lastAccessAt_FK
+        //         }
+        //     )
 
-        await this._processData.process_create<User_I, schemaKey_I>(this.userModel, createUserDto).then(response => {
+        //     await transactionalEntityManager.save(user).then((resp) => {
+
+        //         user = resp;
+        //         console.log("resp", user);
+
+
+        //     });
+
+
+
+        // }).catch((err) => {
+
+        // });
+
+
+    }
+
+    async create(data: User_I): Promise<_response_I<User_Ety>> {
+
+        let _Response: _response_I<User_Ety>;
+
+        await this._processData.process_create<User_Ety>(this._Users_et_repository, data).then(response => {
 
             _Response = response;
 
@@ -82,51 +95,44 @@ export class UsersService {
 
         }, err => {
             _Response = err;
+            console.log('err', err);
             throw new HttpException(_Response, _Response.statusCode);
         })
 
         return _Response;
+
     }
 
-    // findAll() {
-    //     return `This action returns all users`;
-    // }
 
-    async findOne(_id: string) : Promise<_response_I<User_I>> {
 
-        if (isUUID(_id)) {
-
-            let _Response: _response_I<User_I>;
-
-            let args: _argsFind = {
-
+    // forma de usar
+    /*
+       const args: _argsFind<FindOneOptions> = {
                 findObject: {
-                    cognito_username: _id
-                },
-
+                    where: {
+                        host_id: host_id,
+                        host_email: Not(IsNull())
+                    }
+                }
             }
 
-            await this._processData.process_getOne<User_I, schemaKey_I>(this.userModel, args).then(response => {
+    */
+    async findOne(args: _argsFind<FindOneOptions>): Promise<_response_I<User_Ety>> {
 
-                _Response = response;
+        let _Response: _response_I<User_Ety>;
 
-                _Response.message = [
-                    {
-                        text: 'Usuario obtenido',
-                        type: 'global'
-                    }
-                ]
+        await this._processData.process_getOne<User_Ety>(this._Users_et_repository, args).then(async (resp) => {
 
-            }, err => {
-                _Response = err;
+            _Response = resp;
 
-                throw new HttpException(_Response, _Response.statusCode);
-            })
+            _Response.message = [
+                {
+                    text: 'Usuario obtenido',
+                    type: 'global'
+                }
+            ]
 
-
-            return _Response;
-
-        } else {
+        }).catch((err) => {
 
             let _Response: _response_I<any> = {
                 ok: false,
@@ -143,50 +149,75 @@ export class UsersService {
 
             throw new HttpException(_Response, _Response.statusCode);
 
-        }
+        });
 
+        return _Response;
 
     }
 
-    // update(id: number, updateUserDto: UpdateUserDto) {
-    //     return `This action updates a #${id} user`;
-    // }
+    async findAll(page: number = 1): Promise<_response_I<User_Ety[]>> {
 
-    // remove(id: number) {
-    //     return `This action removes a #${id} user`;
-    // }
+        let _Response: _response_I<User_Ety[]>;
 
-
-     async findOneByTerm(term: any) : Promise<_response_I<User_I>> {
-
-            let _Response: _response_I<User_I>;
-
-            let args: _argsFind = {
-                findObject: {
-                    ...term
-                }
+        const args: _argsPagination = {
+            findObject: {
+            },
+            options: {
+                page: page,
+                limit: 12,
+                // limit: this._configP._get(_Configuration_Keys.DEFAULT_LIMIT),
+                route: '/',
             }
+        }
 
-            await this._processData.process_getOne<User_I, schemaKey_I>(this.userModel, args).then(response => {
+        await this._processData.process_getAll_paginate<User_Ety>(this._Users_et_repository, args).then(async (resp) => {
 
-                _Response = response;
+            _Response = structuredClone(resp);
 
-                _Response.message = [
-                    {
-                        text: 'Usuario obtenido',
-                        type: 'global'
-                    }
-                ]
+        }).catch((err) => {
+            _Response = err;
 
-            }, err => {
-                _Response = err;
+            throw new HttpException(_Response, _Response.statusCode);
+        });
 
-                // throw new HttpException(_Response, _Response.statusCode);
-            })
+        return _Response;
 
-            return _Response;
+    }
 
-     }
+
+    // async findOneByTerm(term: any) : Promise<_response_I<User_I>> {
+
+    //        let _Response: _response_I<User_I>;
+
+    //        let args: _argsFind = {
+    //            findObject: {
+    //                ...term
+    //            }
+    //        }
+
+
+
+    //        await this._processData.process_getOne<User_I, schemaKey_I>(this.userModel, args).then(response => {
+
+    //            _Response = response;
+
+    //            _Response.message = [
+    //                {
+    //                    text: 'Usuario obtenido',
+    //                    type: 'global'
+    //                }
+    //            ]
+
+    //        }, err => {
+    //            _Response = err;
+
+    //            // throw new HttpException(_Response, _Response.statusCode);
+    //        })
+
+    //        return _Response;
+
+    // }
+
 
 }
 

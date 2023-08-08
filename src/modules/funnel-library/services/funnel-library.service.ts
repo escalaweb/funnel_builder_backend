@@ -1,21 +1,12 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { CreateFunnelLibraryDto } from '../dto/create-funnel-library.dto';
-import { UpdateFunnelLibraryDto } from '../dto/update-funnel-library.dto';
-import { InjectModel, Model } from 'nestjs-dynamoose';
-import { _argsFind, _response_I } from '../../../common/interfaces';
-import { schemaKey_I } from '../../../common/interfaces/_dynamoose.interface';
-import { FunnelLibrary_I } from '../interfaces';
-import { DateProcessService, ProcessDataService } from '../../../common/adapters';
-import { _argsPagination } from '../../../common/interfaces/_responsePaginator.interface';
+import { Injectable } from "@nestjs/common";
 
-import { validate as isUUID } from 'uuid';
-import { _argsUpdate } from '../../../common/interfaces/responseUpdate.interface';
-import * as dynamoose from 'dynamoose';
-import { AuthPayload_I } from '../../auth/interfaces/_jwt-payload.interface';
-import { ModelRegistry } from '../../../common/helpers/dynamoose.helper.service';
+
 
 @Injectable()
 export class FunnelLibraryService {
+
+
+    /*
 
     constructor(
         @InjectModel('FunnelLibrary')
@@ -217,4 +208,6 @@ export class FunnelLibraryService {
     remove(id: number) {
         return `This action removes a #${id} funnelLibrary`;
     }
+
+    */
 }

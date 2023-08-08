@@ -17,6 +17,8 @@ import * as jwkToPem from 'jwk-to-pem';
 import { UsersService } from "../../users/services/users.service";
 import { User_I } from "../../users/interfaces";
 import * as dynamoose from 'dynamoose';
+import { FindOneOptions } from "typeorm";
+import { User_Ety } from "../../users/models/entities";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -84,25 +86,55 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             "username_id": payload["sub"],
         }
 
-        await this._usersService.findOneByTerm({
-            username_id: newPayload.username_id,
-        }).then(async (response) => {
+        // await this._usersService.findOneByTerm({
+        //     username_id: newPayload.username_id,
+        // }).then(async (response) => {
 
-            console.log('response', response);
+        //     console.log('response', response);
+
+        //     if (response.statusCode != 200 || (response.data === undefined || response.data === null)) {
+
+        //         await this._usersService.create({
+        //             username_id: newPayload.username_id,
+        //         }).then();
+
+        //     } else {
+
+        //         newPayload._id = response.data._id;
+
+        //     }
+
+        // });
+
+        const args: _argsFind<FindOneOptions> = {
+            findObject: {
+                where: {
+                    username_id: newPayload.username_id
+                }
+            }
+        }
+
+        await this._usersService.findOne(args).then(async (response) => {
 
             if (response.statusCode != 200 || (response.data === undefined || response.data === null)) {
+
+                let user: User_I = {
+                    username_id: newPayload.username_id,
+                }
 
                 await this._usersService.create({
                     username_id: newPayload.username_id,
                 }).then();
 
-            }else{
+
+            } else {
 
                 newPayload._id = response.data._id;
 
             }
 
-        });
+        })
+
 
         return newPayload;
 

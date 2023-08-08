@@ -3,12 +3,14 @@
 /src/dist
 /node_modules
 
+/mysql
 
 pruebas.html
 pruebas.json
 
 .env
 .env.prod
+.env.staging
 
 /dynamodb-data
 
