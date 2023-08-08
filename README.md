@@ -36,7 +36,7 @@ $ docker-compose up -d
 ### 4. Start project
 
 ```bash
-$ yarn start:dev
+$ yarn dev
 ```
 
 ### 5. Initializes the endpoint seed to have default users and roles
@@ -49,6 +49,19 @@ $ yarn start:dev
 ```bash
 $ run endpoint  http://localhost:{yourPort}/api-doc
 ```
+
+# Serverless setup
+
+### 1. Start serverless app offline mode
+```bash
+$ serverless offline start --stage development
+```
+### Note
+--stage has the following environments flag variables ( development | staging | production )
+
+-development: it is for development in local environment <br>
+-staging: it is for development sample in a test https url <br>
+-production: is for final deployment and production use
 
 # Docker create image
 

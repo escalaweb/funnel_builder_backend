@@ -92,6 +92,8 @@ provider:
     SERVICE: ${self:service}
     STAGE: ${self:provider.stage}
     REGION: ${self:provider.region}
+    NODE_ENV: ${self:provider.stage}
+
 
   apiGateway:
     shouldStartNameWithService: true
@@ -120,8 +122,8 @@ custom:
     # httpsProtocol: "dev-certs"
     httpPort: 3750
     noPrependStageInUrl: true
-  rds:
-    start:
-      port: 3306
-      dbPath: ./data/mysql
-      migrate: true
+  # rds:
+  #   start:
+  #     port: 3306
+  #     dbPath: ./data/mysql
+  #     migrate: true
