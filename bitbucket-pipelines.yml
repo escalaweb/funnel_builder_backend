@@ -16,9 +16,6 @@ definitions:
           - unzip awscliv2.zip
           - ./aws/install
           - aws --version
-          - npm install serverless@3.34.0 --save-dev
-          - npm install serverless-webpack --save-dev   
-          - npm install serverless-offline --save-dev
 
           
     - step: &set-dev-env
@@ -48,6 +45,9 @@ definitions:
           - pip
         script:
           - source shared_vars.sh
+          - npm install serverless@3.34.0 --save-dev
+          - npm install serverless-webpack --save-dev   
+          - npm install serverless-offline --save-dev
           - npm install
           - sls deploy --stage=$STAGE
 
