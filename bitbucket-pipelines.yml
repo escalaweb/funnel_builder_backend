@@ -45,10 +45,10 @@ definitions:
           - pip
         script:
           - source shared_vars.sh
+          - npm install --omit=dev
           - npm install -g serverless@3.34.0 --save-dev
           - npm install -g serverless-webpack --save-dev   
           - npm install -g serverless-offline --save-dev
-          - npm install --omit=dev
           - sls deploy --stage=$STAGE
 
 pipelines:
