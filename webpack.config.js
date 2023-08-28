@@ -64,8 +64,7 @@ module.exports = {
   plugins: [
     new CopyPlugin({
       patterns: [
-        { from: "./src/config/env/.env.prod", to: "src/config/env/.env.prod" },
-        { from: "./src/config/env/.env", to: "src/config/env/.env" },
+        { from: "./src/config/env/env.empty.prod", to: "src/config/env/.env.prod" }
       ],
     }),
   ],
