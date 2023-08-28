@@ -12,7 +12,7 @@ custom:
 
   webpack:
     webpackConfig: 'webpack.config.js' # Name of webpack configuration file
-    includeModules: false # Node modules configuration for packaging
+    includeModules: true # Node modules configuration for packaging
     packager: 'npm' # Packager that will be used to package your external modules
     excludeFiles: src/**/*.test.js
 
@@ -50,6 +50,7 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
   memorySize: 1024
+  timeout: 29
 
   vpc:
     securityGroupIds:
