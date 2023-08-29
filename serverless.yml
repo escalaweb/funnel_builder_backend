@@ -91,9 +91,9 @@ provider:
     REGION: ${self:provider.region}
     NODE_ENV: ${self:provider.stage}
     DB_HOST: ${self:custom.database_host.${self:provider.stage}}
-    DB_PORT:
+    DB_PORT: 5432
     DB_NAME: ${self:custom.database_name.${self:provider.stage}}
-    DB_USER: ${self:custom.database_user.${self:provider.stage}}
+    DB_USERNAME: ${self:custom.database_user.${self:provider.stage}}
     DB_PASSWORD: ${self:custom.database_password.${self:provider.stage}}
 
 
