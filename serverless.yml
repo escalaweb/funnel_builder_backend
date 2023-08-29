@@ -101,7 +101,7 @@ provider:
     shouldStartNameWithService: true
     apiKeys:
       - ${self:service}-${self:provider.stage}
-    
+
   iam:
     role:
       statements:
@@ -129,7 +129,7 @@ provider:
             - logs:CreateLogGroup
             - logs:CreateLogStream
             - logs:PutLogEvents
-          Resource: "*"  
+          Resource: "*"
         - Effect: "Allow"
           Action:
             - "ec2:CreateNetworkInterface"
@@ -140,7 +140,7 @@ provider:
             - "ec2:DescribeSubnets"
             - "ec2:DescribeVpcs"
           Resource: "*"
-       
+
 package:
   exclude:
     - 'tests/**'
@@ -151,7 +151,7 @@ package:
     - 'support/**'
     - 'node_modules/.cache/**'
     - 'scripts/**'
-  include:  
+  include:
     - webpack.config.js
 
 functions:
