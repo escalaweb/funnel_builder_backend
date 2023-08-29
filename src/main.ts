@@ -59,25 +59,3 @@ async function bootstrap() {
 }
 bootstrap();
 
-
-// console.log(process.cwd());
-
-
-// function generarObjeto(obj) {
-//   const resultado = {};
-//   for (const [clave, valor] of Object.entries(obj)) {
-//     resultado[clave] = { contains: valor };
-//   }
-//   return resultado;
-// }
-
-
-
-// const objeto = {
-//   custom_subId: "7ca9c2a4-fa4c-11ed-84fd-3acdd3b01b9a",
-//   cognito_username: "9bfec8a9-03d3-42ec-b4f6-73759781165d",
-// };
-
-
-// const generado = generarObjeto(objeto);
-// console.log(generado);

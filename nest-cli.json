@@ -6,11 +6,6 @@
         "assets": [
             "assets/*",
             {
-                "include": "../mailing/templates/*.hbs",
-                "outDir": "dist/mailing",
-                "watchAssets": true
-            },
-            {
                 "include": "../assets/**",
                 "outDir": "dist/assets",
                 "watchAssets": true

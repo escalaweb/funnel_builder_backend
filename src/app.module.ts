@@ -14,7 +14,7 @@ import { AuthModule, FileManagerModule, FunnelLibraryModule, FunnelsModule, Plan
         // FunnelLibraryModule,
         // FunnelsModule,
         // PlannerModule,
-        UsersModule,
+        // UsersModule,
         TestModule,
     ],
 })

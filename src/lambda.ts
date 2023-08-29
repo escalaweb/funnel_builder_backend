@@ -64,6 +64,7 @@ async function bootstrapServer(): Promise<Server> {
             AppModule,
             new ExpressAdapter(expressApp),
         )
+        app.setGlobalPrefix('funnel-designer');
         app.use(eventContext());
 
         const logger = new Logger('Bootstrap');

@@ -15,7 +15,7 @@ export class TestController {
     }
 
     @Get()
-    @Auth()
+    // @Auth()
     findAll() {
         return this.testService.findAll();
     }

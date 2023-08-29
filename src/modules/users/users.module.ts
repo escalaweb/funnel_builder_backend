@@ -17,14 +17,14 @@ import { USER_ENTITIES_MODULE } from './models/entities/entities.module';
 
         // ]),
 
-        USER_ENTITIES_MODULE,
+        // USER_ENTITIES_MODULE,
 
     ],
-    controllers: [UsersController],
+    // controllers: [UsersController],
     providers: [UsersService],
     exports: [
         UsersService,
-        USER_ENTITIES_MODULE
+        // USER_ENTITIES_MODULE
         // DynamooseModule
     ]
 

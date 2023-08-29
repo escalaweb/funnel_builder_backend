@@ -1,0 +1,71 @@
+# image: exitoweb/gitlab-aws-angular:node14
+image: node:18
+
+clone:
+  depth: full
+
+definitions:
+  steps:
+    - step: &install-ci-dependencies
+        name: Install CI Dependencies
+        clone:
+          enabled: false
+        image: atlassian/default-image:3
+        script:
+          - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          - unzip awscliv2.zip
+          - ./aws/install
+          - aws --version
+
+          
+    - step: &set-dev-env
+        name: Set develop env vars
+        script:
+          - echo export AWS_ACCESS_KEY_ID=$DEV_AWS_AKEY > shared_vars.sh
+          - echo export AWS_SECRET_ACCESS_KEY=$DEV_AWS_SKEY >> shared_vars.sh
+          - echo export AWS_DEFAULT_REGION=$DEV_AWS_REGION >> shared_vars.sh
+          - echo export STAGE="dev" >> shared_vars.sh
+        artifacts:
+          - shared_vars.sh
+
+    - step: &set-prod-env
+        name: Set production env vars
+        script:
+          - echo export AWS_ACCESS_KEY_ID=$PROD_AWS_AKEY > shared_vars.sh
+          - echo export AWS_SECRET_ACCESS_KEY=$PROD_AWS_SKEY >> shared_vars.sh
+          - echo export AWS_DEFAULT_REGION=$PROD_AWS_REGION >> shared_vars.sh
+          - echo export STAGE="prod" >> shared_vars.sh
+        artifacts:
+          - shared_vars.sh
+
+    - step: &deploy-internal-api
+        name: Deploy api
+        caches:
+          - node
+          - pip
+        script:
+          - source shared_vars.sh
+          - npm install --omit=dev
+          - npm install -g serverless@3.34.0 --save-dev
+          - npm install serverless-webpack --save-dev   
+          - npm install serverless-offline --save-dev
+          - sls deploy --stage=$STAGE
+
+pipelines:
+
+  branches:
+    feature/*:
+      - step: *install-ci-dependencies
+      - step: *set-dev-env
+      - step: *deploy-internal-api
+
+
+    develop:
+      - step: *install-ci-dependencies
+      - step: *set-dev-env
+      - step: *deploy-internal-api
+
+    master:
+      - step: *install-ci-dependencies
+      - step: *set-prod-env
+      - step: *deploy-internal-api
