@@ -1,4 +1,4 @@
-import { FindOneOptions } from "typeorm";
+import { FindManyOptions, FindOneOptions } from "typeorm";
 
 
 export interface PopulateRequest {
@@ -11,11 +11,19 @@ export interface PopulateRequest {
 
 
 
-export interface _argsFind<T = any> {
+export interface _argsFind_I<T = any> {
     findObject: FindOneOptions<T>;
     // populate?: PopulateRequest[];
-    relations?: string[];
-    select?: any;
+    // relations?: string[];
+    // select?: any;
+    // order?: any;
+}
+
+export interface _argsFindMany_I<T = any> {
+    findObject: FindManyOptions<T>;
+    // relations?: string[];
+    // select?: any;
+    // order?: any;
 }
 
 export interface _argsFindByText {

@@ -84,8 +84,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         } else {
 
-            config_step_id = _.get(funnelLibrary_id, 'funnels_id[0].config_step_id', null);
-
             // Se eliminan los funnels que no vienen en el guardado
             const aux_funnelLibrary_id = funnelLibrary_id._id;
             const funnels_ids: string[] = data.map((funnel: FunnelBody_et) => funnel._id);
@@ -114,7 +112,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
             return this._FunnelBody_et_repository.create({
                 ...funnel,
                 _id: _.get(funnel, '_id', uuid.v4()),
-                config_step_id: config_step_id,
                 customizeProcess_step_id: funnel.customizeProcess_step_id,
                 funnelLibrary_id: funnelLibrary_id,
                 stages: funnel.stages.map(stage => {
@@ -207,25 +204,23 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
             if (aux_Response.statusCode === 200) {
 
-                if (aux_Response.data[0].funnels_id.length > 0) {
+                if (aux_Response.data[0].funnels_id?.length > 0) {
 
                     // TODO
                     // establecer un interface o tipo de dato en funnel que soporte string y entity para config_step_id y replicar ese metodo en otros lugares
                     let aux_funnels: FunnelBody_et[] = structuredClone(aux_Response.data[0].funnels_id);
 
-                    let config_step: ConfigPlanner_et = {} as ConfigPlanner_et;
+                    let config_step: ConfigPlanner_et = _.get(aux_Response.data[0], 'config_step_id', null);
 
-                    for (const [i, item] of aux_funnels.entries()) {
+                    if(config_step){
 
-                        if (item.config_step_id) {
-
-                            config_step = item.config_step_id;
-                            // item.config_step_id = config_step;
-
-                        }
-
-                        delete item.funnelLibrary_id;
+                    delete config_step.funnelLibrary_id;
                     }
+
+                    // for (const [i, item] of aux_funnels.entries()) {
+
+                    //     delete item.funnelLibrary_id;
+                    // }
 
                     _Response = {
                         ok: true,

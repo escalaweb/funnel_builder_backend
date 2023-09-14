@@ -1,8 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { EntityKey_et } from "../../../common/entities";
 import { FunnelBody_et } from "../../funnels/entities";
 import { DateProcessService } from "../../../common/adapters";
 import { User_et } from "../../users/entities";
+import { ConfigPlanner_et } from "../../planner/entities";
 
 
 @Entity({
@@ -15,13 +16,6 @@ export class FunnelLibrary_et extends EntityKey_et {
     })
     name?: string;
 
-    // @OneToMany(() => FunnelBody_et, funnel => funnel._id, { cascade: true })
-    // funnels?: FunnelBody_et[];
-
-
-    //   @OneToMany(() => FunnelBody_et, funnel => funnel.funnelLibrary, { cascade: true })
-    //   funnels: FunnelBody_et[];
-
     @OneToMany(() => FunnelBody_et, funnels => funnels.funnelLibrary_id, { cascade: true })
     funnels_id: FunnelBody_et[];
 
@@ -31,18 +25,18 @@ export class FunnelLibrary_et extends EntityKey_et {
     })
     createdAt?: string;
 
+    @OneToOne( () => ConfigPlanner_et, configStep => configStep.funnelLibrary_id )
+    @JoinColumn({
+        name: 'config_step_id'
+    })
+    config_step_id: ConfigPlanner_et;
+
+
     @Column({
         type: 'varchar',
         default: 0
     })
     updatedAt?: string;
-
-    // @Column({ type: 'varchar' })
-    // user_id?: string;
-
-    // @ManyToOne(() => User_et, user => user._id, { onDelete: 'CASCADE'  } )
-    // @JoinColumn({ name: 'user_id' })
-    // user?: User_et;
 
     @ManyToOne(
         () => User_et, (user) => user.funnelLibrary_id,
@@ -52,6 +46,5 @@ export class FunnelLibrary_et extends EntityKey_et {
         })
     @JoinColumn({ name: 'user_id' })
     user_id: User_et
-
 
 }

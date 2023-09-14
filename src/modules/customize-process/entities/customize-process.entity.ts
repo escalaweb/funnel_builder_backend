@@ -18,7 +18,14 @@ export class CustomizeProcess_et  extends EntityKey_et {
      @Column({
         type: 'jsonb',
     })
-    stages: Customize_Stage_I[]
+    stages: Customize_Stage_I[];
+
+    @Column({
+        type: "smallint",
+        default: 0,
+        nullable: true
+    })
+    pos?: number;
 
 
     @OneToOne(() => FunnelBody_et, { onDelete: 'CASCADE' })

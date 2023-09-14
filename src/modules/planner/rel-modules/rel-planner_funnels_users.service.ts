@@ -56,9 +56,6 @@ export class Rel_Planner_Funnels_Library_Users_Service {
 
         let _Response: _response_I<any>;
 
-        let funnels: FunnelBody_et[] = [];
-
-        console.log('busca', user);
 
         // TODO
         // Refactorizar a futuro la posibilidad de que sean más de un library funnel por usuario
@@ -66,9 +63,7 @@ export class Rel_Planner_Funnels_Library_Users_Service {
             return resp.data;
         });
 
-        console.log('funnelLibrary', funnelLibrary);
-
-        if (funnelLibrary.funnels_id === null || funnelLibrary.funnels_id?.length === 0) {
+        if ( !funnelLibrary || funnelLibrary === null) {
 
             _Response = {
                 ok: false,
@@ -86,24 +81,16 @@ export class Rel_Planner_Funnels_Library_Users_Service {
 
         }
 
-        // console.log('funnelLibrary', funnelLibrary);
-
-        const config_step_id: string = _.get(funnelLibrary, 'funnels_id[0].config_step_id._id', uuid.v4());
+        const config_step_id: string =  _.get(funnelLibrary, 'config_step_id._id', uuid.v4());
 
         const configPlanner: ConfigPlanner_et = await this._ConfigPlanner_et_repository.create({
             _id: config_step_id,
             dash: null,
-            toolsSettingsConfig: createPlannerDto.toolsSettingsConfig
+            toolsSettingsConfig: createPlannerDto.toolsSettingsConfig,
+            funnelLibrary_id: funnelLibrary
         })
 
-        console.log('funnelLibrary.funnels_id', funnelLibrary);
-
-        funnels = funnelLibrary.funnels_id.map(r => {
-            return {
-                ...r,
-                config_step_id: configPlanner,
-            };
-        });
+        funnelLibrary.config_step_id = configPlanner;
 
         await this._processData.process_create<ConfigPlanner_et>(this._ConfigPlanner_et_repository, configPlanner).then(response => {
 
@@ -114,16 +101,11 @@ export class Rel_Planner_Funnels_Library_Users_Service {
 
         })
 
-        await this._processData.process_create<FunnelBody_et>(this._FunnelBody_et_repository, funnels).then(response => {
+        await this._processData.process_create<FunnelLibrary_et>(this._FunnelLibrary_et_repository, funnelLibrary).then(response => {
 
             _Response = response;
 
-            // _Response.message = [
-            //     {
-            //         text: 'Datos de usuario guardados',
-            //         type: 'global'
-            //     }
-            // ]
+
 
         }, err => {
 
@@ -131,18 +113,6 @@ export class Rel_Planner_Funnels_Library_Users_Service {
             throw new HttpException(_Response, _Response.statusCode);
 
         })
-
-        // let args: _argsFind<ConfigPlanner_et> = {
-        //     findObject: {
-        //         where: {
-        //             _id: item.config_step_id._id
-        //         }
-        //     }
-        // }
-
-        // await this._processData.process_delete(this._ConfigPlanner_et_repository, args).then(resp => {
-
-        // })
 
 
         return _Response;

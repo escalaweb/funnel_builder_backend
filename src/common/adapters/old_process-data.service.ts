@@ -244,7 +244,6 @@ export class ProcessDataService extends TransactionSupport {
             //     { path: "user_id", model: "Users" },
             // ]);
 
-            // console.log('aaa', populatedPost);
 
             const conditions = this.generarObjeto(args.findObject);
 

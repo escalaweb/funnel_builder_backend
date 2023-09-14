@@ -3,7 +3,7 @@ import { PassportStrategy } from "@nestjs/passport";
 
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { _response_I } from "../../../common/interfaces";
-import { _argsFind } from "../../../common/interfaces/_responseFindParameters.interface";
+import { _argsFind_I } from "../../../common/interfaces/_responseFindParameters.interface";
 import { _Configuration_Keys } from "../../../config/config.keys";
 
 import { HttpService } from '@nestjs/axios';
@@ -88,7 +88,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             "tenant_id": payload["custom:tenantId"]
         }
 
-        const args: _argsFind = {
+        const args: _argsFind_I = {
             findObject: {
                 where: {
                     username_id: newPayload.username_id

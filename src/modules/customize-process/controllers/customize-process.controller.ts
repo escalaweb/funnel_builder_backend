@@ -18,7 +18,6 @@ export class CustomizeProcessController {
     @Auth()
     create(@Body() createCustomizeProcessDto: any, @Request() req: any) {
 
-        console.log('aaa');
 
         const user: AuthPayload_I = req.user;
         // return this.customizeProcessService.create(createCustomizeProcessDto);
@@ -26,11 +25,6 @@ export class CustomizeProcessController {
 
     }
 
-    @Get()
-    findAll() {
-        return 'pruebaaa';
-        // return this.customizeProcessService.findAll();
-    }
 
     // @Get(':id')
     // findOne(@Param('id') id: string) {

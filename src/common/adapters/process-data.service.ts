@@ -9,6 +9,7 @@ import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginat
 import { _paginatorModel_I } from '../interfaces/_response.interface';
 
 import * as _ from 'lodash';
+import { _argsFindMany_I } from '../interfaces/_responseFindParameters.interface';
 
 
 @Injectable()
@@ -260,7 +261,14 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
             let _resp: _response_I<T[]> = {} as _response_I<T[]>;
 
 
-            await this.process_getAll(Model, args).then((resp) => {
+            const args_all: _argsFindMany_I = {
+                findObject: {
+                    ...args.findObject
+                },
+
+            }
+
+            await this.process_getAll(Model, args_all).then((resp) => {
 
                 elements = resp.data;
 
@@ -369,18 +377,14 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
 
     }
 
-    async process_getAll<T>(Model: Repository<T>, args: _argsFind): Promise<_response_I<T[]>> {
+    async process_getAll<T>(Model: Repository<T>, args: _argsFindMany_I<any>): Promise<_response_I<T[]>> {
 
         return new Promise(async (resolve, reject) => {
 
 
-            await Model.find(
-                {
-                    where: args.findObject.where,
-                    relations: args.findObject.relations,
-                    select: args.findObject.select as any
-                }
-            ).then(resp => {
+            // console.log('argumentos finales', args);
+
+            await Model.find(args.findObject).then(resp => {
 
                 let msg: _responseMessage_I[] = [];
                 let _resp: _response_I<T[]> = {} as _response_I<T[]>;

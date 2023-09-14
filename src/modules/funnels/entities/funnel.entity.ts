@@ -21,6 +21,13 @@ export class FunnelBody_et extends EntityKey_et {
     name: string;
 
     @Column({
+        type: "smallint",
+        default: 0,
+        nullable: true
+    })
+    pos?: number;
+
+    @Column({
         type: "varchar",
     })
     type: FunnelStage_Item_Type;
@@ -38,16 +45,16 @@ export class FunnelBody_et extends EntityKey_et {
     })
     relations: FunnelRelationSwitch_I[];
 
-    @OneToOne(() => CustomizeProcess_et, CustomizeProcess => CustomizeProcess.funnel_id )
+    @OneToOne(() => CustomizeProcess_et, CustomizeProcess => CustomizeProcess.funnel_id)
     @JoinColumn({
         name: 'customizeProcess_step_id'
     })
     customizeProcess_step_id: CustomizeProcess_et;
 
 
-    @ManyToOne(() => ConfigPlanner_et, configStep => configStep.funnel_id)
-    @JoinColumn({ name: 'config_step_id' })
-    config_step_id?: ConfigPlanner_et;
+    // @ManyToOne(() => ConfigPlanner_et, configStep => configStep.funnel_id)
+    // @JoinColumn({ name: 'config_step_id' })
+    // config_step_id?: ConfigPlanner_et;
 
     @ManyToOne(() => FunnelLibrary_et, funnelLibrary => funnelLibrary.funnels_id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'funnelLibrary_id' }) // Esta columna se creará en la tabla de libros
@@ -92,18 +99,14 @@ export class FunnelBody_stages_et extends EntityKey_et {
     })
     tools: ToolSetting_I[];
 
-    // @ManyToOne(() => FunnelBody_et, funnel => funnel.stages, { onDelete: 'CASCADE' })
-    // funnel_id: FunnelBody_et;
+    @Column({
+        type: "smallint",
+        default: 0,
+        nullable: true
+    })
+    pos?: number;
 
-    // @Column({ type: 'varchar'})
-    // funnel_id?: string;
-
-    // @ManyToOne(() => FunnelBody_et, funnel => funnel.stages, { onDelete: 'CASCADE' } )
-    // @JoinColumn({ name: 'funnel_id' })
-    // funnel_id?: FunnelBody_et;
-
-
-    @ManyToOne(() => FunnelBody_et, funnel => funnel.stages, { onDelete: 'CASCADE' } )
+    @ManyToOne(() => FunnelBody_et, funnel => funnel.stages, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'funnel_id' })
     funnel_id?: FunnelBody_et;
 

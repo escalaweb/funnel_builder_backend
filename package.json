@@ -20,12 +20,9 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json",
+        "test:e2e": "jest --config ./test/jest-e2e.json"
 
-        "typeorm": "ts-node ./node_modules/typeorm/cli",
-        "typeorm:generate-mig": "typeorm -- -d src/database/orm.config.ts migration:generate src/database/migrations/%npm_config_name%",
-        "typeorm:run-migs": "typeorm migration:run -- -d src/database/orm.config.ts",
-        "typeorm:revert-mig":"typeorm migration:revert -- -d src/database/orm.config.ts"
+
 
     },
     "dependencies": {
@@ -50,6 +47,7 @@
         "class-transformer": "^0.5.1",
         "class-validator": "^0.13.0",
         "cognito-express": "^3.0.3",
+        "dotenv": "^16.3.1",
         "helmet": "^6.0.1",
         "jsonwebtoken": "^9.0.0",
         "jwk-to-pem": "^2.0.5",

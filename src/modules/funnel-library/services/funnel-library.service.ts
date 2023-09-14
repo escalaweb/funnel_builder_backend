@@ -97,9 +97,15 @@ export class FunnelLibraryService {
             findObject: {
                 where: {
                     "user_id._id": user._id
-                    // user_id: user._id
                 },
-                relations: ['user_id', 'funnels_id', 'funnels_id.stages', 'funnels_id.config_step_id', 'funnels_id.customizeProcess_step_id'],
+                relations: [
+                    'user_id',
+                    'config_step_id',
+                    'funnels_id',
+                    'funnels_id.stages',
+                    'funnels_id.customizeProcess_step_id'
+
+                ],
                 select: {
                     user_id: {
                         _id: true,
@@ -109,10 +115,16 @@ export class FunnelLibraryService {
 
                 },
                 order: {
-                    'funnels_id._id': 'DESC',
-                    'funnels_id.stages._id': 'DESC',
-                    'funnels_id.config_step_id._id': 'DESC',
-                    'funnels_id.customizeProcess_step_id._id': 'DESC'
+                    funnels_id: {
+                        pos: 'ASC',
+                        stages: {
+                            pos: 'ASC'
+                        },
+                        customizeProcess_step_id: {
+                            pos: 'ASC'
+                        }
+                    },
+
                 },
 
 
@@ -126,7 +138,6 @@ export class FunnelLibraryService {
         }
 
         await this._processData.process_getAll_paginate<FunnelLibrary_et>(this._FunnelLibrary_et_repository, args).then(async (resp) => {
-
             _Response = structuredClone(resp);
 
         }).catch((err) => {
@@ -198,7 +209,7 @@ export class FunnelLibraryService {
                 where: {
                     "user_id._id": user._id
                 },
-                relations: ['user_id', 'funnels_id', 'funnels_id.stages', 'funnels_id.config_step_id'],
+                relations: ['user_id', 'config_step_id', 'funnels_id', 'funnels_id.stages', 'funnels_id'],
                 select: {
                     user_id: {
                         _id: true,
