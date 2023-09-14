@@ -16,20 +16,27 @@ export class FunnelLibraryController {
   create(@Body() createFunnelLibraryDto: CreateFunnelLibraryDto, @Request() req: any) {
 
     const user: AuthPayload_I = req.user;
-    // return this.funnelLibraryService.create(createFunnelLibraryDto, user);
+    return this.funnelLibraryService.create(createFunnelLibraryDto, user);
 
   }
 
   @Get()
   findAll( @Request() req: any ) {
     const user: AuthPayload_I = req.user;
-    // return this.funnelLibraryService.findAll(user);
+    return this.funnelLibraryService.findAll(1, user);
   }
+
+//   @Get('initial')
+//   get_initial_funnel( @Request() req: any ) {
+//     const user: AuthPayload_I = req.user;
+//     return this.funnelLibraryService.get_initial_funnel(user);
+//   }
+
 
   @Get(':id')
   findOne(@Param('id') id: string,  @Request() req: any) {
     const user: AuthPayload_I = req.user;
-    // return this.funnelLibraryService.findOne(id, user);
+    return this.funnelLibraryService.findOne(id, user);
   }
 
   @Patch(':id')

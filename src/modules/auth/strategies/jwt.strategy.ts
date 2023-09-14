@@ -16,9 +16,9 @@ import * as jwkToPem from 'jwk-to-pem';
 
 import { UsersService } from "../../users/services/users.service";
 import { User_I } from "../../users/interfaces";
-import * as dynamoose from 'dynamoose';
 import { FindOneOptions } from "typeorm";
-import { User_Ety } from "../../users/models/entities";
+
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -34,10 +34,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKeyProvider: (_, token, done) => {
 
-                const aws_region: string = this._configService.get(_Configuration_Keys.REGION),
-                    aws_userPool: string = this._configService.get(_Configuration_Keys.USERPOOLID);
+                // console.log('jwt.decode(token)', jwt.decode(token));
 
-                const jwksUri = `https://cognito-idp.${aws_region}.amazonaws.com/${aws_userPool}/.well-known/jwks.json`;
+                const jwksUri = `${jwt.decode(token)['iss']}/.well-known/jwks.json`;
 
                 this.httpService
                     .get(jwksUri)
@@ -73,68 +72,52 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                             done(err.message, null);
                         },
                     });
+
+
             },
         });
     }
 
     async validate(payload: CognitoPayload_I) {
 
-        console.log('el payload completo', payload);
-
         let newPayload: AuthPayload_I = {
             "_id": '',
             "username_id": payload["sub"],
+            "name": payload["name"],
+            "email": payload["email"],
+            "tenant_id": payload["custom:tenantId"]
         }
 
-        // await this._usersService.findOneByTerm({
-        //     username_id: newPayload.username_id,
-        // }).then(async (response) => {
+        const args: _argsFind = {
+            findObject: {
+                where: {
+                    username_id: newPayload.username_id
+                }
+            }
+        }
 
-        //     console.log('response', response);
+        await this._usersService.findOne(args).then(async (response) => {
 
-        //     if (response.statusCode != 200 || (response.data === undefined || response.data === null)) {
+            if ( (response.statusCode != 200 ) || (response.data === undefined || response.data === null)) {
 
-        //         await this._usersService.create({
-        //             username_id: newPayload.username_id,
-        //         }).then();
+                await this._usersService.create({
+                    username_id: newPayload.username_id,
+                    name: newPayload.name,
+                    email: newPayload.email,
+                    tenant_id: newPayload.tenant_id,
+                }).then(resp => {
 
-        //     } else {
+                        newPayload._id = resp.data._id;
 
-        //         newPayload._id = response.data._id;
+                });
 
-        //     }
+            } else {
 
-        // });
+                newPayload._id = response.data._id;
 
-        // const args: _argsFind<FindOneOptions> = {
-        //     findObject: {
-        //         where: {
-        //             username_id: newPayload.username_id
-        //         }
-        //     }
-        // }
+            }
 
-        // await this._usersService.findOne(args).then(async (response) => {
-
-        //     if (response.statusCode != 200 || (response.data === undefined || response.data === null)) {
-
-        //         let user: User_I = {
-        //             username_id: newPayload.username_id,
-        //         }
-
-        //         await this._usersService.create({
-        //             username_id: newPayload.username_id,
-        //         }).then();
-
-
-        //     } else {
-
-        //         newPayload._id = response.data._id;
-
-        //     }
-
-        // })
-
+        })
 
         return newPayload;
 

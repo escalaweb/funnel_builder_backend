@@ -8,6 +8,8 @@
 pruebas.html
 pruebas.json
 
+/env
+
 .env
 .env.prod
 .env.staging
@@ -16,6 +18,8 @@ pruebas.json
 .build
 
 pruebas.js
+
+/postgres
 
 /dynamodb-data
 

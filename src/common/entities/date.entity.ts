@@ -1,7 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { DateProcessService } from "../adapters";
-import { EntityKey_Ety } from ".";
-import { DateTypeModel_I } from "../schemas/date.schema";
+import { EntityKey_et } from ".";
 
 
 const _dateService = new DateProcessService();
@@ -21,7 +20,7 @@ export class _blank_dateTypeModel {
     type: string;
 
     constructor(
-        date = "",
+        date = '',
         type = "Date"
     ) {
 

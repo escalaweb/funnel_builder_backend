@@ -1,16 +1,17 @@
 
-version: '3'
+version: '3.8'
 
 services:
-  funnel_escala_db:
-    image: postgres:15.4-alpine3.18
+  db_local:
+    image: postgres:13.12-alpine3.18
     restart: always
     ports:
-      - "3350:3306"
+      - "5432:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-    container_name: funnel_escala_db
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    container_name: db_local
     volumes:
-      - ./mysql:/var/lib/mysql
+      - ./postgres:/var/lib/postgresql/data
+
 

@@ -20,10 +20,9 @@ export class ConfigProjectService {
         private readonly _configService: ConfigService
     ) {
 
-        let path: string = `${process.cwd()}/src/config/env/`;
+        let path: string = `${process.cwd()}/env/`;
         let isEnviroment: typeEnviroments = 'none';
 
-        console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 
         switch (process.env.NODE_ENV) {
 
@@ -35,15 +34,15 @@ export class ConfigProjectService {
 
                 break;
             case "staging":
-                // isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+                isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
                 dotenv.config({ path: path + ".env.staging" })
                 this.envConfig = parse(fs.readFileSync(path + ".env.staging"));
 
                 break;
             case "production":
                 // isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
-                dotenv.config({ path: path + ".env.prod" })
-                this.envConfig = parse(fs.readFileSync(path + ".env.prod"));
+                // dotenv.config({ path: path + ".env.prod" })
+                // this.envConfig = parse(fs.readFileSync(path + ".env.prod"));
 
                 break;
 

@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 // import { _MONGOOSEMODULE } from "../database/mongo-config";
 import { EnvConfigurations } from "./app.config";
 import { ConfigProjectService } from "./config.service";
-import { _MYSQL_CONNECTION_MODULE } from '../database/mysql-config';
+import { _POSTGRES_CONNECTION_MODULE } from '../database/postgres-config';
 // import { dynamoDBProvider } from '../database/dynamoose-config';
 // import { _MYSQL_CONNECTION_MODULE } from '../database/mysql-config';
 // import { DynamooseDbModule } from '../database/dynamoose-config';
@@ -12,11 +12,12 @@ import { _MYSQL_CONNECTION_MODULE } from '../database/mysql-config';
 @Global()
 @Module({
     imports: [
+
         ConfigModule.forRoot({
             load: [EnvConfigurations],
         }),
-        // _MYSQL_CONNECTION_MODULE
-        // _DYNAMOOSE_MODULE
+
+        _POSTGRES_CONNECTION_MODULE
 
 
 

@@ -59,3 +59,7 @@ async function bootstrap() {
 }
 bootstrap();
 
+
+
+// TODO
+// Refactorizar todos los metodos para ya no usar tipo any

@@ -8,23 +8,23 @@ export class DateProcessService {
 
     constructor() { }
 
-    setDate() {
+    setDate(): string {
 
-        const dateMoment = momentTimeZone().tz("America/Montevideo");
+        const dateMoment = momentTimeZone().tz("America/New_York");
         dateMoment.locale('es');
         return dateMoment.format('x');
 
     }
 
     getShortDate() {
-        let dateMoment = momentTimeZone().tz("America/Montevideo");
+        let dateMoment = momentTimeZone().tz("America/New_York");
         dateMoment.locale('es');
         return dateMoment.format('LL');
     }
 
     getDiffInDays(date: any) {
         date = this.convertHumanDateIntoSystemDate(date)
-        let dateMoment = momentTimeZone().tz("America/Montevideo");
+        let dateMoment = momentTimeZone().tz("America/New_York");
         dateMoment.locale('es');
         return dateMoment.diff(date, 'days');
     }
@@ -48,21 +48,21 @@ export class DateProcessService {
     }
 
     getBackpointInTime(days: number) {
-        let dateMoment = momentTimeZone().tz("America/Montevideo");
+        let dateMoment = momentTimeZone().tz("America/New_York");
         dateMoment.locale('es');
         return dateMoment.subtract(days, "days");
     }
 
     //funcion que me retorna fecha futura en base a dias
     getNextPointInTime(days: number) {
-        let dateMoment = momentTimeZone().tz("America/Montevideo");
+        let dateMoment = momentTimeZone().tz("America/New_York");
         dateMoment.locale('es');
         return dateMoment.add(days, 'days').format('LL');
     }
 
     getNextPointDate(days: number, date: string) {
         date = this.convertHumanDateIntoSystemDate(date)
-        let dateMoment = momentTimeZone(date).tz("America/Montevideo");
+        let dateMoment = momentTimeZone(date).tz("America/New_York");
         dateMoment.locale('es');
         return dateMoment.add(days, 'days').format('dddd,LL,h:mm A').split(',');
     }

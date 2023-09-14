@@ -5,10 +5,15 @@ import { _paginatorModel_I } from "./_response.interface";
 
 const Config = new ConfigService();
 
-export interface _argsPagination<T = any> {
+export interface _argsPagination {
 
-    findObject: T | {};
-    options?: IPaginationOptions
+    findObject: {
+        where?: any,
+        relations?: string[],
+        select?: any,
+        order?: any,
+    };
+    options?: IPaginationOptions,
     // options?: _dataPaginator;
 
 }

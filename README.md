@@ -23,14 +23,14 @@ $ yarn install
 ### 2. Set .env file
 
 ```
-Copy the .env.template file and rename it
+For dev in localhost, Copy the .env.template file and rename it
 as .env to initialize your environment variables
 ```
 
 ### 3. Create and initialize the database with docker
 
 ```bash
-$ docker-compose up -d
+$ docker-compose --env-file ./env/.env up -d
 ```
 
 ### 4. Start project
@@ -94,3 +94,9 @@ Optionally, I remove obsolete images:
 docker image prune
 ```
 
+# Database setup and Migrations
+
+### 1. Generate migration
+```
+npx ts-node ./node_modules/typeorm/cli.js migration:generate -n {$name_version_migration}
+```

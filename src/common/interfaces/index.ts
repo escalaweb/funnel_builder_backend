@@ -13,3 +13,5 @@ export { connectedClients_I } from "./_socketsHandlers.interface";
 
 
 export * from "./_responsePaginator.interface";
+
+export * from "./_typeORM.interfaces";

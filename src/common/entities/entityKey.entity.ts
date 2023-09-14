@@ -1,9 +1,16 @@
-import { PrimaryGeneratedColumn } from "typeorm";
+import { Column, PrimaryGeneratedColumn } from "typeorm";
 
 
-export class EntityKey_Ety {
+export class EntityKey_et {
 
     @PrimaryGeneratedColumn("uuid")
-    _id: string;
+    _id?: string;
+
+    @Column({
+        type: "smallint",
+        default: 0
+    })
+    __v?: number;
+
 
 }
