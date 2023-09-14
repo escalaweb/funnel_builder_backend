@@ -23,20 +23,6 @@ export class UsersService {
 
     }
 
-
-    async test(){
-
-        await this.create({
-            username_id: "ewqdsdsdf_2",
-            tenant_id: "ewqdsdsdf_2",
-            name: 'name',
-            email: 'email',
-        }).then( resp => {
-            console.log('creado', resp);
-        })
-
-    }
-
     async test_transaction() {
 
         // await this.dataSource.manager.transaction(async (transactionalEntityManager: EntityManager) => {
@@ -77,6 +63,63 @@ export class UsersService {
 
 
     }
+
+
+
+    async delete_user(_id: string): Promise<_response_I<User_et>> {
+
+        let _Response: _response_I<User_et>;
+
+        let user: User_et;
+
+        await this.findOne({
+            findObject: {
+                where: {
+                    _id: _id
+
+                }
+            }
+        }).then(async (resp) => {
+
+            if(resp.statusCode !== 200){
+                _Response = resp;
+                throw new HttpException(_Response, _Response.statusCode);
+
+            }
+
+            user = resp.data;
+
+
+        })
+
+
+        await this._processData.process_delete<User_et>(this._Users_et_repository, {
+            findObject: {
+                where: {
+                    _id: user._id
+                }
+            }
+        }).then(response => {
+
+            _Response = response;
+            _Response.data = user;
+
+        }, err => {
+            _Response = err;
+            _Response.message = [
+                {
+                    text: 'Error al eliminar usuario',
+                    type: 'global'
+                }
+            ]
+            throw new HttpException(_Response, _Response.statusCode);
+        })
+
+        return _Response;
+
+    }
+
+
 
     async create(data: User_et): Promise<_response_I<User_et>> {
 
@@ -125,6 +168,16 @@ export class UsersService {
 
             _Response = resp;
 
+            if(_Response.statusCode != 200){
+                _Response.message = [
+                    {
+                        text: 'No se encontró un usuario con este id',
+                        type: 'global'
+                    }
+                ]
+                   throw new HttpException(_Response, _Response.statusCode);
+            }
+
             _Response.message = [
                 {
                     text: 'Usuario obtenido',
@@ -132,24 +185,19 @@ export class UsersService {
                 }
             ]
 
-        }).catch((err) => {
+            return _Response;
+
+        }, (err) => {
 
             _Response = {
-                ok: false,
-                statusCode: 404,
-                data: null,
-                err: err,
-                message: [
-                    {
-                        text: 'El id o termino especificado, no es válido',
-                        type: 'global'
-                    }
-                ]
+               ...err
             }
 
-            // throw new HttpException(_Response, _Response.statusCode);
+
+            throw new HttpException(_Response, _Response.statusCode);
 
         });
+
 
         return _Response;
 
@@ -175,7 +223,7 @@ export class UsersService {
 
             _Response = structuredClone(resp);
 
-        }).catch((err) => {
+        }, (err) => {
             _Response = err;
 
             throw new HttpException(_Response, _Response.statusCode);
@@ -186,36 +234,37 @@ export class UsersService {
     }
 
 
-    async findOneByTerm(term: any) : Promise<_response_I<User_et>> {
+    async findOneByTerm(term: any): Promise<_response_I<User_et>> {
 
-           let _Response: _response_I<User_et>;
+        let _Response: _response_I<User_et>;
 
-           let args: _argsFind = {
-               findObject: {
-                   ...term
-               }
-           }
+        let args: _argsFind = {
+            findObject: {
+                ...term
+            }
+        }
 
-           await this._processData.process_getOne<User_et>(this._Users_et_repository, args).then(response => {
+        await this._processData.process_getOne<User_et>(this._Users_et_repository, args).then(response => {
 
-               _Response = response;
+            _Response = response;
 
-               _Response.message = [
-                   {
-                       text: 'Usuario obtenido',
-                       type: 'global'
-                   }
-               ]
+            _Response.message = [
+                {
+                    text: 'Usuario obtenido',
+                    type: 'global'
+                }
+            ]
 
-           }, err => {
-               _Response = err;
+        }, err => {
+            _Response = err;
 
-               // throw new HttpException(_Response, _Response.statusCode);
-           })
+            // throw new HttpException(_Response, _Response.statusCode);
+        })
 
-           return _Response;
+        return _Response;
 
     }
+
 
 
 

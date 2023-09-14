@@ -97,6 +97,12 @@ export class Rel_Planner_Funnels_Library_Users_Service {
         }, err => {
 
             _Response = err;
+            _Response.message = [
+                {
+                    text: 'Error al crear el configurador del embudo',
+                    type: 'global'
+                }
+            ]
             throw new HttpException(_Response, _Response.statusCode);
 
         })
@@ -105,11 +111,15 @@ export class Rel_Planner_Funnels_Library_Users_Service {
 
             _Response = response;
 
-
-
         }, err => {
 
             _Response = err;
+            _Response.message = [
+                {
+                    text: 'Error al actualizar el funnel library',
+                    type: 'global'
+                }
+            ]
             throw new HttpException(_Response, _Response.statusCode);
 
         })

@@ -152,7 +152,7 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
                 err: error,
                 message: [
                     {
-                        text: 'Algo ha salido mal intente más tarde',
+                        text: 'Error al guardar el proceso comercial',
                         type: 'global'
                     }
                 ]

@@ -35,36 +35,36 @@ export class AuthController {
 
     }
 
-    // @Get('envs')
-    // // @Auth()
-    // async envs() {
+    @Post('envs')
+    @Auth()
+    async envs() {
 
-    //     const _config = new ConfigProjectService(new ConfigService());
-    //     let envs = {
-    //         host: _config._get(_Configuration_Keys.DB_HOST),
-    //     port: Number(_config._get(_Configuration_Keys.DB_PORT)),
-    //     database: _config._get(_Configuration_Keys.DB_NAME),
-    //     username: _config._get(_Configuration_Keys.DB_USERNAME),
-    //     password: _config._get(_Configuration_Keys.DB_PASSWORD),
-    //     }
+        const _config = new ConfigProjectService(new ConfigService());
+        let envs = {
+            // host: _config._get(_Configuration_Keys.DB_HOST),
+            PORT: _config._get(_Configuration_Keys.PORT),
+            LOG_LEVEL: _config._get(_Configuration_Keys.LOG_LEVEL),
+            ENVIROMENT: _config._get(_Configuration_Keys.ENVIROMENT),
 
-    //      let _Response: _response_I<any> = {
-    //         ok: true,
-    //         data: {
-    //             ...envs
-    //         },
-    //         message: [
-    //             {
-    //                 text: 'prueba envs',
-    //                 type: 'global'
-    //             }
-    //         ],
-    //         statusCode: 200,
+        }
 
-    //      };
-    //    return _Response;
+         let _Response: _response_I<any> = {
+            ok: true,
+            data: {
+                ...envs
+            },
+            message: [
+                {
+                    text: 'prueba envs',
+                    type: 'global'
+                }
+            ],
+            statusCode: 200,
 
-    // }
+         };
+       return _Response;
+
+    }
 
 
     // @Get('status')

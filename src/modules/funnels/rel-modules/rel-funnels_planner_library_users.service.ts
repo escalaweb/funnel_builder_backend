@@ -138,7 +138,13 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         }, err => {
             _Response = err;
-            console.log('err', err);
+            _Response.message = [
+                {
+                    text: 'Error al guardar datos de funnels',
+                    type: 'global'
+                }
+            ]
+            // console.log('err', err);
             throw new HttpException(_Response, _Response.statusCode);
         })
 
