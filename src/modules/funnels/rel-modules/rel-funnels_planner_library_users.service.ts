@@ -112,13 +112,13 @@ export class Rel_Funnels_Planner_Library_Users_Service {
             return this._FunnelBody_et_repository.create({
                 ...funnel,
                 _id: _.get(funnel, '_id', uuid.v4()),
-                customizeProcess_step_id: funnel.customizeProcess_step_id,
+                // customizeProcess_step_id: funnel.customizeProcess_step_id,
                 funnelLibrary_id: funnelLibrary_id,
                 stages: funnel.stages.map(stage => {
-                    return {
+                    return this._FunnelBody_stages_et_repository.create({
                         ...stage,
                         funnel_id: funnel,
-                    }
+                    })
                 })
             });
         });
