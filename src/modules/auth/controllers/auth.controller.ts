@@ -6,6 +6,7 @@ import { _response_I } from "../../../common/interfaces";
 import { _Configuration_Keys } from "../../../config/config.keys";
 import { ConfigProjectService } from "../../../config/config.service";
 import { ConfigService } from "@nestjs/config";
+import { getConnection } from "typeorm";
 
 // @ApiTags('Auth')
 @Controller('auth')
@@ -18,7 +19,7 @@ export class AuthController {
     @Auth()
     async registerUser() {
 
-         let _Response: _response_I<any> = {
+        let _Response: _response_I<any> = {
             ok: true,
             data: 'Hola mundo',
             message: [
@@ -29,41 +30,57 @@ export class AuthController {
             ],
             statusCode: 200,
 
-         };
-       return _Response;
+        };
+        return _Response;
 
     }
 
-    @Get('envs')
-    // @Auth()
-    async envs() {
+    // @Get('envs')
+    // // @Auth()
+    // async envs() {
 
-        const _config = new ConfigProjectService(new ConfigService());
-        let envs = {
-            host: _config._get(_Configuration_Keys.DB_HOST),
-        port: Number(_config._get(_Configuration_Keys.DB_PORT)),
-        database: _config._get(_Configuration_Keys.DB_NAME),
-        username: _config._get(_Configuration_Keys.DB_USERNAME),
-        password: _config._get(_Configuration_Keys.DB_PASSWORD),
-        }
+    //     const _config = new ConfigProjectService(new ConfigService());
+    //     let envs = {
+    //         host: _config._get(_Configuration_Keys.DB_HOST),
+    //     port: Number(_config._get(_Configuration_Keys.DB_PORT)),
+    //     database: _config._get(_Configuration_Keys.DB_NAME),
+    //     username: _config._get(_Configuration_Keys.DB_USERNAME),
+    //     password: _config._get(_Configuration_Keys.DB_PASSWORD),
+    //     }
 
-         let _Response: _response_I<any> = {
-            ok: true,
-            data: {
-                ...envs
-            },
-            message: [
-                {
-                    text: 'prueba envs',
-                    type: 'global'
-                }
-            ],
-            statusCode: 200,
+    //      let _Response: _response_I<any> = {
+    //         ok: true,
+    //         data: {
+    //             ...envs
+    //         },
+    //         message: [
+    //             {
+    //                 text: 'prueba envs',
+    //                 type: 'global'
+    //             }
+    //         ],
+    //         statusCode: 200,
 
-         };
-       return _Response;
+    //      };
+    //    return _Response;
 
-    }
+    // }
+
+
+    // @Get('status')
+    // async checkDatabaseConnection() {
+    //     try {
+    //         const connection = getConnection(); // Esto asume que tienes una única conexión en tu aplicación
+
+    //         if (connection.isConnected) {
+    //             return { status: 'connected' };
+    //         } else {
+    //             return { status: 'disconnected' };
+    //         }
+    //     } catch (error) {
+    //         return { status: 'error', error: error.message };
+    //     }
+    // }
 
 
 }

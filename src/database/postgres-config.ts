@@ -16,10 +16,10 @@ export const _POSTGRES_CONNECTION_MODULE = TypeOrmModule.forRootAsync({
         database: _config._get(_Configuration_Keys.DB_NAME),
         username: _config._get(_Configuration_Keys.DB_USERNAME),
         password: _config._get(_Configuration_Keys.DB_PASSWORD),
-        entities: [],
+        // entities: [],
+        synchronize: true,
         autoLoadEntities: true,
 
-        // synchronize: true,
     })
 
 }
