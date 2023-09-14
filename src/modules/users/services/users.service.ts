@@ -134,11 +134,11 @@ export class UsersService {
 
         }).catch((err) => {
 
-            let _Response: _response_I<any> = {
+            _Response = {
                 ok: false,
                 statusCode: 404,
                 data: null,
-                // err: err,
+                err: err,
                 message: [
                     {
                         text: 'El id o termino especificado, no es válido',
@@ -147,7 +147,7 @@ export class UsersService {
                 ]
             }
 
-            throw new HttpException(_Response, _Response.statusCode);
+            // throw new HttpException(_Response, _Response.statusCode);
 
         });
 
