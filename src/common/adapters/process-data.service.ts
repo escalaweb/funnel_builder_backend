@@ -30,12 +30,11 @@ export class ProcessDataService {
         return new Promise(async (resolve, reject) => {
 
             await Model.delete({ ...args.findObject.where as any }).then(resp => {
-                console.log('a eliminar', args);
-                console.log('eliminado', resp);
+
                 let _resp: _response_I<T> = {
                     ok: true,
                     statusCode: 200,
-                    data: null,
+                    data: args.findObject.where as any,
                     message: [
                         {
                             text: 'Elemento removido correctamente',
@@ -483,7 +482,7 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
                     _resp = {
                         ok: true,
                         statusCode: 404,
-                        data: { ...resp },
+                        data: null,
                         message: msg
                     }
 

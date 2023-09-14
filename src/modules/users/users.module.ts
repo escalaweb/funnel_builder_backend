@@ -8,7 +8,7 @@ import { USER_ENTITIES_MODULE } from './entities/entities.module';
 
 
 @Module({
-    // controllers: [UsersController],
+    controllers: [UsersController],
     imports: [
 
         USER_ENTITIES_MODULE,
