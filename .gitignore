@@ -8,7 +8,7 @@
 pruebas.html
 pruebas.json
 
-/env
+# /env
 
 .env
 .env.prod
