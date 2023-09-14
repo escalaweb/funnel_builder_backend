@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 
 import { ExtractJwt, Strategy } from "passport-jwt";
@@ -15,10 +15,9 @@ import { AuthPayload_I, CognitoPayload_I } from "../interfaces/_jwt-payload.inte
 import * as jwkToPem from 'jwk-to-pem';
 
 import { UsersService } from "../../users/services/users.service";
-import { User_I } from "../../users/interfaces";
-import { FindOneOptions } from "typeorm";
 
 import * as jwt from 'jsonwebtoken';
+import { User_et } from "../../users/entities";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -98,17 +97,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
         await this._usersService.findOne(args).then(async (response) => {
 
-            if ( (response.statusCode != 200 ) || (response.data === undefined || response.data === null)) {
+            if ((response.statusCode != 200) || (response.data === undefined || response.data === null)) {
 
-                await this._usersService.create({
-                    username_id: newPayload.username_id,
-                    name: newPayload.name,
-                    email: newPayload.email,
-                    tenant_id: newPayload.tenant_id,
-                }).then(resp => {
 
-                        newPayload._id = resp.data._id;
-
+                await this.register_user(newPayload).then(resp => {
+                    newPayload._id = resp._id;
                 });
 
             } else {
@@ -117,9 +110,43 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
             }
 
+        }, async (err) => {
+
+            await this.register_user(newPayload).then(resp => {
+
+                newPayload._id = resp._id;
+
+            }, err => {
+                throw new HttpException(err, err.statusCode);
+            });
+
         })
 
         return newPayload;
+
+    }
+
+    async register_user(payload: AuthPayload_I): Promise<User_et> {
+
+        return new Promise(async (resolve, reject) => {
+
+            await this._usersService.create({
+                username_id: payload.username_id,
+                name: payload.name,
+                email: payload.email,
+                tenant_id: payload.tenant_id,
+            }).then(resp => {
+
+                resolve(resp.data);
+
+            }, err => {
+
+                reject(err);
+
+            });
+
+
+        })
 
     }
 
