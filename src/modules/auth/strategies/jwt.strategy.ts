@@ -87,7 +87,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             "tenant_id": payload["custom:tenantId"]
         }
 
-        /*
         const args: _argsFind_I = {
             findObject: {
                 where: {
@@ -122,7 +121,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             });
 
         })
-        */
         return newPayload;
 
     }
