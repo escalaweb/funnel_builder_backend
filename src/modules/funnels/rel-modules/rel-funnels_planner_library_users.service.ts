@@ -70,7 +70,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         funnelLibrary_id = (await this._FunnelLibraryService.findAll(1, user).then()).data[0] || null;
 
-        let config_step_id: any;
 
         if (funnelLibrary_id === null) {
 
@@ -107,6 +106,47 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         }
 
+        /*
+         stages: funnel.stages.map(stage => {
+                    return this._FunnelBody_stages_et_repository.create({
+                        ...stage,
+                        funnel_id: funnel,
+                    })
+                })
+        */
+
+        let stages: FunnelBody_stages_et[] = [];
+        /*
+         data.map((funnel: FunnelBody_et) => {
+            return funnel.stages.map(stage => {
+                return this._FunnelBody_stages_et_repository.create({
+                    ...stage,
+                    _id: _.get(stage, '_id', uuid.v4()),
+                    funnel_id: funnel,
+                });
+
+            })
+
+        })
+        */
+
+        for (const [i, item] of data.entries()) {
+
+            for (const [_i, _item] of item.stages.entries()) {
+
+                let aux: any = this._FunnelBody_stages_et_repository.create({
+                    ..._item,
+                    _id: _.get(_item, '_id', uuid.v4()),
+                    funnel_id: item,
+                });
+
+                stages.push(aux)
+
+            }
+
+        }
+
+
         let funnels: FunnelBody_et[] = data.map((funnel: FunnelBody_et) => {
 
             return this._FunnelBody_et_repository.create({
@@ -114,39 +154,87 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                 _id: _.get(funnel, '_id', uuid.v4()),
                 // customizeProcess_step_id: funnel.customizeProcess_step_id,
                 funnelLibrary_id: funnelLibrary_id,
-                stages: funnel.stages.map(stage => {
-                    return this._FunnelBody_stages_et_repository.create({
-                        ...stage,
-                        funnel_id: funnel,
-                    })
-                })
+
             });
         });
 
         funnelLibrary_id.funnels_id = [...funnels];
 
-        await this._processData.process_create<FunnelLibrary_et>(this._FunnelLibrary_et_repository, funnelLibrary_id).then(response => {
+        const queryRunner = this.dataSource.createQueryRunner();
 
-            _Response = response;
+        await queryRunner.connect();
 
-            _Response.message = [
-                {
-                    text: 'Datos de usuario guardados',
-                    type: 'global'
-                }
-            ]
+        await queryRunner.startTransaction();
 
-        }, err => {
-            _Response = err;
-            _Response.message = [
-                {
-                    text: 'Error al guardar datos de funnels',
-                    type: 'global'
-                }
-            ]
-            // console.log('err', err);
-            throw new HttpException(_Response, _Response.statusCode);
-        })
+        try {
+
+            await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
+
+            await queryRunner.manager.save(FunnelBody_stages_et, stages);
+
+            await queryRunner.commitTransaction();
+            await queryRunner.release();
+
+            _Response = {
+                ok: true,
+                statusCode: 201,
+                data: {
+                    funnelLibrary_id: funnelLibrary_id,
+                    stages: stages
+                } as any,
+                message: [
+                    {
+                        text: 'Datos de embudos guardados',
+                        type: 'global'
+                    }
+                ]
+            }
+
+
+        } catch (error) {
+
+            console.log('error', error);
+
+            await queryRunner.rollbackTransaction();
+            await queryRunner.release();
+
+            _Response = {
+                ok: false,
+                statusCode: 400,
+                data: null,
+                err: error,
+                message: [
+                    {
+                        text: 'Error al guardar datos de embudos',
+                        type: 'global'
+                    }
+                ]
+            }
+
+        }
+
+        // await this._processData.process_create<FunnelLibrary_et>(this._FunnelLibrary_et_repository, funnelLibrary_id).then(response => {
+
+        //     _Response = response;
+
+        //     _Response.message = [
+        //         {
+        //             text: 'Datos de embudos guardados',
+        //             type: 'global'
+        //         }
+        //     ]
+
+        // }, err => {
+        //     _Response = err;
+        //     _Response.message = [
+        //         {
+        //             text: 'Error al guardar datos de funnels',
+        //             type: 'global'
+        //         }
+        //     ]
+        //     // console.log('err', err);
+        //     throw new HttpException(_Response, _Response.statusCode);
+        // })
 
         return _Response;
 
@@ -218,9 +306,9 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
                     let config_step: ConfigPlanner_et = _.get(aux_Response.data[0], 'config_step_id', null);
 
-                    if(config_step){
+                    if (config_step) {
 
-                    delete config_step.funnelLibrary_id;
+                        delete config_step.funnelLibrary_id;
                     }
 
                     // for (const [i, item] of aux_funnels.entries()) {
