@@ -3,7 +3,7 @@ version: '3.8'
 
 services:
   db_local:
-    image: postgres:13.12-alpine3.18
+    image: postgres:13.8
     restart: always
     ports:
       - "5432:5432"
