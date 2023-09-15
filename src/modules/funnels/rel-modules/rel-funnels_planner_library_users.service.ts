@@ -158,7 +158,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
             });
         });
 
-        funnelLibrary_id.funnels_id = [...funnels];
+        // funnelLibrary_id.funnels_id = [...funnels];
 
         const queryRunner = this.dataSource.createQueryRunner();
 
@@ -169,6 +169,8 @@ export class Rel_Funnels_Planner_Library_Users_Service {
         try {
 
             await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
+
+            await queryRunner.manager.save(FunnelBody_et, funnels);
 
             await queryRunner.manager.save(FunnelBody_stages_et, stages);
 
