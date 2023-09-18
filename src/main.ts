@@ -14,22 +14,23 @@ async function bootstrap() {
 
     const logger = new Logger('Bootstrap');
 
-    const allowedOrigins = Config.get(_Configuration_Keys.ALLOWEDORIGINS);
-
     app.use(helmet());
 
+    /*
+    */
+    // const allowedOrigins = Config.get(_Configuration_Keys.ALLOWEDORIGINS);
     app.enableCors({
         origin: function (origin, callback) {
             // allow requests with no origin
             // (like mobile apps or curl requests)
             if (!origin) return callback(null, true);
 
-            if (allowedOrigins.indexOf(origin) === -1) {
-                var msg =
-                    "Theeee CORS policy for this site does not " +
-                    "allow access from the specified Origin.";
-                return callback(new Error(msg), false);
-            }
+            // if (allowedOrigins.indexOf(origin) === -1) {
+            //     var msg =
+            //         "Theeee CORS policy for this site does not " +
+            //         "allow access from the specified Origin.";
+            //     return callback(new Error(msg), false);
+            // }
             return callback(null, true);
         },
     });
