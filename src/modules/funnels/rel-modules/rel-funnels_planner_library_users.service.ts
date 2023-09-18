@@ -152,13 +152,13 @@ export class Rel_Funnels_Planner_Library_Users_Service {
             return this._FunnelBody_et_repository.create({
                 ...funnel,
                 _id: _.get(funnel, '_id', uuid.v4()),
-                // customizeProcess_step_id: funnel.customizeProcess_step_id,
+                customizeProcess_step_id: null,
                 funnelLibrary_id: funnelLibrary_id,
 
             });
         });
 
-        // funnelLibrary_id.funnels_id = [...funnels];
+        funnelLibrary_id.funnels_id = [...funnels];
 
         const queryRunner = this.dataSource.createQueryRunner();
 
@@ -170,7 +170,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
             await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
 
-            await queryRunner.manager.save(FunnelBody_et, funnels);
+            // await queryRunner.manager.save(FunnelBody_et, funnels);
 
             await queryRunner.manager.save(FunnelBody_stages_et, stages);
 
@@ -247,8 +247,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         if (!funnel.customizeProcess_step_id || funnel.customizeProcess_step_id === null) {
 
-
-            // const funnelId: DeepPartial<FunnelBody_et> = { _id: funnel._id }; // Crear objeto    DeepPartial<FunnelBody_et> con el ID del FunnelBody_et
 
             return this._CustomizeProcess_et_repository.create(
                 {
