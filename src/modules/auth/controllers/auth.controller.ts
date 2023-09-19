@@ -11,9 +11,10 @@ import { getConnection } from "typeorm";
 // @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    constructor(
 
-    ) { }
+    constructor() {
+
+    }
 
     @Get()
     @Auth()
@@ -35,11 +36,12 @@ export class AuthController {
 
     }
 
+    /*
     @Post('envs')
     @Auth()
     async envs() {
 
-        const _config = new ConfigProjectService(new ConfigService());
+        const _config = new ConfigProjectService();
         let envs = {
             // host: _config._get(_Configuration_Keys.DB_HOST),
             PORT: _config._get(_Configuration_Keys.PORT),
@@ -65,6 +67,8 @@ export class AuthController {
        return _Response;
 
     }
+
+    */
 
 
     // @Get('status')

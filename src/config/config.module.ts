@@ -26,10 +26,8 @@ import { _POSTGRES_CONNECTION_MODULE } from '../database/postgres-config';
         {
             provide: ConfigProjectService,
             useValue: new ConfigProjectService(
-                new ConfigService()
             ),
         },
-        // dynamoDBProvider
     ],
     exports: [ConfigProjectService],
 })
