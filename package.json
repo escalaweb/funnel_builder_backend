@@ -1,6 +1,6 @@
 {
     "name": "fb_backend_escala",
-    "version": "1.0.2",
+    "version": "1.0.5",
     "description": "",
     "author": "",
     "private": true,
@@ -20,11 +20,17 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json"
+        "test:e2e": "jest --config ./test/jest-e2e.json",
 
-
-
+        "typeorm": "cross-env ts-node ./node_modules/typeorm/cli",
+        "typeorm:run-mig": "cross-env npm run typeorm migration:run -- -d ./src/database/typeOrm.config.ts",
+        "typeorm:generate-mig": "cross-env npm run typeorm -- -d ./src/database/typeOrm.config.ts migration:generate ./src/database/migrations/%npm_config_name%",
+        "typeorm:create-mig": "cross-env npm run typeorm -- migration:create ./src/database/migrations/%npm_config_name%",
+        "typeorm:revert-mig": "cross-env npm run typeorm -- -d ./src/database/typeOrm.config.ts migration:revert"
     },
+
+
+
     "dependencies": {
         "@nestjs/axios": "^3.0.0",
         "@nestjs/common": "^9.0.0",
@@ -107,7 +113,7 @@
         "ts-jest": "29.0.3",
         "ts-loader": "^9.4.4",
         "ts-node": "^10.0.0",
-        "tsconfig-paths": "4.1.1",
+        "tsconfig-paths": "^4.2.0",
         "typescript": "^4.9.5",
         "webpack": "^5.88.2"
     },

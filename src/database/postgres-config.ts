@@ -4,7 +4,7 @@ import { _Configuration_Keys } from "../config/config.keys";
 import { ConfigProjectService } from "../config/config.service";
 
 
-const _config = new ConfigProjectService(new ConfigService());
+const _config = new ConfigProjectService();
 
 export const _POSTGRES_CONNECTION_MODULE = TypeOrmModule.forRootAsync({
     imports: [ConfigModule],
@@ -24,6 +24,8 @@ export const _POSTGRES_CONNECTION_MODULE = TypeOrmModule.forRootAsync({
 
 }
 );
+
+
 
 
 

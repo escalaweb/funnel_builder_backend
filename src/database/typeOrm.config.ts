@@ -1,39 +1,28 @@
-import { ConfigService } from "@nestjs/config";
+import { DataSource } from "typeorm";
 import { _Configuration_Keys } from "../config/config.keys";
 import { ConfigProjectService } from "../config/config.service";
-
-import { DataSource } from 'typeorm';
-import { config } from "dotenv";
-import { FunnelLibrary_et } from "../modules/funnel-library/entities";
-import { FunnelBody_et, FunnelBody_stages_et } from "../modules/funnels/entities";
-import { ConfigPlanner_et } from "../modules/planner/entities";
-import { CustomizeProcess_et } from '../modules/customize-process/entities/customize-process.entity';
-import { User_et } from "../modules/users/entities";
-
-
+import { config } from 'dotenv';
+import { ConfigService } from "@nestjs/config";
 
 config();
 
-const _config = new ConfigProjectService(new ConfigService());
+// const _config = new ConfigProjectService();
+
+const configService = new ConfigService();
 
 export default new DataSource({
+
     type: 'postgres',
-    host: _config._get(_Configuration_Keys.DB_HOST),
-    port: Number(_config._get(_Configuration_Keys.DB_PORT)),
-    database: _config._get(_Configuration_Keys.DB_NAME),
-    username: _config._get(_Configuration_Keys.DB_USERNAME),
-    password: _config._get(_Configuration_Keys.DB_PASSWORD),
-    entities: [
-        User_et,
-        FunnelLibrary_et,
-        FunnelBody_et,
-        FunnelBody_stages_et,
-        ConfigPlanner_et,
-        CustomizeProcess_et
-    ]
-    // entities: ['src/**/**/*.entity.ts'],
-    // migrations: ['src/database/migrations/*{.ts,.js}'],
-    // synchronize: true,
-    // autoLoadEntities: true,
+    host: configService.get(_Configuration_Keys.DB_HOST) || 'localhost',
+    port: Number(configService.get(_Configuration_Keys.DB_PORT)) || 5432,
+    database: configService.get(_Configuration_Keys.DB_NAME) || 'local_funnel_builder_escala',
+    username: configService.get(_Configuration_Keys.DB_USERNAME) || 'postgres',
+    password: configService.get(_Configuration_Keys.DB_PASSWORD) || 'fb_escala_Hj2pMV*',
+
+    entities: ["dist/**/*.entity{.ts,.js}"],
+
+    migrations: ["dist/config/migrations/*{.ts,.js}"],
+    migrationsTableName: "_migrations",
 
 });
+

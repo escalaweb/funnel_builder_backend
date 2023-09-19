@@ -16,8 +16,9 @@ export class ConfigProjectService {
 
     private readonly envConfig: { [key: string]: string };
 
+    private _configService: ConfigService = new ConfigService();
+
     constructor(
-        private readonly _configService: ConfigService
     ) {
 
         let path: string = `${process.cwd()}/env/`;
