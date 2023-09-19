@@ -23,8 +23,15 @@ export class FunnelLibraryController {
   @Get()
   findAll( @Request() req: any ) {
     const user: AuthPayload_I = req.user;
-    return this.funnelLibraryService.findAll(user);
+    return this.funnelLibraryService.findAll(1, user);
   }
+
+//   @Get('initial')
+//   get_initial_funnel( @Request() req: any ) {
+//     const user: AuthPayload_I = req.user;
+//     return this.funnelLibraryService.get_initial_funnel(user);
+//   }
+
 
   @Get(':id')
   findOne(@Param('id') id: string,  @Request() req: any) {
@@ -35,11 +42,11 @@ export class FunnelLibraryController {
   @Patch(':id')
   update(@Param('id',) id: string, @Body() updateFunnelLibraryDto: UpdateFunnelLibraryDto,  @Request() req: any) {
     const user: AuthPayload_I = req.user;
-    return this.funnelLibraryService.update(id, updateFunnelLibraryDto, user);
+    // return this.funnelLibraryService.update(id, updateFunnelLibraryDto, user);
   }
 
 //   @Delete(':id')
 //   remove(@Param('id') id: string) {
-//     return this.funnelLibraryService.remove(+id);
+    // return this.funnelLibraryService.remove(+id);
 //   }
 }

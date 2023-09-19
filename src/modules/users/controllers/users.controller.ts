@@ -9,10 +9,9 @@ export class UsersController {
 
     constructor(private readonly usersService: UsersService) { }
 
-      @Post()
-      test() {
-        return this.usersService.test();
-      }
+    // @Post()
+    // test() {
+    // }
 
     // @Get()
     // @Auth()
@@ -20,20 +19,22 @@ export class UsersController {
     //     return null;
     // }
 
-    @Get(':id')
-    // @Auth()
-    @Auth_SameID()
-    findOne(@Param('id') id: string) {
-        return this.usersService.findOne(id);
-    }
+    // @Get(':id')
+    // // @Auth()
+    // @Auth_SameID()
+    // findOne(@Param('id') id: string) {
+    //     // return this.usersService.findOne(id);
+    // }
 
     //   @Patch(':id')
     //   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     //     return this.usersService.update(+id, updateUserDto);
     //   }
 
-    //   @Delete(':id')
-    //   remove(@Param('id') id: string) {
-    //     return this.usersService.remove(+id);
-    //   }
+    @Delete(':id')
+    // @Auth_SameID()
+    async remove(@Param('id') id: string) {
+        return await this.usersService.delete_user(id);
+    }
+
 }

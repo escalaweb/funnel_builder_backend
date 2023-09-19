@@ -22,7 +22,7 @@ import { DynamooseHelper } from './helpers';
         },
         CommonService,
         ProcessDataService,
-        DynamooseHelper,
+        // DynamooseHelper,
         DateProcessService,
 
         SocketsGateway,
@@ -34,7 +34,7 @@ import { DynamooseHelper } from './helpers';
     exports: [
         CommonService,
         ProcessDataService,
-        DynamooseHelper,
+        // DynamooseHelper,
         DateProcessService,
         SocketsService,
         ExeptionsHandlersService

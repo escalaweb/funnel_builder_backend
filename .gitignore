@@ -3,12 +3,23 @@
 /src/dist
 /node_modules
 
+/mysql
 
 pruebas.html
 pruebas.json
 
+# /env
+
 .env
 .env.prod
+.env.staging
+
+/.build
+.build
+
+pruebas.js
+
+/postgres
 
 /dynamodb-data
 
@@ -43,3 +54,4 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+/.serverless/

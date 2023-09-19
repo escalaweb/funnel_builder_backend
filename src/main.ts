@@ -14,22 +14,23 @@ async function bootstrap() {
 
     const logger = new Logger('Bootstrap');
 
-    const allowedOrigins = Config.get(_Configuration_Keys.ALLOWEDORIGINS);
-
     app.use(helmet());
 
+    /*
+    */
+    // const allowedOrigins = Config.get(_Configuration_Keys.ALLOWEDORIGINS);
     app.enableCors({
         origin: function (origin, callback) {
             // allow requests with no origin
             // (like mobile apps or curl requests)
             if (!origin) return callback(null, true);
 
-            if (allowedOrigins.indexOf(origin) === -1) {
-                var msg =
-                    "Theeee CORS policy for this site does not " +
-                    "allow access from the specified Origin.";
-                return callback(new Error(msg), false);
-            }
+            // if (allowedOrigins.indexOf(origin) === -1) {
+            //     var msg =
+            //         "Theeee CORS policy for this site does not " +
+            //         "allow access from the specified Origin.";
+            //     return callback(new Error(msg), false);
+            // }
             return callback(null, true);
         },
     });
@@ -53,28 +54,11 @@ async function bootstrap() {
         logger.log(`App Nestjs running on port: ${Config.get(_Configuration_Keys.PORT)}`);
     });
 
+
 }
 bootstrap();
 
 
-// console.log(process.cwd());
 
-
-// function generarObjeto(obj) {
-//   const resultado = {};
-//   for (const [clave, valor] of Object.entries(obj)) {
-//     resultado[clave] = { contains: valor };
-//   }
-//   return resultado;
-// }
-
-
-
-// const objeto = {
-//   custom_subId: "7ca9c2a4-fa4c-11ed-84fd-3acdd3b01b9a",
-//   cognito_username: "9bfec8a9-03d3-42ec-b4f6-73759781165d",
-// };
-
-
-// const generado = generarObjeto(objeto);
-// console.log(generado);
+// TODO
+// Refactorizar todos los metodos para ya no usar tipo any

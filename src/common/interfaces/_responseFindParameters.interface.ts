@@ -1,15 +1,29 @@
-import { PopulateRequest } from "../helpers/dynamoose.helper.service";
+import { FindManyOptions, FindOneOptions } from "typeorm";
 
 
-
-
-export interface _argsAggregateFind {
-
-}
-    export interface _argsFind {
-    findObject: any;
+export interface PopulateRequest {
+    path: string;
+    model: string;
     populate?: PopulateRequest[];
-    select?: any;
+}
+
+
+
+
+
+export interface _argsFind_I<T = any> {
+    findObject: FindOneOptions<T>;
+    // populate?: PopulateRequest[];
+    // relations?: string[];
+    // select?: any;
+    // order?: any;
+}
+
+export interface _argsFindMany_I<T = any> {
+    findObject: FindManyOptions<T>;
+    // relations?: string[];
+    // select?: any;
+    // order?: any;
 }
 
 export interface _argsFindByText {

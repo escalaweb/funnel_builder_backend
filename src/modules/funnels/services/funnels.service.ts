@@ -1,19 +1,244 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { CreateFunnelDto } from '../dto/create-funnel.dto';
-import { UpdateFunnelDto } from '../dto/update-funnel.dto';
-import { InjectModel, Model } from 'nestjs-dynamoose';
+import { HttpException, Inject, Injectable, forwardRef } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { FindOneOptions, Repository } from "typeorm";
+import { ProcessDataService, DateProcessService } from "../../../common/adapters";
+import { FunnelBody_et } from "../entities";
+import { _argsFind, _response_I } from "../../../common/interfaces";
+import { FunnelLibraryService } from "../../funnel-library/services/funnel-library.service";
+import { AuthPayload_I } from "../../auth/interfaces";
+import { FunnelLibrary_et } from "../../funnel-library/entities";
+import { UsersService } from "../../users/services/users.service";
 
-import { ProcessDataService, DateProcessService } from '../../../common/adapters';
-import { schemaKey_I } from '../../../common/interfaces/_dynamoose.interface';
-import { FunnelBody_I } from '../interfaces';
-import { FunnelLibrary_I } from '../../funnel-library/interfaces';
-import { _response_I } from '../../../common/interfaces';
-import { FunnelLibraryService } from '../../funnel-library/services/funnel-library.service';
-import { AuthPayload_I } from '../../auth/interfaces/_jwt-payload.interface';
-import { ModelRegistry } from '../../../common/helpers/dynamoose.helper.service';
+
 
 @Injectable()
 export class FunnelsService {
+
+
+    constructor(
+
+        @InjectRepository(FunnelBody_et)
+        private readonly _FunnelBody_et_repository: Repository<FunnelBody_et>,
+
+        // @InjectRepository(FunnelLibrary_et)
+        // private readonly _FunnelLibrary_et_repository: Repository<FunnelLibrary_et>,
+
+        // private readonly _FunnelLibraryService: FunnelLibraryService,
+
+
+
+        private readonly _processData: ProcessDataService,
+        private readonly _dateService: DateProcessService,
+
+    ) {
+
+    }
+
+    // async create(data: any[], user: AuthPayload_I): Promise<_response_I<FunnelLibrary_et>> {
+
+    //     let _Response: _response_I<FunnelLibrary_et>;
+
+    //     let funnelLibrary_id: FunnelLibrary_et;
+
+    //     // console.log('entra aqui');
+
+    //     // const User_et =
+
+    //     funnelLibrary_id = (await this._FunnelLibraryService.findAll(1, user).then()).data[0] || null;
+    //     // funnelLibrary_id = await this._FunnelLibrary_et_repository.preload({
+    //     //       user_id: { _id: user._id },
+    //     //     name: 'Carpeta de embudo',
+    //     // })
+
+
+    //     if(funnelLibrary_id === null){
+
+    //         funnelLibrary_id = await this._FunnelLibrary_et_repository.create({
+    //             name: 'Carpeta de embudo',
+    //             user_id: { _id: user._id },
+    //             funnels_id: [],
+
+    //         })
+
+
+    //     }else{
+
+
+
+    //     }
+
+
+    //     console.log('funnelLibrary_id', funnelLibrary_id);
+
+    //     /*
+    //     funnelLibrary_id.funnels_id = data.map( funnel => {
+    //         return this._FunnelBody_et_repository.create({
+    //             funnelLibrary_id: funnelLibrary_id,
+    //             stages: funnel.stages.map( stage => {
+    //                 stage.funnel_id = funnel;
+    //                 return stage;
+    //              })
+    //         })
+    //     }),
+    //     */
+
+    //     // for (const [_i, _item] of data.entries()) {
+
+    //     // if (funnelLibrary_id.length > 0) {
+
+    //     //     _item.funnelLibrary_id = funnelLibrary_id[0]._id;
+
+    //     // } else {
+
+    //     //     _item.funnelLibrary_id = (await this._FunnelLibraryService.create({
+    //     //         name: 'Carpeta de embudo',
+    //     //     }, user).then()).data._id;
+
+    //     // }
+
+    //     // for (const [i, item] of _item.stages.entries()) {
+
+    //     //     item.funnel_id = _item._id;
+
+    //     // }
+
+    //     // }
+
+    //     return ;
+
+    //     await this._processData.process_create<FunnelLibrary_et>(this._FunnelLibrary_et_repository, funnelLibrary_id).then(response => {
+
+    //         _Response = response;
+
+    //         _Response.message = [
+    //             {
+    //                 text: 'Datos de usuario guardados',
+    //                 type: 'global'
+    //             }
+    //         ]
+
+    //     }, err => {
+    //         _Response = err;
+    //         console.log('err', err);
+    //         throw new HttpException(_Response, _Response.statusCode);
+    //     })
+
+    //     return _Response;
+
+    // }
+
+
+
+    async update(_id: string, data: any, user: AuthPayload_I): Promise<_response_I<FunnelBody_et>> {
+
+        let _Response: _response_I<FunnelBody_et>;
+
+        await this._processData.process_update<FunnelBody_et>(this._FunnelBody_et_repository, _id , data).then(response => {
+
+            _Response = response;
+
+            _Response.message = [
+                {
+                    text: 'Datos de usuario guardados',
+                    type: 'global'
+                }
+            ]
+
+        }, err => {
+            _Response = err;
+            console.log('err', err);
+            throw new HttpException(_Response, _Response.statusCode);
+        })
+
+        return _Response;
+
+    }
+
+    async findAll(user: AuthPayload_I): Promise<_response_I<FunnelBody_et[]>> {
+
+        let _Response: _response_I<FunnelBody_et[]>;
+
+        let args: _argsFind = {
+            findObject: {
+                where: {
+                    // "user_id._id": user._id
+                    // user_id: user._id
+                },
+                relations: ['funnelLibrary_id', 'stages'],
+                select: {
+
+                }
+
+            },
+
+        }
+
+        await this._processData.process_getAll<FunnelBody_et>(this._FunnelBody_et_repository, args).then(async (resp) => {
+
+            _Response = structuredClone(resp);
+
+        }).catch((err) => {
+            _Response = err;
+
+            throw new HttpException(_Response, _Response.statusCode);
+        });
+
+        return _Response;
+
+    }
+
+      async findOne(_id: string, user: AuthPayload_I): Promise<_response_I<FunnelBody_et>> {
+
+        let _Response: _response_I<FunnelBody_et>;
+
+        let args: _argsFind = {
+            findObject: {
+                where: {
+                    _id: _id,
+
+                },
+                relations: ['stages'],
+                select: {
+
+                }
+
+            },
+        }
+
+        await this._processData.process_getOne<FunnelBody_et>(this._FunnelBody_et_repository, args).then(async (resp) => {
+
+            _Response = structuredClone(resp);
+            // let aux_resp = structuredClone(resp);
+
+
+        }).catch((err) => {
+
+            let _Response: _response_I<any> = {
+                ok: false,
+                statusCode: 404,
+                data: null,
+                err: err,
+                message: [
+                    {
+                        text: 'El id o termino especificado, no es válido',
+                        type: 'global'
+                    }
+                ]
+            }
+
+            throw new HttpException(_Response, _Response.statusCode);
+
+        });
+
+        return _Response;
+
+    }
+
+
+
+
+
+    /*
 
     constructor(
         @InjectModel('Funnels')
@@ -167,4 +392,6 @@ export class FunnelsService {
     // remove(id: number) {
     //     return `This action removes a #${id} funnel`;
     // }
+
+    */
 }

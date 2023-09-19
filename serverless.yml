@@ -1,36 +1,158 @@
-service: fb-backend
+service: funnel-designer-backend
 
 plugins:
-  - serverless-plugin-typescript
+  - serverless-webpack
   - serverless-offline
-  - serverless-dynamodb-local
+
+custom:
+  serverless-offline:
+    # httpsProtocol: "dev-certs"
+    httpPort: 3750
+    noPrependStageInUrl: true
+
+  webpack:
+    webpackConfig: 'webpack.config.js' # Name of webpack configuration file
+    includeModules: true # Node modules configuration for packaging
+    packager: 'npm' # Packager that will be used to package your external modules
+    excludeFiles: src/**/*.test.js
+
+  rds:
+  #   start:
+  #     port: 3306
+  #     dbPath: ./data/mysql
+  #     migrate: true
+
+  securityGroupId:
+    dev: sg-0224dd659c657972b
+    staging: sg-0224dd659c657972b
+    prod: sg-06f3aa09ec55cfdc7
+  subnetId1:
+    dev: subnet-052ea2ff0aed8a2a1
+    staging: subnet-052ea2ff0aed8a2a1
+    prod: subnet-0a53e07805389f7ff
+  subnetId2:
+    dev: subnet-0c6d9dbefa2af155a
+    staging: subnet-0c6d9dbefa2af155a
+    prod: subnet-045ad00129bb81a18
+  subnetId3:
+    dev: subnet-0de84996c8487e6b0
+    staging: subnet-0de84996c8487e6b0
+    prod: subnet-01a007ee0c15e529d
+
+  internal_domain_names:
+    dev: internal.dev.exitoweb.com
+    staging: internal.staging.exitoweb.com
+    prod: internal.escala.com
+
+  database_host:
+    dev: aurorav2-cluster-dev-cluster.cluster-cfsu8zru6elq.us-east-1.rds.amazonaws.com
+    prod: aurorav2-cluster-prod-cluster.cluster-ci8vtestdc4h.us-east-1.rds.amazonaws.com
+  database_name:
+    dev: funnelbuilderdb
+    prod: funnelbuilderdb
+  database_user:
+    dev: funnelbuilderuser
+    prod: funnelbuilderuser
+  database_password:
+    dev: ${ssm:/${self:provider.stage}/service/funnel-builder/dbpassword}
+    prod: ${ssm:/${self:provider.stage}/service/funnel-builder/dbpassword}
 
 provider:
   name: aws
   runtime: nodejs18.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
-  # memorySize: 256
+  memorySize: 1024
+  timeout: 29
+
+  vpc:
+    securityGroupIds:
+      - ${self:custom.securityGroupId.${self:provider.stage}}
+    subnetIds:
+      - ${self:custom.subnetId1.${self:provider.stage}}
+      - ${self:custom.subnetId2.${self:provider.stage}}
+      - ${self:custom.subnetId3.${self:provider.stage}}
+
+  tags:
+    Business Unit: ExitoWeb
+    Cost Center: ${opt:stage, 'dev'}
+    Project: ExitoWeb
+    Component: ${self:service}
+
+  stackTags:
+    Business Unit: ExitoWeb
+    Cost Center: ${opt:stage, 'dev'}
+    Project: ExitoWeb
+    Component: ${self:service}
+
   environment:
     SERVICE: ${self:service}
     STAGE: ${self:provider.stage}
     REGION: ${self:provider.region}
+    NODE_ENV: ${self:provider.stage}
+    DB_HOST: ${self:custom.database_host.${self:provider.stage}}
+    DB_PORT: 5432
+    DB_NAME: ${self:custom.database_name.${self:provider.stage}}
+    DB_USERNAME: ${self:custom.database_user.${self:provider.stage}}
+    DB_PASSWORD: ${self:custom.database_password.${self:provider.stage}}
+
 
   apiGateway:
     shouldStartNameWithService: true
+    apiKeys:
+      - ${self:service}-${self:provider.stage}
+
   iam:
     role:
       statements:
         - Effect: Allow
           Action:
-            - dynamodb:DescribeTable
-            - dynamodb:Query
-            - dynamodb:Scan
-            - dynamodb:GetItem
-            - dynamodb:PutItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-          Resource: arn:aws:dynamodb:${self:provider.region}:*:*
+            - rds-db:connect
+          Resource: "*"
+        - Effect: 'Allow'
+          Action:
+            - 'lambda:InvokeFunction'
+          Resource:
+          - Fn::Join:
+            - ':'
+            - - arn:aws:lambda
+              - Ref: AWS::Region
+              - Ref: AWS::AccountId
+              - function:${self:service}-${self:provider.stage}-*
+        - Effect: Allow
+          Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "*"
+        - Effect: "Allow"
+          Action:
+            - "ec2:CreateNetworkInterface"
+            - "ec2:DescribeNetworkInterfaces"
+            - "ec2:DeleteNetworkInterface"
+            - "ec2:DetachNetworkInterface"
+            - "ec2:DescribeSecurityGroups"
+            - "ec2:DescribeSubnets"
+            - "ec2:DescribeVpcs"
+          Resource: "*"
+
+package:
+  exclude:
+    - 'tests/**'
+    - 'tests-integration/**'
+    - '.idea/**'
+    - 'serverless-configs/**'
+    - 'envs/**'
+    - 'support/**'
+    - 'node_modules/.cache/**'
+    - 'scripts/**'
+  include:
+    - webpack.config.js
 
 functions:
   api:
@@ -40,39 +162,23 @@ functions:
           path: /
           method: ANY
           cors: true
+          private: true
       - http:
           path: /{proxy+}
           method: ANY
           cors: true
-custom:
-  serverless-offline:
-    # httpsProtocol: "dev-certs"
-    httpPort: 3750
-    noPrependStageInUrl: true
-  dynamodb:
-    start:
-      port: 8000
-      inMemory: true
-      migrate: true
-# resources:
-#   Resources:
-#     UsersTable:
-#       Type: AWS::DynamoDB::Table
-#       Properties:
-#         TableName: Users
-#         AttributeDefinitions:
-#           - AttributeName: id
-#             AttributeType: S
-#         KeySchema:
-#           - AttributeName: id
-#             KeyType: HASH
-#         ProvisionedThroughput:
-#           ReadCapacityUnits: 1
-#           WriteCapacityUnits: 1
-# ```
-
+          private: true
 
 resources:
-  - ${file(resource/dynamodb.yml)}
-
-
+  Resources:
+    ServiceMapping:
+      Type: AWS::ApiGateway::BasePathMapping
+      DependsOn:
+        - ApiGatewayRestApi
+        - ApiGatewayUsagePlan
+      Properties:
+        BasePath: "funnel-designer"
+        DomainName: ${self:custom.internal_domain_names.${self:provider.stage}}
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        Stage: ${self:provider.stage}

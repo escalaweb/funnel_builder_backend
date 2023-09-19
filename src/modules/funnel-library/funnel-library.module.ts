@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common';
 import { FunnelLibraryService } from './services/funnel-library.service';
 import { FunnelLibraryController } from './controllers/funnel-library.controller';
-import { FunnelLibrarySchema } from './models/schemas/funnelLibrary.schema';
-import { DynamooseModule } from 'nestjs-dynamoose';
 import { UsersModule } from '../users/users.module';
-import { ModelRegistry } from '../../common/helpers/dynamoose.helper.service';
+import { FUNNEL_LIBRARY_ENTITIES_MODULE } from './entities/entities.module';
 
 
 
@@ -13,17 +11,12 @@ import { ModelRegistry } from '../../common/helpers/dynamoose.helper.service';
     providers: [FunnelLibraryService],
     imports: [
 
-        DynamooseModule.forFeature([
-            {
-                name: 'FunnelLibrary',
-                schema: FunnelLibrarySchema,
-            },
-        ]),
+        FUNNEL_LIBRARY_ENTITIES_MODULE,
         UsersModule
 
     ],
     exports: [
-        DynamooseModule,
+        FUNNEL_LIBRARY_ENTITIES_MODULE,
         FunnelLibraryService
     ]
 })

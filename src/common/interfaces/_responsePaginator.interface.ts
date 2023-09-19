@@ -1,13 +1,26 @@
 import { ConfigService } from "@nestjs/config";
 import { _Configuration_Keys } from "../../config/config.keys";
+import { IPaginationOptions } from "nestjs-typeorm-paginate";
+import { _paginatorModel_I } from "./_response.interface";
 
 const Config = new ConfigService();
 
-export interface _argsPagination<T> {
+export interface _argsPagination {
 
-    findObject: T | {};
-    options: _dataPaginator;
+    findObject: {
+        where?: any,
+        relations?: string[],
+        select?: any,
+        order?: any,
+    };
+    options?: IPaginationOptions,
+    // options?: _dataPaginator;
 
+}
+
+export interface _paginateByArray_I<T> {
+    data: T[],
+    paginator: _paginatorModel_I
 }
 
 export interface _dataPaginator {

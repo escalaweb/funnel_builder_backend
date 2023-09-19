@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { _response_I } from "../../../common/interfaces";
-import { _argsFind } from "../../../common/interfaces/_responseFindParameters.interface";
+import { _argsFind_I } from "../../../common/interfaces/_responseFindParameters.interface";
 import { _Configuration_Keys } from "../../../config/config.keys";
 
 import { HttpService } from '@nestjs/axios';
@@ -15,8 +15,9 @@ import { AuthPayload_I, CognitoPayload_I } from "../interfaces/_jwt-payload.inte
 import * as jwkToPem from 'jwk-to-pem';
 
 import { UsersService } from "../../users/services/users.service";
-import { User_I } from "../../users/interfaces";
-import * as dynamoose from 'dynamoose';
+
+import * as jwt from 'jsonwebtoken';
+import { User_et } from "../../users/entities";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -32,10 +33,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKeyProvider: (_, token, done) => {
 
-                const aws_region: string = this._configService.get(_Configuration_Keys.REGION),
-                    aws_userPool: string = this._configService.get(_Configuration_Keys.USERPOOLID);
+                // console.log('jwt.decode(token)', jwt.decode(token));
 
-                const jwksUri = `https://cognito-idp.${aws_region}.amazonaws.com/${aws_userPool}/.well-known/jwks.json`;
+                const jwksUri = `${jwt.decode(token)['iss']}/.well-known/jwks.json`;
 
                 this.httpService
                     .get(jwksUri)
@@ -71,40 +71,81 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                             done(err.message, null);
                         },
                     });
+
+
             },
         });
     }
 
     async validate(payload: CognitoPayload_I) {
 
-        console.log('el payload completo', payload);
-
         let newPayload: AuthPayload_I = {
             "_id": '',
             "username_id": payload["sub"],
+            "name": payload["name"],
+            "email": payload["email"],
+            "tenant_id": payload["custom:tenantId"]
         }
 
-        await this._usersService.findOneByTerm({
-            username_id: newPayload.username_id,
-        }).then(async (response) => {
+        const args: _argsFind_I = {
+            findObject: {
+                where: {
+                    username_id: newPayload.username_id
+                }
+            }
+        }
 
-            console.log('response', response);
+        await this._usersService.findOne(args).then(async (response) => {
 
-            if (response.statusCode != 200 || (response.data === undefined || response.data === null)) {
+            if ((response.statusCode != 200) || (response.data === undefined || response.data === null)) {
 
-                await this._usersService.create({
-                    username_id: newPayload.username_id,
-                }).then();
 
-            }else{
+                await this.register_user(newPayload).then(resp => {
+                    newPayload._id = resp._id;
+                });
+
+            } else {
 
                 newPayload._id = response.data._id;
 
             }
 
-        });
+        }, async (err) => {
 
+            await this.register_user(newPayload).then(resp => {
+
+                newPayload._id = resp._id;
+
+            }, err => {
+                throw new HttpException(err, err.statusCode);
+            });
+
+        })
         return newPayload;
+
+    }
+
+    async register_user(payload: AuthPayload_I): Promise<User_et> {
+
+        return new Promise(async (resolve, reject) => {
+
+            await this._usersService.create({
+                username_id: payload.username_id,
+                name: payload.name,
+                email: payload.email,
+                tenant_id: payload.tenant_id,
+            }).then(resp => {
+
+                resolve(resp.data);
+
+            }, err => {
+
+                reject(err);
+
+            });
+
+
+        })
 
     }
 
