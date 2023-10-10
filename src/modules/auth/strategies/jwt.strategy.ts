@@ -23,7 +23,6 @@ import { User_et } from "../../users/entities";
 export class JwtStrategy extends PassportStrategy(Strategy) {
 
 
-
     constructor(
         private readonly httpService: HttpService,
         private readonly _configService: ConfigService,
@@ -34,6 +33,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKeyProvider: (_, token, done) => {
 
+                // console.log('jwt.decode(token)', jwt.decode(token));
                 const jwksUri = `${jwt.decode(token)['iss']}/.well-known/jwks.json`;
 
                 this.httpService

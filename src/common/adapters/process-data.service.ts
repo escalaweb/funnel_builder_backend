@@ -461,7 +461,6 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
 
         return new Promise(async (resolve, reject) => {
 
-
             await Model.findOne(
                 {
                     where: args.findObject.where,
@@ -518,7 +517,6 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
                 reject(_resp);
 
             });
-
 
         })
 

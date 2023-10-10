@@ -1,19 +1,20 @@
-import { HttpException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, DeepPartial, FindOneOptions, IsNull, Not, Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { ProcessDataService, DateProcessService } from "../../../common/adapters";
 import { _argsFind, _response_I } from "../../../common/interfaces";
 import { AuthPayload_I } from "../../auth/interfaces";
-import { FunnelLibrary_et } from "../../funnel-library/entities";
 import { FunnelLibraryService } from "../../funnel-library/services/funnel-library.service";
-import { FunnelBody_et, FunnelBody_stages_et } from "../entities";
-import { User_et } from "../../users/entities";
 import { UsersService } from "../../users/services/users.service";
+import { FunnelBody_et, FunnelBody_stages_et } from "../entities";
 import { CustomizeProcess_et } from "../../customize-process/entities";
+import { FunnelLibrary_et } from "../../funnel-library/entities";
+import { User_et } from "../../users/entities";
 
 import * as uuid from 'uuid';
 import * as _ from "lodash";
 import { ConfigPlanner_et } from "../../planner/entities";
+import { LoggModel, _LoggerService } from '../../../common/services/_logger.service';
 
 @Injectable()
 export class Rel_Funnels_Planner_Library_Users_Service {
@@ -31,8 +32,8 @@ export class Rel_Funnels_Planner_Library_Users_Service {
         @InjectRepository(User_et)
         private readonly _Users_et_repository: Repository<User_et>,
 
-        @InjectRepository(ConfigPlanner_et)
-        private readonly _ConfigPlanner_et_repository: Repository<ConfigPlanner_et>,
+        // @InjectRepository(ConfigPlanner_et)
+        // private readonly _ConfigPlanner_et_repository: Repository<ConfigPlanner_et>,
 
         @InjectRepository(CustomizeProcess_et)
         private readonly _CustomizeProcess_et_repository: Repository<CustomizeProcess_et>,
@@ -43,8 +44,20 @@ export class Rel_Funnels_Planner_Library_Users_Service {
         private readonly _processData: ProcessDataService,
         private readonly _dateService: DateProcessService,
 
-        private readonly dataSource: DataSource
+        private readonly dataSource: DataSource,
+
+        private readonly _LoggerService: _LoggerService
     ) {
+
+
+
+        /*    this._LoggerService.log({
+               message: `Usuario tal@escala.com ha creado
+                   un embudo
+               `,
+               context: 'Rel_Funnels_Planner_Library_Users_Service - create'
+           });
+            */
 
     }
 
@@ -53,6 +66,8 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         let _Response: _response_I<FunnelLibrary_et>;
         // let _Response: _response_I<any>;
+
+        let LoggerModels: LoggModel[] = []
 
         let funnelLibrary_id: FunnelLibrary_et;
 
@@ -70,6 +85,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         funnelLibrary_id = (await this._FunnelLibraryService.findAll(1, user).then()).data[0] || null;
 
+        let funnels_deleteEty: FunnelBody_et[] = [];
 
         if (funnelLibrary_id === null) {
 
@@ -78,8 +94,13 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                 name: 'Carpeta de embudo',
                 user_id: User_data,
                 funnels_id: [],
-
             })
+
+            LoggerModels.push({
+                type: 'log',
+                message: `Usuario ${user.email} ha creado una carpeta de embudos`,
+                context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
+            });
 
         } else {
 
@@ -87,14 +108,32 @@ export class Rel_Funnels_Planner_Library_Users_Service {
             const aux_funnelLibrary_id = funnelLibrary_id._id;
             const funnels_ids: string[] = data.map((funnel: FunnelBody_et) => funnel._id);
 
-            const deleteEntityIds = await this._FunnelBody_et_repository
+            funnels_deleteEty = await this._FunnelBody_et_repository
                 .createQueryBuilder('funnels')
                 .where('funnels.funnelLibrary_id = :aux_funnelLibrary_id', { aux_funnelLibrary_id })
                 .andWhere('funnels._id NOT IN (:...funnelIds)', { funnelIds: funnels_ids })
-                .select('funnels._id')
+                .select('funnels')
                 .getMany();
 
-            await this._FunnelBody_et_repository.remove(deleteEntityIds);
+            await this._FunnelBody_et_repository.remove(structuredClone(funnels_deleteEty)).then((resp) => {
+
+                if (funnels_deleteEty.length > 0) {
+
+                    let funnelsString = funnels_deleteEty.map((funnel: FunnelBody_et) => {
+                        return `_id: ${funnel._id} Embudo: ${funnel.name}`;
+                    }).join(' \n ');
+
+                    LoggerModels.push({
+                        type: 'log',
+                        message: `
+                    Usuario ${user.email} ha eliminado los embudos que no vienen en el guardado:
+                    ${funnelsString}
+               `,
+                        context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
+                    });
+                }
+
+            });
 
             const deleteStages_ids = await this._FunnelBody_stages_et_repository
                 .createQueryBuilder('stages_funnel')
@@ -106,29 +145,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         }
 
-        /*
-         stages: funnel.stages.map(stage => {
-                    return this._FunnelBody_stages_et_repository.create({
-                        ...stage,
-                        funnel_id: funnel,
-                    })
-                })
-        */
-
         let stages: FunnelBody_stages_et[] = [];
-        /*
-         data.map((funnel: FunnelBody_et) => {
-            return funnel.stages.map(stage => {
-                return this._FunnelBody_stages_et_repository.create({
-                    ...stage,
-                    _id: _.get(stage, '_id', uuid.v4()),
-                    funnel_id: funnel,
-                });
-
-            })
-
-        })
-        */
 
         for (const [i, item] of data.entries()) {
 
@@ -146,16 +163,42 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         }
 
+        const aux_funnelLibrary_id = funnelLibrary_id._id;
+        const aux_funnels_Ety = await this._FunnelBody_et_repository
+            .createQueryBuilder('funnels')
+            .where('funnels.funnelLibrary_id = :aux_funnelLibrary_id', { aux_funnelLibrary_id })
+            .select('funnels')
+            .getMany();
 
         let funnels: FunnelBody_et[] = data.map((funnel: FunnelBody_et) => {
+
+            if (aux_funnels_Ety.some(item => item._id === funnel._id)) {
+
+                LoggerModels.push({
+                    type: 'log',
+                    message: `Usuario ${user.email} ha re escrito un embudo:
+                   _id: ${funnel._id} Embudo: ${funnel.name}`,
+                    context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
+                });
+
+            } else {
+
+                LoggerModels.push({
+                    type: 'log',
+                    message: `Usuario ${user.email} ha creado un embudo:
+                    _id: ${funnel._id} Embudo: ${funnel.name}`,
+                    context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
+                });
+
+            }
 
             return this._FunnelBody_et_repository.create({
                 ...funnel,
                 _id: _.get(funnel, '_id', uuid.v4()),
                 customizeProcess_step_id: null,
                 funnelLibrary_id: funnelLibrary_id,
-
             });
+
         });
 
         funnelLibrary_id.funnels_id = [...funnels];
@@ -171,7 +214,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
             await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
 
             // await queryRunner.manager.save(FunnelBody_et, funnels);
-
             await queryRunner.manager.save(FunnelBody_stages_et, stages);
 
             await queryRunner.commitTransaction();
@@ -191,6 +233,8 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                     }
                 ]
             }
+
+            this._LoggerService._emitLoggers(LoggerModels);
 
 
         } catch (error) {
@@ -212,6 +256,16 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                     }
                 ]
             }
+
+            this._LoggerService.error({
+                message: `Usuario ${user.email} ha tenido un error al guardar un embudo`,
+                context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels',
+            })
+
+            this._LoggerService.error({
+                message: `Error: ${error}`,
+                context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels',
+            })
 
         }
 
@@ -247,7 +301,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         if (!funnel.customizeProcess_step_id || funnel.customizeProcess_step_id === null) {
 
-
             return this._CustomizeProcess_et_repository.create(
                 {
                     name: 'Proceso comercial',
@@ -278,7 +331,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                 }
             )
 
-
         } else {
 
             return funnel.customizeProcess_step_id
@@ -286,7 +338,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
         }
 
     }
-
 
     async get_initial_funnel(user: AuthPayload_I): Promise<_response_I<FunnelBody_et[]>> {
 
@@ -349,6 +400,38 @@ export class Rel_Funnels_Planner_Library_Users_Service {
             }
 
         });
+
+        return _Response;
+
+    }
+
+    async adrm_get_initial_funnel_byEmail(email: string): Promise<_response_I<FunnelBody_et[]>> {
+
+        let _Response: _response_I<any>;
+
+        const args: _argsFind<User_et> = {
+            findObject: {
+                where: {
+                    email: email,
+                }
+            }
+        }
+        const User_data: User_et = await this._usersService.findOne(args).then(resp => {
+            return resp.data;
+        });
+
+        let user: AuthPayload_I = {
+            _id: User_data._id,
+            email: User_data.email,
+            name: User_data.name,
+            username_id: User_data.username_id,
+            tenant_id: User_data.tenant_id,
+        }
+
+        await this.get_initial_funnel(user).then(resp => {
+            _Response = resp;
+        })
+
 
         return _Response;
 

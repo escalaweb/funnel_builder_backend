@@ -14,6 +14,8 @@ import { ConfigPlanner_et } from "../../planner/entities";
 
 import * as uuid from 'uuid';
 import * as _ from "lodash";
+import { _LoggerService } from "../../../common/services";
+import { LoggModel } from "../../../common/services/_logger.service";
 
 @Injectable()
 export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
@@ -35,7 +37,7 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
         private readonly _FunnelLibraryService: FunnelLibraryService,
         private readonly _usersService: UsersService,
 
-
+        private readonly _LoggerService: _LoggerService,
         private readonly _processData: ProcessDataService,
         private readonly _dateService: DateProcessService,
 
@@ -51,7 +53,9 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
         let _Response: _response_I<CustomizeProcess_et[]>;
 
         let funnels: FunnelBody_et[] = [];
-        let customizeProcess: CustomizeProcess_et[] = []
+        let customizeProcess: CustomizeProcess_et[] = [];
+
+        let LoggerModels: LoggModel[] = []
 
         // TODO
         // Refactorizar a futuro la posibilidad de que sean más de un library funnel por usuario
@@ -73,11 +77,14 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
                 ]
             }
 
+            this._LoggerService.warn({
+                message: `No se encontró una carpeta de embudos asociado a este usuario ${user.email}`,
+                context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
+            })
+
             throw new HttpException(_Response, _Response.statusCode);
 
         }
-
-
 
         const queryRunner = this.dataSource.createQueryRunner();
 
@@ -90,15 +97,26 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
             const customizeProcessPromises = data.customizeModels.map(async (customizeProcess: any) => {
 
                 const funnelId = customizeProcess.funnel_id;
+
                 const funnel = await queryRunner.manager.findOne(FunnelBody_et, {
                     where: {
                         _id: funnelId
                     }
                 });
 
+                let cust_id: string =  customizeProcess._id || uuid.v4();
+
+                LoggerModels.push({
+                    type: 'log',
+                    message: `Usuario ${user.email} ha creado proceso comercial:
+                    _id: ${cust_id} Nombre de proceso: ${customizeProcess.name} para el embudo:
+                    _id: ${funnel._id} Embudo: ${funnel.name}`,
+                    context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
+                })
+
                 return this._CustomizeProcess_et_repository.create({
                     ...customizeProcess,
-                    _id: customizeProcess._id || uuid.v4(),
+                    _id: cust_id,
                     funnel_id: funnel
                 });
 
@@ -109,7 +127,6 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
             await queryRunner.manager.save(CustomizeProcess_et, customizeProcesses); // Guardar las entidades
 
             for (const [i, item] of customizeProcesses.entries()) {
-
 
                 const funnel = await queryRunner.manager.findOne(FunnelBody_et, {
                     where: {
@@ -130,12 +147,14 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
                 statusCode: 201,
                 data: customizeProcesses,
                 message: [
-                {
-                    text: 'Datos de proceso comercial guardados',
-                    type: 'global'
-                }
-            ]
+                    {
+                        text: 'Datos de proceso comercial guardados',
+                        type: 'global'
+                    }
+                ]
             }
+
+                  this._LoggerService._emitLoggers(LoggerModels);
 
 
         } catch (error) {
@@ -157,6 +176,16 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
                     }
                 ]
             }
+
+              this._LoggerService.error({
+                message: `Usuario ${user.email} ha tenido un error al guardar proceso comercial para sus embudos`,
+                context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
+            })
+
+            this._LoggerService.error({
+                message: `Error: ${error}`,
+                context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
+            })
 
         }
 
