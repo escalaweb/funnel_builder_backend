@@ -25,9 +25,6 @@ export class PlannerController {
     }
 
 
-
-
-
     @Get()
     @Auth()
     findAll(@Request() req: any) {

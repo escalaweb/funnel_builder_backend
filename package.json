@@ -1,6 +1,6 @@
 {
     "name": "fb_backend_escala",
-    "version": "1.0.5",
+    "version": "1.0.7",
     "description": "",
     "author": "",
     "private": true,
@@ -21,16 +21,12 @@
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json",
-
         "typeorm": "cross-env ts-node ./node_modules/typeorm/cli",
         "typeorm:run-mig": "cross-env npm run typeorm migration:run -- -d ./src/database/typeOrm.config.ts",
         "typeorm:generate-mig": "cross-env npm run typeorm -- -d ./src/database/typeOrm.config.ts migration:generate ./src/database/migrations/%npm_config_name%",
         "typeorm:create-mig": "cross-env npm run typeorm -- migration:create ./src/database/migrations/%npm_config_name%",
         "typeorm:revert-mig": "cross-env npm run typeorm -- -d ./src/database/typeOrm.config.ts migration:revert"
     },
-
-
-
     "dependencies": {
         "@nestjs/axios": "^3.0.0",
         "@nestjs/common": "^9.0.0",
@@ -67,7 +63,7 @@
         "passport-jwt": "^4.0.1",
         "pg": "^8.11.3",
         "reflect-metadata": "^0.1.13",
-        "rxjs": "^7.2.0",
+        "rxjs": "^7.8.1",
         "serverless": "^3.34.0",
         "serverless-http": "^3.2.0",
         "serverless-plugin-browserifier": "^3.1.1",
@@ -75,7 +71,8 @@
         "typeorm": "^0.3.17",
         "util": "^0.12.5",
         "uuid": "^9.0.0",
-        "webpack-node-externals": "^3.0.0"
+        "webpack-node-externals": "^3.0.0",
+        "winston": "^3.11.0"
     },
     "devDependencies": {
         "@nestjs/cli": "^9.0.0",

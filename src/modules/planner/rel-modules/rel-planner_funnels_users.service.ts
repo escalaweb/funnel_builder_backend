@@ -1,18 +1,15 @@
 import { Injectable, HttpException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { ProcessDataService, DateProcessService } from "../../../common/adapters";
+import { DataSource, Repository } from "typeorm";
+import { ProcessDataService } from "../../../common/adapters";
 import { _argsFind, _response_I } from "../../../common/interfaces";
 import { AuthPayload_I } from "../../auth/interfaces";
 
-import { FunnelBody_et } from "../../funnels/entities";
-import { User_et } from "../../users/entities";
-import { UsersService } from "../../users/services/users.service";
 import { ConfigPlanner_et } from "../entities";
-import { FunnelsService } from "../../funnels/services/funnels.service";
 import { FunnelLibrary_et } from "../../funnel-library/entities";
 import { FunnelLibraryService } from "../../funnel-library/services/funnel-library.service";
 
+import { LoggModel, _LoggerService } from '../../../common/services/_logger.service';
 
 import * as uuid from 'uuid';
 import * as _ from "lodash";
@@ -24,9 +21,6 @@ export class Rel_Planner_Funnels_Library_Users_Service {
 
 
     constructor(
-        @InjectRepository(FunnelBody_et)
-        private readonly _FunnelBody_et_repository: Repository<FunnelBody_et>,
-
         @InjectRepository(ConfigPlanner_et)
         private readonly _ConfigPlanner_et_repository: Repository<ConfigPlanner_et>,
 
@@ -34,18 +28,14 @@ export class Rel_Planner_Funnels_Library_Users_Service {
         private readonly _FunnelLibrary_et_repository: Repository<FunnelLibrary_et>,
 
 
+        private readonly _LoggerService: _LoggerService,
+          private readonly dataSource: DataSource,
 
-        @InjectRepository(User_et)
-        private readonly _Users_et_repository: Repository<User_et>,
 
-
-        private readonly _usersService: UsersService,
-        private readonly _funnelService: FunnelsService,
         private readonly _funnelLibraryService: FunnelLibraryService,
 
 
         private readonly _processData: ProcessDataService,
-        private readonly _dateService: DateProcessService,
     ) {
 
     }
@@ -55,7 +45,6 @@ export class Rel_Planner_Funnels_Library_Users_Service {
     async create(createPlannerDto: any, user: AuthPayload_I) {
 
         let _Response: _response_I<any>;
-
 
         // TODO
         // Refactorizar a futuro la posibilidad de que sean más de un library funnel por usuario
@@ -77,6 +66,11 @@ export class Rel_Planner_Funnels_Library_Users_Service {
                 ]
             }
 
+            this._LoggerService.warn({
+                  message: `No se encontró una carpeta de embudos asociado a este usuario ${user.email}`,
+                context: 'Rel_Planner_Funnels_Library_Users_Service - create',
+            })
+
             throw new HttpException(_Response, _Response.statusCode);
 
         }
@@ -92,7 +86,47 @@ export class Rel_Planner_Funnels_Library_Users_Service {
 
         funnelLibrary.config_step_id = configPlanner;
 
-        await this._processData.process_create<ConfigPlanner_et>(this._ConfigPlanner_et_repository, configPlanner).then(response => {
+          const queryRunner = this.dataSource.createQueryRunner();
+
+        await queryRunner.connect();
+
+        await queryRunner.startTransaction();
+
+        try {
+
+            await queryRunner.manager.save(ConfigPlanner_et, configPlanner);
+
+            // await queryRunner.manager.save(FunnelBody_et, funnels);
+            await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary);
+
+            /* TODO
+                Mostrar más detalles de la información que se guarda en el configurador
+             */
+            this._LoggerService.log({
+                message: `El usuario ${user.email} guardó el configurador:
+                _id: ${configPlanner._id} y se asoció a la carpeta de embudos:
+                _id: ${funnelLibrary._id}`,
+            })
+
+            await queryRunner.commitTransaction();
+            await queryRunner.release();
+
+
+        } catch (error) {
+
+            console.log('error', error);
+            await queryRunner.rollbackTransaction();
+            await queryRunner.release();
+
+             this._LoggerService.error({
+                message: `Error: ${error}`,
+                context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels',
+            })
+
+        }
+
+       /*
+       await this._processData.process_create<ConfigPlanner_et>(this._ConfigPlanner_et_repository, configPlanner).then(() => {
 
         }, err => {
 
@@ -123,6 +157,7 @@ export class Rel_Planner_Funnels_Library_Users_Service {
             throw new HttpException(_Response, _Response.statusCode);
 
         })
+         */
 
 
         return _Response;

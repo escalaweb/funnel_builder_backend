@@ -5,7 +5,6 @@ import { AuthModule, FileManagerModule, FunnelLibraryModule, FunnelsModule, Plan
 import { CustomizeProcessModule } from "./modules/customize-process/customize-process.module";
 
 
-
 @Module({
     imports: [
         ConfigProjectModule,

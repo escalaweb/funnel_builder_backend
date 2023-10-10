@@ -161,8 +161,6 @@ export class FunnelsService {
         let args: _argsFind = {
             findObject: {
                 where: {
-                    // "user_id._id": user._id
-                    // user_id: user._id
                 },
                 relations: ['funnelLibrary_id', 'stages'],
                 select: {
@@ -195,11 +193,9 @@ export class FunnelsService {
             findObject: {
                 where: {
                     _id: _id,
-
                 },
                 relations: ['stages'],
                 select: {
-
                 }
 
             },
@@ -208,8 +204,6 @@ export class FunnelsService {
         await this._processData.process_getOne<FunnelBody_et>(this._FunnelBody_et_repository, args).then(async (resp) => {
 
             _Response = structuredClone(resp);
-            // let aux_resp = structuredClone(resp);
-
 
         }).catch((err) => {
 

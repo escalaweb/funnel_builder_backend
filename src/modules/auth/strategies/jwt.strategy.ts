@@ -34,7 +34,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             secretOrKeyProvider: (_, token, done) => {
 
                 // console.log('jwt.decode(token)', jwt.decode(token));
-
                 const jwksUri = `${jwt.decode(token)['iss']}/.well-known/jwks.json`;
 
                 this.httpService

@@ -3,7 +3,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { DateProcessService, ProcessDataService } from './adapters';
 import { HttpExceptionFilter } from './filters';
 import { MiddlewareModule } from './middlewares/middleware.module';
-import { CommonService, ExeptionsHandlersService } from './services';
+import { CommonService, ExeptionsHandlersService, _LoggerService } from './services';
 import { SocketsGateway } from './sockets/sockets.gateway';
 import { SocketsService } from './sockets/sockets.service';
 import { DynamooseHelper } from './helpers';
@@ -28,15 +28,17 @@ import { DynamooseHelper } from './helpers';
         SocketsGateway,
         SocketsService,
 
-        ExeptionsHandlersService
+        ExeptionsHandlersService,
+
+        _LoggerService
 
     ],
     exports: [
         CommonService,
         ProcessDataService,
-        // DynamooseHelper,
         DateProcessService,
         SocketsService,
+        _LoggerService,
         ExeptionsHandlersService
     ]
 })
