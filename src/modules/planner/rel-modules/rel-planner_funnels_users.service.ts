@@ -104,8 +104,8 @@ export class Rel_Planner_Funnels_Library_Users_Service {
              */
             this._LoggerService.log({
                 message: `El usuario ${user.email} guardó el configurador:
-                _id: ${configPlanner._id} y se asoció a la carpeta de embudos:
-                _id: ${funnelLibrary._id}`,
+                _id: "${configPlanner._id}" y se asoció a la carpeta de embudos:
+                _id: "${funnelLibrary._id}"`,
             })
 
             await queryRunner.commitTransaction();

@@ -120,7 +120,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                 if (funnels_deleteEty.length > 0) {
 
                     let funnelsString = funnels_deleteEty.map((funnel: FunnelBody_et) => {
-                        return `_id: ${funnel._id} Embudo: ${funnel.name}`;
+                        return `_id: "${funnel._id}" Embudo: "${funnel.name}"`;
                     }).join(' \n ');
 
                     LoggerModels.push({
@@ -177,7 +177,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                 LoggerModels.push({
                     type: 'log',
                     message: `Usuario ${user.email} ha re escrito un embudo:
-                   _id: ${funnel._id} Embudo: ${funnel.name}`,
+                   _id: "${funnel._id}" Embudo: "${funnel.name}"`,
                     context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
                 });
 
@@ -186,7 +186,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                 LoggerModels.push({
                     type: 'log',
                     message: `Usuario ${user.email} ha creado un embudo:
-                    _id: ${funnel._id} Embudo: ${funnel.name}`,
+                    _id: "${funnel._id}" Embudo: "${funnel.name}"`,
                     context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
                 });
 
