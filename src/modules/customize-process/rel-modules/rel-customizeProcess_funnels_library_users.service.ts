@@ -109,8 +109,8 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
                 LoggerModels.push({
                     type: 'log',
                     message: `Usuario ${user.email} ha creado proceso comercial:
-                    _id: ${cust_id} Nombre de proceso: ${customizeProcess.name} para el embudo:
-                    _id: ${funnel._id} Embudo: ${funnel.name}`,
+                    _id: "${cust_id}" Nombre de proceso: "${customizeProcess.name}" para el embudo:
+                    _id: "${funnel._id}" Embudo: "${funnel.name}"`,
                     context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
                 })
 
