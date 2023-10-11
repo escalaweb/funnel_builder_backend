@@ -8,7 +8,7 @@ import { FunnelBody_et } from "../../funnels/entities";
 import { User_et } from "../../users/entities";
 import { UsersService } from "../../users/services/users.service";
 import { CustomizeProcess_et } from "../entities";
-import { _response_I } from "../../../common/interfaces";
+import { _argsFind, _response_I } from "../../../common/interfaces";
 import { AuthPayload_I } from "../../auth/interfaces";
 import { ConfigPlanner_et } from "../../planner/entities";
 
@@ -45,8 +45,6 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
     ) {
 
     }
-
-
 
     async create_customizeProcess(data: any, user: AuthPayload_I): Promise<_response_I<CustomizeProcess_et[]>> {
 
@@ -104,7 +102,7 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
                     }
                 });
 
-                let cust_id: string =  customizeProcess._id || uuid.v4();
+                let cust_id: string = customizeProcess._id || uuid.v4();
 
                 LoggerModels.push({
                     type: 'log',
@@ -154,7 +152,7 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
                 ]
             }
 
-                  this._LoggerService._emitLoggers(LoggerModels);
+            this._LoggerService._emitLoggers(LoggerModels);
 
 
         } catch (error) {
@@ -177,7 +175,7 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
                 ]
             }
 
-              this._LoggerService.error({
+            this._LoggerService.error({
                 message: `Usuario ${user.email} ha tenido un error al guardar proceso comercial para sus embudos`,
                 context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
             })
@@ -192,6 +190,68 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
         return _Response;
     }
 
+    async adrm_get_initial_customize_byEmail(email: string): Promise<_response_I<CustomizeProcess_et[]>> {
+
+        let _Response: _response_I<CustomizeProcess_et[]>;
+
+        const args: _argsFind<User_et> = {
+            findObject: {
+                where: {
+                    email: email,
+                }
+            }
+        }
+        const User_data: User_et = await this._usersService.findOne(args).then(resp => {
+            return resp.data;
+        });
+
+        let user: AuthPayload_I = {
+            _id: User_data._id,
+            email: User_data.email,
+            name: User_data.name,
+            username_id: User_data.username_id,
+            tenant_id: User_data.tenant_id,
+        }
+
+        let user_id: string = user._id;
+
+        await this._FunnelLibrary_et_repository
+            .createQueryBuilder('funnelLibrary')
+            .innerJoinAndSelect('funnels', 'f', 'f.funnelLibrary_id = funnelLibrary._id')
+            .innerJoinAndSelect('customize_process', 'cp', 'cp.funnel_id = f._id')
+            .where('funnelLibrary.user_id = :user_id', { user_id })
+            .select('cp.*')
+            .getRawMany<CustomizeProcess_et>().then(resp => {
+
+                _Response = {
+                    statusCode: (resp.length === 0) ? 404 : 200,
+                    ok: true,
+                    message: [{
+                        text: `Datos de proceso comercial del usuario ${email}`,
+                        type: 'global'
+                    }],
+                    data: resp,
+                }
+
+            }, err => {
+
+                _Response = {
+                    data: [],
+                    err: err,
+                    message: [{
+                        text: `Algo ha salido mal consultando datos de proceso comercial del usuario ${email}`,
+                        type: 'global'
+                    }],
+                    ok: false,
+                    statusCode: 500
+                }
+
+            });
+
+
+        return _Response;
+
+    }
 
 
 

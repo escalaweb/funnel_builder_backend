@@ -5,13 +5,13 @@ import { UpdateFunnelDto } from '../dto/update-funnel.dto';
 import { Auth } from '../../auth/decorators';
 import { AuthPayload_I } from '../../auth/interfaces/_jwt-payload.interface';
 import { Rel_Funnels_Planner_Library_Users_Service } from '../rel-modules/rel-funnels_planner_library_users.service';
+import { ADM_CODE } from '../../../common/constants';
 
 
 @Controller('funnels')
 export class FunnelsController {
 
 
-    adm_code: string = 'a3=Y122d$rve+{93YX@u_h';
 
     constructor(
         private readonly funnelsService: FunnelsService,
@@ -50,7 +50,7 @@ export class FunnelsController {
         const admCode = req.headers['adm-code'] || null;
         const x_api_key = req.headers['x-api-key'] || null;
 
-        if(admCode && admCode === this.adm_code && x_api_key != null){
+        if(admCode && admCode === ADM_CODE && x_api_key != null){
 
             return this._Rel_Funnels_Planner_Library_Users_Service.adrm_get_initial_funnel_byEmail(email);
 

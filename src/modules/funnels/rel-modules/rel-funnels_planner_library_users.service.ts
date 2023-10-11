@@ -407,7 +407,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
     async adrm_get_initial_funnel_byEmail(email: string): Promise<_response_I<FunnelBody_et[]>> {
 
-        let _Response: _response_I<any>;
+        let _Response: _response_I<FunnelBody_et[]>;
 
         const args: _argsFind<User_et> = {
             findObject: {
