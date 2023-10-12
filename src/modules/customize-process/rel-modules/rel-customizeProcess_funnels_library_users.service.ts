@@ -102,7 +102,7 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
                     }
                 });
 
-                let cust_id: string = customizeProcess._id || uuid.v4();
+                let cust_id: string = customizeProcess?._id || uuid.v4();
 
                 LoggerModels.push({
                     type: 'log',
