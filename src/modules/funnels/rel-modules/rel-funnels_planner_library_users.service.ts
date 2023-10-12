@@ -355,6 +355,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                     // establecer un interface o tipo de dato en funnel que soporte string y entity para config_step_id y replicar ese metodo en otros lugares
                     let aux_funnels: FunnelBody_et[] = structuredClone(aux_Response.data[0].funnels_id);
 
+
                     let config_step: ConfigPlanner_et = _.get(aux_Response.data[0], 'config_step_id', null);
 
                     if (config_step) {
@@ -377,7 +378,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                     }
 
                 } else {
-                    // _Response.data = [];
 
                     _Response = {
                         ok: true,

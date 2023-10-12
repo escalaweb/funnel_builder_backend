@@ -1,5 +1,7 @@
 import { Injectable, LoggerService, Scope } from '@nestjs/common';
 import * as winston from 'winston';
+import { ConfigProjectService } from '../../config/config.service';
+import { _Configuration_Keys } from '../../config/config.keys';
 
 export interface LoggModel {
     // dateStamp: string;
@@ -15,8 +17,16 @@ export class _LoggerService implements LoggerService {
     private readonly logger: winston.Logger;
 
     constructor(
-
+        private readonly _ConfigProjectService: ConfigProjectService
     ) {
+
+        let aux_transports: any[] = [
+            new winston.transports.Console()
+        ];
+
+        if(this._ConfigProjectService._get(_Configuration_Keys.ENVIROMENT) === 'development') {
+            aux_transports.push(new winston.transports.File({ filename: 'debug.log' }));
+        }
 
         this.logger = winston.createLogger({
             level: 'debug',
@@ -28,10 +38,7 @@ export class _LoggerService implements LoggerService {
                     return `[${timestamp}] - ${level}: ${message}`;
                 })
             ),
-            transports: [
-                // new winston.transports.File({ filename: 'debug.log' }),
-                new winston.transports.Console()
-            ],
+            transports: aux_transports
         });
 
     }
