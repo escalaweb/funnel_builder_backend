@@ -2,13 +2,22 @@ import { Injectable, LoggerService, Scope } from '@nestjs/common';
 import * as winston from 'winston';
 import { ConfigProjectService } from '../../config/config.service';
 import { _Configuration_Keys } from '../../config/config.keys';
+import { AuthPayload_I } from '../../modules/auth/interfaces';
 
-export interface LoggModel <T = any>{
+export interface LoggModel<T = any> {
     // dateStamp: string;
-    message: T;
+    message: string;
+    response: {
+        body?: T;
+        user?: AuthPayload_I;
+    };
     context?: string;
     trace?: any;
     type?: 'log' | 'error' | 'warn' | 'debug' | 'verbose';
+}
+
+export interface LoggModel_ByUser {
+
 }
 
 @Injectable({ scope: Scope.DEFAULT })
@@ -24,7 +33,7 @@ export class _LoggerService implements LoggerService {
             new winston.transports.Console()
         ];
 
-        if(this._ConfigProjectService._get(_Configuration_Keys.ENVIROMENT) === 'development') {
+        if (this._ConfigProjectService._get(_Configuration_Keys.ENVIROMENT) === 'development') {
             console.log('develop');
             aux_transports.push(new winston.transports.File({ filename: 'debug.log' }));
         }
@@ -44,37 +53,51 @@ export class _LoggerService implements LoggerService {
 
     }
 
-    log( LoggModel: LoggModel ) {
+    log(LoggModel: LoggModel) {
         let a: string = (LoggModel.context) ? `[${LoggModel.context}] - ${LoggModel.message}` : LoggModel.message;
         // console.log(a);
+        a += (LoggModel.response) ? ` - Resp: ${JSON.stringify(LoggModel.response)}` : '';
+
         this.logger.info(a);
     }
 
-    error( LoggModel: LoggModel ) {
+    error(LoggModel: LoggModel) {
         let a: string = (LoggModel.context) ? `[${LoggModel.context}] - ${LoggModel.message}` : LoggModel.message;
         // console.error( a, { ...LoggModel.trace } );
-        this.logger.error( a, { ...LoggModel.trace } );
+        a += (LoggModel.response) ? ` - Resp: ${JSON.stringify(LoggModel.response)}` : '';
+
+
+        this.logger.error(a, { ...LoggModel.trace });
     }
 
-    warn( LoggModel: LoggModel ) {
+    warn(LoggModel: LoggModel) {
         let a: string = (LoggModel.context) ? `[${LoggModel.context}] - ${LoggModel.message}` : LoggModel.message;
         // console.warn(a);
+        a += (LoggModel.response) ? ` - Resp: ${JSON.stringify(LoggModel.response)}` : '';
+
+
         this.logger.warn(a);
     }
 
-    debug( LoggModel: LoggModel ) {
+    debug(LoggModel: LoggModel) {
         let a: string = (LoggModel.context) ? `[${LoggModel.context}] - ${LoggModel.message}` : LoggModel.message;
         // console.debug(a);
+        a += (LoggModel.response) ? ` - Resp: ${JSON.stringify(LoggModel.response)}` : '';
+
+
         this.logger.debug(a);
     }
 
-    verbose( LoggModel: LoggModel ) {
+    verbose(LoggModel: LoggModel) {
         let a: string = (LoggModel.context) ? `[${LoggModel.context}] - ${LoggModel.message}` : LoggModel.message;
         // console.log(a);
+        a += (LoggModel.response) ? ` - Resp: ${JSON.stringify(LoggModel.response)}` : '';
+
+
         this.logger.verbose(a);
     }
 
-    _emitLoggers(LoggerModels: LoggModel[]){
+    _emitLoggers(LoggerModels: LoggModel[]) {
 
         for (const [i, LoggerModel] of LoggerModels.entries()) {
 

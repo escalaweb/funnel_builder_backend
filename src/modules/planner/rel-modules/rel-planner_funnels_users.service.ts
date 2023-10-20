@@ -27,22 +27,18 @@ export class Rel_Planner_Funnels_Library_Users_Service {
         @InjectRepository(FunnelLibrary_et)
         private readonly _FunnelLibrary_et_repository: Repository<FunnelLibrary_et>,
 
-
         private readonly _LoggerService: _LoggerService,
-          private readonly dataSource: DataSource,
-
+        private readonly dataSource: DataSource,
 
         private readonly _funnelLibraryService: FunnelLibraryService,
 
-
         private readonly _processData: ProcessDataService,
+
     ) {
 
     }
 
-
-
-    async create(createPlannerDto: any, user: AuthPayload_I) {
+    async create_configsPlanner(createPlannerDto: any, user: AuthPayload_I) {
 
         let _Response: _response_I<any>;
 
@@ -52,7 +48,7 @@ export class Rel_Planner_Funnels_Library_Users_Service {
             return resp.data;
         });
 
-        if ( !funnelLibrary || funnelLibrary === null) {
+        if (!funnelLibrary || funnelLibrary === null) {
 
             _Response = {
                 ok: false,
@@ -67,26 +63,33 @@ export class Rel_Planner_Funnels_Library_Users_Service {
             }
 
             this._LoggerService.warn({
-                message: `No se encontró una carpeta de embudos asociado a este Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} -`,
-                context: 'Rel_Planner_Funnels_Library_Users_Service - create',
+                // message: `No se encontró una carpeta de embudos asociado a este Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} -`,
+                message: `Usuario ${user.email} - No tiene una carpeta de embudos asociado`,
+                response: {
+                    user: {
+                        ...user
+                    }
+                },
+                context: 'Rel_Planner_Funnels_Library_Users_Service - create_configsPlanner',
             })
 
             throw new HttpException(_Response, _Response.statusCode);
 
         }
 
-        const config_step_id: string =  _.get(funnelLibrary, 'config_step_id._id', uuid.v4());
+        const config_step_id: string = _.get(funnelLibrary, 'config_step_id._id', uuid.v4());
 
         const configPlanner: ConfigPlanner_et = await this._ConfigPlanner_et_repository.create({
             _id: config_step_id,
             dash: null,
             toolsSettingsConfig: createPlannerDto.toolsSettingsConfig,
-            funnelLibrary_id: funnelLibrary
+            funnelLibrary_id: funnelLibrary,
+
         })
 
         funnelLibrary.config_step_id = configPlanner;
 
-          const queryRunner = this.dataSource.createQueryRunner();
+        const queryRunner = this.dataSource.createQueryRunner();
 
         await queryRunner.connect();
 
@@ -103,7 +106,22 @@ export class Rel_Planner_Funnels_Library_Users_Service {
                 Mostrar más detalles de la información que se guarda en el configurador
              */
             this._LoggerService.log({
-                message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - guardó el configurador: _id: "${configPlanner._id}" y se asoció a la carpeta de embudos: _id: "${funnelLibrary._id}"`,
+                // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - guardó el configurador: _id: "${configPlanner._id}" y se asoció a la carpeta de embudos: _id: "${funnelLibrary._id}"`,
+                message: `Usuario ${user.email} - Guardó configuraciones de herramientas de su carpeta de embudos`,
+                response: {
+                    user: {
+                        ...user
+                    },
+                    body: {
+                        configuraciones: {
+                            ..._.pick(configPlanner, ['_id', 'toolsSettingsConfig'])
+                        },
+                        carpeta: {
+                            ..._.pick(funnelLibrary, ['_id', 'name'])
+                        }
+                    }
+                },
+                context: 'Rel_Planner_Funnels_Library_Users_Service - create_configsPlanner',
             })
 
             await queryRunner.commitTransaction();
@@ -116,46 +134,55 @@ export class Rel_Planner_Funnels_Library_Users_Service {
             await queryRunner.rollbackTransaction();
             await queryRunner.release();
 
-             this._LoggerService.error({
-                message: `Error: ${error}`,
-                context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels',
+            this._LoggerService.error({
+                // message: `Error: ${error}`,
+                message: `Usuario ${user.email} - Error al guardar configuraciones de herramientas de su carpeta de embudos`,
+                response: {
+                    user: {
+                        ...user
+                    },
+                    body: {
+                        error: error
+                    }
+                },
+                context: 'Rel_Planner_Funnels_Library_Users_Service - create_configsPlanner',
             })
 
         }
 
-       /*
-       await this._processData.process_create<ConfigPlanner_et>(this._ConfigPlanner_et_repository, configPlanner).then(() => {
+        /*
+        await this._processData.process_create<ConfigPlanner_et>(this._ConfigPlanner_et_repository, configPlanner).then(() => {
 
-        }, err => {
+         }, err => {
 
-            _Response = err;
-            _Response.message = [
-                {
-                    text: 'Error al crear el configurador del embudo',
-                    type: 'global'
-                }
-            ]
-            throw new HttpException(_Response, _Response.statusCode);
+             _Response = err;
+             _Response.message = [
+                 {
+                     text: 'Error al crear el configurador del embudo',
+                     type: 'global'
+                 }
+             ]
+             throw new HttpException(_Response, _Response.statusCode);
 
-        })
+         })
 
-        await this._processData.process_create<FunnelLibrary_et>(this._FunnelLibrary_et_repository, funnelLibrary).then(response => {
+         await this._processData.process_create<FunnelLibrary_et>(this._FunnelLibrary_et_repository, funnelLibrary).then(response => {
 
-            _Response = response;
+             _Response = response;
 
-        }, err => {
+         }, err => {
 
-            _Response = err;
-            _Response.message = [
-                {
-                    text: 'Error al actualizar el funnel library',
-                    type: 'global'
-                }
-            ]
-            throw new HttpException(_Response, _Response.statusCode);
+             _Response = err;
+             _Response.message = [
+                 {
+                     text: 'Error al actualizar el funnel library',
+                     type: 'global'
+                 }
+             ]
+             throw new HttpException(_Response, _Response.statusCode);
 
-        })
-         */
+         })
+          */
 
 
         return _Response;

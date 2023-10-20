@@ -50,9 +50,9 @@ export interface Cognito_EsalaCustomer_Payment_I {
 
 
 export interface AuthPayload_I{
-    "_id": string;
-    "name": string;
-    "email": string;
-    "username_id": string;
-    "tenant_id": string;
+    _id?: string;
+    name?: string;
+    email?: string;
+    username_id?: string;
+    tenant_id?: string;
 }

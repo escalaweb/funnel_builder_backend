@@ -97,7 +97,18 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
             LoggerModels.push({
                 type: 'log',
-                message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado una carpeta de embudos`,
+                // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado una carpeta de embudos`,
+                message: `Usuario ${user.email} - ha creado una carpeta de embudos`,
+                response: {
+                    user: {
+                        ...user
+                    },
+                    body: {
+                        carpeta: {
+                            ..._.pick(funnelLibrary_id, ['_id', 'name'])
+                        }
+                    }
+                },
                 context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
             });
 
@@ -118,14 +129,25 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
                 if (funnels_deleteEty.length > 0) {
 
-                    let funnelsString = funnels_deleteEty.map((funnel: FunnelBody_et) => {
-                        return `_id: "${funnel._id}" Embudo: "${funnel.name}"`;
-                    }).join(' ');
+                    let funnelsString: any[] = funnels_deleteEty.map((funnel: FunnelBody_et) => {
+                        return {
+                            _id: funnel._id,
+                            Embudo: funnel.name
+                        }
+                    });
 
                     LoggerModels.push({
                         type: 'log',
-                        message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha eliminado los embudos que no vienen en el guardado: ${funnelsString}`,
-                        context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
+                        context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels',
+                        message: `Usuario ${user.email} - ha eliminado los embudos que no vienen en el guardado`,
+                        response: {
+                            user: {
+                                ...user
+                            },
+                            body: {
+                                embudos: [...funnelsString]
+                            }
+                        }
                     });
                 }
 
@@ -151,6 +173,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                     ..._item,
                     _id: _.get(_item, '_id', uuid.v4()),
                     funnel_id: item,
+
                 });
 
                 stages.push(aux)
@@ -170,31 +193,29 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
             if (aux_funnels_Ety.some(item => item._id === funnel._id)) {
 
-               /*
-               LoggerModels.push({
-                    type: 'log',
-                    message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha re escrito un embudo:
-                   _id: "${funnel._id}" Embudo: "${funnel.name}"`,
-                    context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
-                });
-            */
+                /*
                 LoggerModels.push({
-                    type: 'log',
-                    message: {
-                        message: 'esto es una prueba de mensaje',
-                        dato: '123456',
-                        otrodato: {
-                            m: 24
-                        }
-                    },
-                    context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
-                });
+                     type: 'log',
+                     message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha re escrito un embudo:
+                    _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                     context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
+                 });
+             */
 
             } else {
 
                 LoggerModels.push({
                     type: 'log',
-                    message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado un embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                    // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado un embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                    message: `Usuario ${user.email} - ha creado un embudo`,
+                    response: {
+                        user: {
+                            ...user
+                        },
+                        body: {
+                            ..._.pick(funnel, ['_id', 'name'])
+                        }
+                    },
                     context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
                 });
 
@@ -205,11 +226,13 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                 _id: _.get(funnel, '_id', uuid.v4()),
                 customizeProcess_step_id: funnel.customizeProcess_step_id || null,
                 funnelLibrary_id: funnelLibrary_id,
+                updatedAt: this._dateService.setDate(),
             });
 
         });
 
         funnelLibrary_id.funnels_id = [...funnels];
+        funnelLibrary_id.updatedAt = this._dateService.setDate();
 
         const queryRunner = this.dataSource.createQueryRunner();
 
@@ -264,7 +287,16 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
             this._LoggerService._emitLoggers(LoggerModels);
             this._LoggerService.error({
-                message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha tenido un error al guardar un embudo - Error: ${error}`,
+                // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha tenido un error al guardar un embudo - Error: ${error}`,
+                message: `Usuario ${user.email} - ha tenido un error al guardar un embudo`,
+                response: {
+                    user: {
+                        ...user
+                    },
+                    body: {
+                        error: error
+                    }
+                },
                 context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels',
             });
 
@@ -322,10 +354,14 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         let _Response: _response_I<any>;
 
-        let LoggerModels: LoggModel[] = [];
-
         this._LoggerService.log({
-            message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha solicitado su información de funnel builder inicial `,
+            // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha solicitado su información de funnel builder inicial `,
+            message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial `,
+            response: {
+                user: {
+                    ...user
+                }
+            },
             context: 'Rel_Funnels_Planner_Library_Users_Service - get_funnels',
         });
 
@@ -358,11 +394,16 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                     }
 
                     this._LoggerService.log({
-                        message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha obtenido su información de funnel builder inicial `,
-                        context: 'Rel_Funnels_Planner_Library_Users_Service - get_funnels',
-                    });
-                    this._LoggerService.debug({
-                        message: `_Response: ${JSON.stringify(_Response)} `,
+                        // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha obtenido su información de funnel builder inicial `,
+                        message: `El Usuario ${user.email} - Ha obtenido su información de funnel builder inicial `,
+                        response: {
+                            user: {
+                                ...user
+                            },
+                            body: {
+                                data: _Response.data
+                            }
+                        },
                         context: 'Rel_Funnels_Planner_Library_Users_Service - get_funnels',
                     });
 
@@ -378,7 +419,16 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                     }
 
                     this._LoggerService.log({
-                        message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
+                        // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
+                        message: `El Usuario ${user.email} - No tiene información de embudos inicial `,
+                        response: {
+                            user: {
+                                ...user
+                            },
+                            body: {
+                                data: null
+                            }
+                        },
                         context: 'Rel_Funnels_Planner_Library_Users_Service - get_funnels',
                     });
 
@@ -392,8 +442,17 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                     config_step: null
                 };
 
-                 this._LoggerService.log({
-                    message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
+                this._LoggerService.log({
+                    // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
+                    message: `El Usuario ${user.email} - No tiene información de embudos inicial `,
+                    response: {
+                        user: {
+                            ...user
+                        },
+                        body: {
+                            data: null
+                        }
+                    },
                     context: 'Rel_Funnels_Planner_Library_Users_Service - get_funnels',
                 });
             }
@@ -432,10 +491,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
             _Response = resp;
         })
 
-        if(_Response.data.length === 0) {
-
-
-        }
 
 
         return _Response;
