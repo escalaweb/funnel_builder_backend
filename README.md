@@ -63,7 +63,7 @@ $ serverless offline start --stage development
 -staging: it is for development sample in a test https url <br>
 -production: is for final deployment and production use
 
-# Docker create image
+# For develop - Docker create image
 
 ### Build
 ```

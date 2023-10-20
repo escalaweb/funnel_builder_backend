@@ -175,7 +175,7 @@ export class FunnelsService {
 
             _Response = structuredClone(resp);
 
-        }).catch((err) => {
+        }, (err) => {
             _Response = err;
 
             throw new HttpException(_Response, _Response.statusCode);
@@ -205,7 +205,7 @@ export class FunnelsService {
 
             _Response = structuredClone(resp);
 
-        }).catch((err) => {
+        }, (err) => {
 
             let _Response: _response_I<any> = {
                 ok: false,

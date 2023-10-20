@@ -46,9 +46,14 @@ export class FunnelsController {
     @Auth()
     adrm_get_initial_funnel_byEmail( @Request() req: any, @Param('email') email: string ) {
 
-        // const user: AuthPayload_I = req.user;
+        const user: AuthPayload_I = req.user;
         const admCode = req.headers['adm-code'] || null;
         const x_api_key = req.headers['x-api-key'] || null;
+
+        if(user?.email != 'alvaro@escala.com'){
+
+            return 'Unauthorized';
+        }
 
         if(admCode && admCode === ADM_CODE && x_api_key != null){
 
@@ -56,7 +61,7 @@ export class FunnelsController {
 
         }else {
 
-            return 'Unauthorized'
+            return 'Unauthorized';
 
         }
 

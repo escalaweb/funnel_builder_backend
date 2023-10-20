@@ -138,12 +138,14 @@ export class FunnelLibraryService {
         }
 
         await this._processData.process_getAll_paginate<FunnelLibrary_et>(this._FunnelLibrary_et_repository, args).then(async (resp) => {
+
             _Response = structuredClone(resp);
 
-        }).catch((err) => {
-            _Response = err;
+        }, (err) => {
 
+            _Response = err;
             throw new HttpException(_Response, _Response.statusCode);
+
         });
 
         return _Response;
@@ -189,7 +191,7 @@ export class FunnelLibraryService {
                 ]
             }
 
-        }).catch((err) => {
+        }, (err) => {
 
             _Response = err;
             throw new HttpException(_Response, _Response.statusCode);
@@ -234,7 +236,7 @@ export class FunnelLibraryService {
                 ]
             }
 
-        }).catch((err) => {
+        }, (err) => {
 
             _Response = err;
             throw new HttpException(_Response, _Response.statusCode);

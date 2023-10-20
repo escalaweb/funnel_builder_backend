@@ -259,7 +259,6 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
             let elements: T[] = [];
             let _resp: _response_I<T[]> = {} as _response_I<T[]>;
 
-
             const args_all: _argsFindMany_I = {
                 findObject: {
                     ...args.findObject
@@ -271,7 +270,7 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
 
                 elements = resp.data;
 
-            }).catch((err) => {
+            }, (err) => {
 
                 reject(err);
 
@@ -311,65 +310,6 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
                 resolve(_resp);
 
             })
-
-            /*
-
-            await paginate<T>(Model, args.options ).then(resp => {
-
-                let msg: _responseMessage_I[] = [];
-                let _resp: _response_I<T[]> = {} as _response_I<T[]>;
-
-                if (resp.items.length === 0) {
-
-                    msg.push({
-                        text: 'No se han encontrado resultados',
-                        type: 'global'
-                    });
-
-                         _resp = {
-                    ok: true,
-                    statusCode: 404,
-                    data: [],
-                    paginator: null,
-                    message: msg
-                }
-
-                resolve(_resp);
-
-                }
-
-                _resp = {
-                    ok: true,
-                    statusCode: 200,
-                    data: [...resp.items],
-                    paginator: {
-                        meta: { ...resp.meta },
-                        links: { ...resp.links }
-                    },
-                    message: msg
-                }
-
-                resolve(_resp);
-
-            }, err => {
-
-                let _resp: _response_I<T[]> = {
-                    ok: false,
-                    statusCode: 400,
-                    data: [],
-                    err: err,
-                    message: [
-                        {
-                            text: 'Algo ha salido mal, intente más tarde',
-                            type: 'global'
-                        }
-                    ]
-                }
-                // throw new HttpException(_resp, _resp.statusCode);
-                reject(_resp);
-
-            })
-        */
 
         })
 
@@ -499,7 +439,7 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
                 }
                 resolve(_resp)
 
-            }).catch((err) => {
+            }, (err) => {
 
                 let _resp: _response_I<T[]> = {
                     ok: false,
