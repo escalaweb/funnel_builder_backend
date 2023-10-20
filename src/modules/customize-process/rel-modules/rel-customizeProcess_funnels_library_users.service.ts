@@ -16,6 +16,7 @@ import * as uuid from 'uuid';
 import * as _ from "lodash";
 import { _LoggerService } from "../../../common/services";
 import { LoggModel } from "../../../common/services/_logger.service";
+import { response } from "express";
 
 @Injectable()
 export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
@@ -76,7 +77,13 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
             }
 
             this._LoggerService.warn({
-                message: `No se encontró una carpeta de embudos asociado a este Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} -`,
+                // message: `No se encontró una carpeta de embudos asociado a este Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} -`,
+                message: `Usuario ${user.email} - No tiene embudos asociados a su carpeta`,
+                response: {
+                    user: {
+                        ...user
+                    }
+                },
                 context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
             })
 
@@ -105,14 +112,31 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
 
                 LoggerModels.push({
                     type: 'log',
-                    message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha guardado un proceso comercial: _id: "${cust_id}" Nombre de proceso: "${customizeProcess.name}" para el embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                    // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha guardado un proceso comercial: _id: "${cust_id}" Nombre de proceso: "${customizeProcess.name}" para el embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                    message: `Usuario ${user.email} - ha guardado un proceso comercial`,
+                    response: {
+                        user: {
+                            ...user
+                        },
+                        body: {
+                            proceso_comercial: {
+                                _id: cust_id,
+                                name: customizeProcess.name,
+                                funnel_id: funnel._id,
+                                funnel_name: funnel.name
+                            }
+
+                        }
+                    },
                     context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
+
                 })
 
                 return this._CustomizeProcess_et_repository.create({
                     ...customizeProcess,
                     _id: cust_id,
-                    funnel_id: funnel
+                    funnel_id: funnel,
+
                 });
 
             });
@@ -173,12 +197,16 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
             }
 
             this._LoggerService.error({
-                message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha tenido un error al guardar proceso comercial para sus embudos`,
-                context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
-            })
-
-            this._LoggerService.error({
-                message: `Error: ${error}`,
+                // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha tenido un error al guardar proceso comercial para sus embudos`,
+                message: `Usuario ${user.email} - ha tenido un error al guardar proceso comercial para sus embudos`,
+                response: {
+                    user: {
+                        ...user
+                    },
+                    body: {
+                        error: error
+                    }
+                },
                 context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
             })
 

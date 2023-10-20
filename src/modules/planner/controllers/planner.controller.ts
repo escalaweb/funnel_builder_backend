@@ -20,7 +20,7 @@ export class PlannerController {
         const user: AuthPayload_I = req.user;
         // return this.plannerService.create(createPlannerDto ,user);
 
-        return this._Rel_Planner_Funnels_Library_Users_Service.create(createPlannerDto, user);
+        return this._Rel_Planner_Funnels_Library_Users_Service.create_configsPlanner(createPlannerDto, user);
 
     }
 
