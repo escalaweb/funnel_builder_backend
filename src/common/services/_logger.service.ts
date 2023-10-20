@@ -3,9 +3,9 @@ import * as winston from 'winston';
 import { ConfigProjectService } from '../../config/config.service';
 import { _Configuration_Keys } from '../../config/config.keys';
 
-export interface LoggModel {
+export interface LoggModel <T = any>{
     // dateStamp: string;
-    message: string;
+    message: T;
     context?: string;
     trace?: any;
     type?: 'log' | 'error' | 'warn' | 'debug' | 'verbose';
@@ -25,6 +25,7 @@ export class _LoggerService implements LoggerService {
         ];
 
         if(this._ConfigProjectService._get(_Configuration_Keys.ENVIROMENT) === 'development') {
+            console.log('develop');
             aux_transports.push(new winston.transports.File({ filename: 'debug.log' }));
         }
 
@@ -99,6 +100,7 @@ export class _LoggerService implements LoggerService {
             }
 
         }
+
     }
 
 }

@@ -65,9 +65,8 @@ export class Rel_Funnels_Planner_Library_Users_Service {
     async create_funnels(data: any[], user: AuthPayload_I): Promise<_response_I<FunnelLibrary_et>> {
 
         let _Response: _response_I<FunnelLibrary_et>;
-        // let _Response: _response_I<any>;
 
-        let LoggerModels: LoggModel[] = []
+        let LoggerModels: LoggModel[] = [];
 
         let funnelLibrary_id: FunnelLibrary_et;
 
@@ -98,7 +97,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
             LoggerModels.push({
                 type: 'log',
-                message: `Usuario ${user.email} ha creado una carpeta de embudos`,
+                message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado una carpeta de embudos`,
                 context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
             });
 
@@ -121,14 +120,11 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
                     let funnelsString = funnels_deleteEty.map((funnel: FunnelBody_et) => {
                         return `_id: "${funnel._id}" Embudo: "${funnel.name}"`;
-                    }).join(' \n ');
+                    }).join(' ');
 
                     LoggerModels.push({
                         type: 'log',
-                        message: `
-                    Usuario ${user.email} ha eliminado los embudos que no vienen en el guardado:
-                    ${funnelsString}
-               `,
+                        message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha eliminado los embudos que no vienen en el guardado: ${funnelsString}`,
                         context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
                     });
                 }
@@ -174,10 +170,23 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
             if (aux_funnels_Ety.some(item => item._id === funnel._id)) {
 
+               /*
+               LoggerModels.push({
+                    type: 'log',
+                    message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha re escrito un embudo:
+                   _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                    context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
+                });
+            */
                 LoggerModels.push({
                     type: 'log',
-                    message: `Usuario ${user.email} ha re escrito un embudo:
-                   _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                    message: {
+                        message: 'esto es una prueba de mensaje',
+                        dato: '123456',
+                        otrodato: {
+                            m: 24
+                        }
+                    },
                     context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
                 });
 
@@ -185,8 +194,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
                 LoggerModels.push({
                     type: 'log',
-                    message: `Usuario ${user.email} ha creado un embudo:
-                    _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                    message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado un embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
                     context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels'
                 });
 
@@ -195,7 +203,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
             return this._FunnelBody_et_repository.create({
                 ...funnel,
                 _id: _.get(funnel, '_id', uuid.v4()),
-                customizeProcess_step_id: null,
+                customizeProcess_step_id: funnel.customizeProcess_step_id || null,
                 funnelLibrary_id: funnelLibrary_id,
             });
 
@@ -212,7 +220,6 @@ export class Rel_Funnels_Planner_Library_Users_Service {
         try {
 
             await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
-
             // await queryRunner.manager.save(FunnelBody_et, funnels);
             await queryRunner.manager.save(FunnelBody_stages_et, stages);
 
@@ -236,10 +243,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
             this._LoggerService._emitLoggers(LoggerModels);
 
-
         } catch (error) {
-
-            console.log('error', error);
 
             await queryRunner.rollbackTransaction();
             await queryRunner.release();
@@ -257,40 +261,15 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                 ]
             }
 
-            this._LoggerService.error({
-                message: `Usuario ${user.email} ha tenido un error al guardar un embudo`,
-                context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels',
-            })
 
+            this._LoggerService._emitLoggers(LoggerModels);
             this._LoggerService.error({
-                message: `Error: ${error}`,
+                message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha tenido un error al guardar un embudo - Error: ${error}`,
                 context: 'Rel_Funnels_Planner_Library_Users_Service - create_funnels',
-            })
+            });
+
 
         }
-
-        // await this._processData.process_create<FunnelLibrary_et>(this._FunnelLibrary_et_repository, funnelLibrary_id).then(response => {
-
-        //     _Response = response;
-
-        //     _Response.message = [
-        //         {
-        //             text: 'Datos de embudos guardados',
-        //             type: 'global'
-        //         }
-        //     ]
-
-        // }, err => {
-        //     _Response = err;
-        //     _Response.message = [
-        //         {
-        //             text: 'Error al guardar datos de funnels',
-        //             type: 'global'
-        //         }
-        //     ]
-        //     // console.log('err', err);
-        //     throw new HttpException(_Response, _Response.statusCode);
-        // })
 
         return _Response;
 
@@ -343,6 +322,13 @@ export class Rel_Funnels_Planner_Library_Users_Service {
 
         let _Response: _response_I<any>;
 
+        let LoggerModels: LoggModel[] = [];
+
+        this._LoggerService.log({
+            message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha solicitado su información de funnel builder inicial `,
+            context: 'Rel_Funnels_Planner_Library_Users_Service - get_funnels',
+        });
+
         await this._FunnelLibraryService.findAll(1, user).then(async (resp) => {
 
             let aux_Response: _response_I<FunnelLibrary_et[]> = structuredClone(resp);
@@ -355,18 +341,12 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                     // establecer un interface o tipo de dato en funnel que soporte string y entity para config_step_id y replicar ese metodo en otros lugares
                     let aux_funnels: FunnelBody_et[] = structuredClone(aux_Response.data[0].funnels_id);
 
-
                     let config_step: ConfigPlanner_et = _.get(aux_Response.data[0], 'config_step_id', null);
 
                     if (config_step) {
 
                         delete config_step.funnelLibrary_id;
                     }
-
-                    // for (const [i, item] of aux_funnels.entries()) {
-
-                    //     delete item.funnelLibrary_id;
-                    // }
 
                     _Response = {
                         ok: true,
@@ -376,6 +356,15 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                             config_step: config_step
                         }
                     }
+
+                    this._LoggerService.log({
+                        message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha obtenido su información de funnel builder inicial `,
+                        context: 'Rel_Funnels_Planner_Library_Users_Service - get_funnels',
+                    });
+                    this._LoggerService.debug({
+                        message: `_Response: ${JSON.stringify(_Response)} `,
+                        context: 'Rel_Funnels_Planner_Library_Users_Service - get_funnels',
+                    });
 
                 } else {
 
@@ -387,6 +376,12 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                             config_step: null
                         }
                     }
+
+                    this._LoggerService.log({
+                        message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
+                        context: 'Rel_Funnels_Planner_Library_Users_Service - get_funnels',
+                    });
+
                 }
 
             } else {
@@ -397,7 +392,12 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                     config_step: null
                 };
 
+                 this._LoggerService.log({
+                    message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
+                    context: 'Rel_Funnels_Planner_Library_Users_Service - get_funnels',
+                });
             }
+
 
         });
 
@@ -431,6 +431,11 @@ export class Rel_Funnels_Planner_Library_Users_Service {
         await this.get_initial_funnel(user).then(resp => {
             _Response = resp;
         })
+
+        if(_Response.data.length === 0) {
+
+
+        }
 
 
         return _Response;

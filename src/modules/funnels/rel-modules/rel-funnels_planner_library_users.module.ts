@@ -4,12 +4,14 @@ import { UsersModule } from "../../users/users.module";
 import { FunnelLibraryModule } from "../../funnel-library/funnel-library.module";
 import { FunnelsModule, PlannerModule } from "../..";
 import { CustomizeProcessModule } from "../../customize-process/customize-process.module";
+import { EntitiesModule } from "../../../database/entities/entities.module";
 
 
 @Module({
     providers: [Rel_Funnels_Planner_Library_Users_Service],
     imports: [
         // FunnelsModule,
+        EntitiesModule,
         forwardRef(() => FunnelsModule),
         forwardRef(() => PlannerModule),
         UsersModule,

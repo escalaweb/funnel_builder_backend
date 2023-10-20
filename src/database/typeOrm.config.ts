@@ -21,7 +21,7 @@ export default new DataSource({
 
     entities: ["dist/**/*.entity{.ts,.js}"],
 
-    migrations: ["dist/config/migrations/*{.ts,.js}"],
+    migrations: ["dist/database/migrations/*{.ts,.js}"],
     migrationsTableName: "_migrations",
 
 });

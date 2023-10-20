@@ -27,6 +27,12 @@ export class User_et extends EntityKey_et {
      })
     name?: string;
 
+    // @Column({
+    //     type: "varchar",
+    //     nullable: true
+    //  })
+    // test2?: string;
+
     @Column({
         type: "varchar",
      })
@@ -43,7 +49,6 @@ export class User_et extends EntityKey_et {
         default: 0
     })
     lastAccessAt?: string;
-
 
     @OneToMany(
         () => FunnelLibrary_et,

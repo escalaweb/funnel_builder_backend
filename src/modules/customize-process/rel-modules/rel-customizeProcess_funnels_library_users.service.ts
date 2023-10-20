@@ -76,7 +76,7 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
             }
 
             this._LoggerService.warn({
-                message: `No se encontró una carpeta de embudos asociado a este usuario ${user.email}`,
+                message: `No se encontró una carpeta de embudos asociado a este Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} -`,
                 context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
             })
 
@@ -89,7 +89,6 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
         await queryRunner.connect();
 
         await queryRunner.startTransaction();
-
         try {
 
             const customizeProcessPromises = data.customizeModels.map(async (customizeProcess: any) => {
@@ -106,9 +105,7 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
 
                 LoggerModels.push({
                     type: 'log',
-                    message: `Usuario ${user.email} ha creado proceso comercial:
-                    _id: "${cust_id}" Nombre de proceso: "${customizeProcess.name}" para el embudo:
-                    _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                    message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha guardado un proceso comercial: _id: "${cust_id}" Nombre de proceso: "${customizeProcess.name}" para el embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
                     context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
                 })
 
@@ -176,7 +173,7 @@ export class Rel_CustomizeProcess_Funnels_Library_Users_Service {
             }
 
             this._LoggerService.error({
-                message: `Usuario ${user.email} ha tenido un error al guardar proceso comercial para sus embudos`,
+                message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha tenido un error al guardar proceso comercial para sus embudos`,
                 context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
             })
 

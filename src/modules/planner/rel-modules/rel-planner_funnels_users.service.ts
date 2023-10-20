@@ -67,7 +67,7 @@ export class Rel_Planner_Funnels_Library_Users_Service {
             }
 
             this._LoggerService.warn({
-                  message: `No se encontró una carpeta de embudos asociado a este usuario ${user.email}`,
+                message: `No se encontró una carpeta de embudos asociado a este Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} -`,
                 context: 'Rel_Planner_Funnels_Library_Users_Service - create',
             })
 
@@ -103,9 +103,7 @@ export class Rel_Planner_Funnels_Library_Users_Service {
                 Mostrar más detalles de la información que se guarda en el configurador
              */
             this._LoggerService.log({
-                message: `El usuario ${user.email} guardó el configurador:
-                _id: "${configPlanner._id}" y se asoció a la carpeta de embudos:
-                _id: "${funnelLibrary._id}"`,
+                message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - guardó el configurador: _id: "${configPlanner._id}" y se asoció a la carpeta de embudos: _id: "${funnelLibrary._id}"`,
             })
 
             await queryRunner.commitTransaction();
