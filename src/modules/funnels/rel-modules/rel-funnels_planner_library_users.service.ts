@@ -393,7 +393,7 @@ export class Rel_Funnels_Planner_Library_Users_Service {
                         }
                     }
 
-                    this._LoggerService.log({
+                    this._LoggerService.debug({
                         // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha obtenido su información de funnel builder inicial `,
                         message: `El Usuario ${user.email} - Ha obtenido su información de funnel builder inicial `,
                         response: {

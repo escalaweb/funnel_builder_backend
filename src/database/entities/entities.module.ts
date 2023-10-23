@@ -5,6 +5,14 @@ import { FUNNELS_ENTITIES_MODULE, FUNNEL_STAGES_ENTITIES_MODULE } from '../../mo
 import { FUNNEL_LIBRARY_ENTITIES_MODULE } from '../../modules/funnel-library/entities/entities.module';
 import { CUSTOMIZE_PROCESS_ENTITIES_MODULE } from '../../modules/customize-process/entities/entities.module';
 
+
+
+/**
+ * Modulo tipo barrel que importa todos los modulos de entidades postgresql del proyecto
+ *
+ * @export
+ * @class EntitiesModule
+ */
 @Module({
     imports: [
         USER_ENTITIES_MODULE,
