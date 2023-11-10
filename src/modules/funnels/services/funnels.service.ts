@@ -439,7 +439,6 @@ export class FunnelsService {
         let _Response: _response_I<any>;
 
         this._LoggerService.log({
-            // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha solicitado su información de funnel builder inicial `,
             message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial `,
             response: {
                 user: {
