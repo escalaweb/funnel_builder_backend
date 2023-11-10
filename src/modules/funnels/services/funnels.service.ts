@@ -170,6 +170,14 @@ export class FunnelsService {
 
         let funnels_deleteEty: FunnelBody_et[] = [];
 
+        const queryRunner = this.dataSource.createQueryRunner();
+
+        await queryRunner.connect();
+
+        await queryRunner.startTransaction();
+
+        try {
+
         if (funnelLibrary_id === null) {
 
             funnelLibrary_id = await this._FunnelLibrary_et_repository.create({
@@ -318,13 +326,7 @@ export class FunnelsService {
         funnelLibrary_id.funnels_id = [...funnels];
         funnelLibrary_id.updatedAt = this._dateService.setDate();
 
-        const queryRunner = this.dataSource.createQueryRunner();
 
-        await queryRunner.connect();
-
-        await queryRunner.startTransaction();
-
-        try {
 
             await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
             // await queryRunner.manager.save(FunnelBody_et, funnels);
