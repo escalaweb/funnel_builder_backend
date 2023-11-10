@@ -10,22 +10,27 @@ export class Admin_Internal_Guard implements CanActivate {
         context: ExecutionContext,
     ): boolean | Promise<boolean> | Observable<boolean> {
 
-        const request = context.switchToHttp().getRequest();
-        const user: AuthPayload_I = request.user;
-        const emailParam = request.params.email;
-        const admCode = request.headers['adm-code'];
-        const xApiKey = request.headers['x-api-key'];
+        try {
+            const request = context.switchToHttp().getRequest();
+            const user: AuthPayload_I = request.user;
+            const emailParam = request.params.email;
+            const admCode = request.headers['adm-code'];
+            const xApiKey = request.headers['x-api-key'];
 
-        // Revisar si el correo del usuario es el correcto
-        if (user?.email !== 'alvaro@escala.com') {
-            throw new UnauthorizedException('Access denied: Incorrect user email.');
-        }
+            // Revisar si el correo del usuario es el correcto
+            if (user?.email !== 'alvaro@escala.com') {
+                throw new UnauthorizedException('Access denied: Incorrect user email.');
+            }
 
-        // Revisar si admCode y xApiKey son válidos
-        if (admCode === ADM_CODE && xApiKey) {
-            return true;
-        } else {
-            throw new UnauthorizedException('Access denied: Invalid credentials.');
+            // Revisar si admCode y xApiKey son válidos
+            if (admCode === ADM_CODE && xApiKey) {
+                return true;
+            } else {
+                throw new UnauthorizedException('Access denied: Invalid credentials.');
+            }
+
+        } catch (error) {
+            throw new UnauthorizedException('Not access', error);
         }
 
     }
