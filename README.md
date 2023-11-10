@@ -100,3 +100,8 @@ docker image prune
 ```
 npx ts-node ./node_modules/typeorm/cli.js migration:generate -n {$name_version_migration}
 ```
+
+
+
+
+docker compose -f docker-compose.prod.yaml --env-file ./env/.prod.env up --build

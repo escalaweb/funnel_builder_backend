@@ -10,43 +10,45 @@ import { AuthPayload_I } from "../../auth/interfaces/_jwt-payload.interface";
 @Controller('funnel-library')
 @Auth()
 export class FunnelLibraryController {
-  constructor(private readonly funnelLibraryService: FunnelLibraryService) {}
+    constructor(
+        private readonly funnelLibraryService: FunnelLibraryService
+    ) { }
 
-  @Post()
-  create(@Body() createFunnelLibraryDto: CreateFunnelLibraryDto, @Request() req: any) {
+    @Post()
+    create(@Body() createFunnelLibraryDto: CreateFunnelLibraryDto, @Request() req: any) {
 
-    const user: AuthPayload_I = req.user;
-    return this.funnelLibraryService.create(createFunnelLibraryDto, user);
+        const user: AuthPayload_I = req.user;
+        return this.funnelLibraryService.create(createFunnelLibraryDto, user);
 
-  }
+    }
 
-  @Get()
-  findAll( @Request() req: any ) {
-    const user: AuthPayload_I = req.user;
-    return this.funnelLibraryService.findAll(1, user);
-  }
+    @Get()
+    findAll(@Request() req: any) {
+        const user: AuthPayload_I = req.user;
+        return this.funnelLibraryService.findAll(1, user);
+    }
 
-//   @Get('initial')
-//   get_initial_funnel( @Request() req: any ) {
-//     const user: AuthPayload_I = req.user;
-//     return this.funnelLibraryService.get_initial_funnel(user);
-//   }
+    //   @Get('initial')
+    //   get_initial_funnel( @Request() req: any ) {
+    //     const user: AuthPayload_I = req.user;
+    //     return this.funnelLibraryService.get_initial_funnel(user);
+    //   }
 
 
-  @Get(':id')
-  findOne(@Param('id') id: string,  @Request() req: any) {
-    const user: AuthPayload_I = req.user;
-    return this.funnelLibraryService.findOne(id, user);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string, @Request() req: any) {
+        const user: AuthPayload_I = req.user;
+        return this.funnelLibraryService.findOne(id, user);
+    }
 
-  @Patch(':id')
-  update(@Param('id',) id: string, @Body() updateFunnelLibraryDto: UpdateFunnelLibraryDto,  @Request() req: any) {
-    const user: AuthPayload_I = req.user;
-    // return this.funnelLibraryService.update(id, updateFunnelLibraryDto, user);
-  }
+    @Patch(':id')
+    update(@Param('id',) id: string, @Body() updateFunnelLibraryDto: UpdateFunnelLibraryDto, @Request() req: any) {
+        const user: AuthPayload_I = req.user;
+        // return this.funnelLibraryService.update(id, updateFunnelLibraryDto, user);
+    }
 
-//   @Delete(':id')
-//   remove(@Param('id') id: string) {
+    //   @Delete(':id')
+    //   remove(@Param('id') id: string) {
     // return this.funnelLibraryService.remove(+id);
-//   }
+    //   }
 }

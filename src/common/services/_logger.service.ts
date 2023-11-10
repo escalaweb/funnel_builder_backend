@@ -16,9 +16,6 @@ export interface LoggModel<T = any> {
     type?: 'log' | 'error' | 'warn' | 'debug' | 'verbose';
 }
 
-export interface LoggModel_ByUser {
-
-}
 
 @Injectable({ scope: Scope.DEFAULT })
 export class _LoggerService implements LoggerService {
@@ -33,8 +30,7 @@ export class _LoggerService implements LoggerService {
             new winston.transports.Console()
         ];
 
-        if (this._ConfigProjectService._get(_Configuration_Keys.ENVIROMENT) === 'development') {
-            console.log('develop');
+        if (this._ConfigProjectService._get(_Configuration_Keys.ENVIROMENT) === 'developer') {
             aux_transports.push(new winston.transports.File({ filename: 'debug.log' }));
         }
 

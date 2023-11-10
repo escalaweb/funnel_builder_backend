@@ -1,21 +1,22 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { PlannerService } from './services/planner.service';
+import { Module } from '@nestjs/common';
 import { PlannerController } from './controllers/planner.controller';
-
-import { Rel_Planner_Funnels_Library_Users_Module } from './rel-modules/rel-planner_funnels_library_users.module';
+import { Planner_Rel_Module } from './rel.module';
 import { EntitiesModule } from '../../database/entities/entities.module';
+import { PlannerService } from './services/planner.service';
+
+
 
 @Module({
-  controllers: [PlannerController],
-  providers: [PlannerService],
-  imports: [
-    EntitiesModule,
-    //   forwardRef(() => Rel_Planner_Funnels_Users_Module),
-    Rel_Planner_Funnels_Library_Users_Module,
-  ],
-  exports: [
-
-    PlannerService
-  ]
+    controllers: [PlannerController],
+    providers: [
+        PlannerService
+    ],
+    imports: [
+        EntitiesModule,
+        Planner_Rel_Module
+    ],
+    exports: [
+        PlannerService
+    ]
 })
-export class PlannerModule {}
+export class PlannerModule { }

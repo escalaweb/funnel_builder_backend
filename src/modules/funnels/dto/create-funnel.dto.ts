@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 import { IsString, MinLength, IsEmail, MaxLength, Matches, IsNotEmpty } from "class-validator";
-import { FunnelRelationSwitch_I } from "../interfaces";
+import { FunnelMetricsPorcents_I } from "../interfaces";
 
 
 export class CreateFunnelDto {

@@ -1,10 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Request } from '@nestjs/common';
 import { FunnelsService } from '../services/funnels.service';
-import { CreateFunnelDto } from '../dto/create-funnel.dto';
-import { UpdateFunnelDto } from '../dto/update-funnel.dto';
 import { Auth } from '../../auth/decorators';
 import { AuthPayload_I } from '../../auth/interfaces/_jwt-payload.interface';
-import { Rel_Funnels_Planner_Library_Users_Service } from '../rel-modules/rel-funnels_planner_library_users.service';
 import { ADM_CODE } from '../../../common/constants';
 
 
@@ -12,19 +9,16 @@ import { ADM_CODE } from '../../../common/constants';
 export class FunnelsController {
 
 
-
     constructor(
         private readonly funnelsService: FunnelsService,
-        private readonly _Rel_Funnels_Planner_Library_Users_Service: Rel_Funnels_Planner_Library_Users_Service
     ) { }
-
 
     @Post()
     @Auth()
     create(@Body() createFunnelDto: any[], @Request() req: any) {
 
         const user: AuthPayload_I = req.user;
-        return this._Rel_Funnels_Planner_Library_Users_Service.create_funnels(createFunnelDto, user);
+        return this.funnelsService.create_funnels(createFunnelDto, user);
 
     }
 
@@ -39,7 +33,7 @@ export class FunnelsController {
     @Auth()
     get_initial_funnel(@Request() req: any) {
         const user: AuthPayload_I = req.user;
-        return this._Rel_Funnels_Planner_Library_Users_Service.get_initial_funnel(user);
+        return this.funnelsService.get_initial_funnel(user);
     }
 
     @Get('adm/initial/:email')
@@ -57,7 +51,7 @@ export class FunnelsController {
 
         if(admCode && admCode === ADM_CODE && x_api_key != null){
 
-            return this._Rel_Funnels_Planner_Library_Users_Service.adrm_get_initial_funnel_byEmail(email);
+            return this.funnelsService.adrm_get_initial_funnel_byEmail(email);
 
         }else {
 
@@ -81,13 +75,5 @@ export class FunnelsController {
         return this.funnelsService.findOne(funnel_id, user);
     }
 
-    // @Patch(':id')
-    // update(@Param('id') id: string, @Body() updateFunnelDto: UpdateFunnelDto) {
-    //     return this.funnelsService.update(+id, updateFunnelDto);
-    // }
 
-    // @Delete(':id')
-    // remove(@Param('id') id: string) {
-    //     return this.funnelsService.remove(+id);
-    // }
 }
