@@ -22,14 +22,10 @@ import { DynamooseHelper } from './helpers';
         },
         CommonService,
         ProcessDataService,
-        // DynamooseHelper,
         DateProcessService,
-
         SocketsGateway,
         SocketsService,
-
         ExeptionsHandlersService,
-
         _LoggerService
 
     ],

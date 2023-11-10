@@ -10,7 +10,6 @@ export const _POSTGRES_CONNECTION_MODULE = TypeOrmModule.forRootAsync({
     imports: [ConfigModule],
     inject: [ConfigService],
     useFactory: () => ({
-
         type: 'postgres',
         host: _config._get(_Configuration_Keys.DB_HOST),
         port: Number(_config._get(_Configuration_Keys.DB_PORT)),
@@ -18,7 +17,9 @@ export const _POSTGRES_CONNECTION_MODULE = TypeOrmModule.forRootAsync({
         username: _config._get(_Configuration_Keys.DB_USERNAME),
         password: _config._get(_Configuration_Keys.DB_PASSWORD),
         // entities: [],
-        synchronize: (_config._get(_Configuration_Keys.ENVIROMENT) === 'developer')? true: false,
+        // synchronize: (_config._get(_Configuration_Keys.ENVIROMENT) === 'developer')? true: false,
+        // synchronize: true,
+        synchronize: false,
         autoLoadEntities: true,
 
     })

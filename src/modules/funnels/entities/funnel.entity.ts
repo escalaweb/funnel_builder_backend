@@ -2,12 +2,10 @@
 
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { EntityKey_et } from "../../../common/entities";
-import { FunnelItem_I, FunnelRelationSwitch_I, FunnelStage_Item_Type, StageItems_Value_I, ToolSetting_I, ToolSetting_Type, ToolSettingsOrganization_I } from "../interfaces";
+import { FunnelItem_I, FunnelMetricsPorcents_I, FunnelStage_Item_Type, Funnel_TimingMetrics_Type, StageItems_Metrics_I, ToolSetting_I, ToolSettingsOrganization_I } from "../interfaces";
 import { FunnelLibrary_et } from "../../funnel-library/entities/funnel-library.entity";
-import { ConfigPlanner_et } from "../../planner/entities/configPlanner.entity";
 import { DateProcessService } from "../../../common/adapters";
 import { CustomizeProcess_et } from "../../customize-process/entities";
-
 
 
 @Entity({
@@ -32,6 +30,12 @@ export class FunnelBody_et extends EntityKey_et {
     })
     type: FunnelStage_Item_Type;
 
+    @Column({
+        type: "varchar",
+        default: "daily"
+    })
+    timingMetrics: Funnel_TimingMetrics_Type;
+
     @OneToMany(() => FunnelBody_stages_et, stage => stage.funnel_id, { cascade: true })
     stages: FunnelBody_stages_et[];
 
@@ -43,14 +47,13 @@ export class FunnelBody_et extends EntityKey_et {
     @Column({
         type: 'jsonb',
     })
-    relations: FunnelRelationSwitch_I[];
+    metricsPorcents: FunnelMetricsPorcents_I[];
 
     @OneToOne(() => CustomizeProcess_et, CustomizeProcess => CustomizeProcess.funnel_id)
     @JoinColumn({
         name: 'customizeProcess_step_id'
     })
     customizeProcess_step_id: CustomizeProcess_et;
-
 
     // @ManyToOne(() => ConfigPlanner_et, configStep => configStep.funnel_id)
     // @JoinColumn({ name: 'config_step_id' })
@@ -82,7 +85,7 @@ export class FunnelBody_stages_et extends EntityKey_et {
     @Column({
         type: "jsonb",
     })
-    value: StageItems_Value_I;
+    metrics: StageItems_Metrics_I;
 
     @Column({
         type: "varchar",

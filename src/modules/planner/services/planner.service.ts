@@ -1,91 +1,153 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { CreatePlannerDto } from '../dto/create-planner.dto';
-import { UpdatePlannerDto } from '../dto/update-planner.dto';
 import { AuthPayload_I } from '../../auth/interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ProcessDataService, DateProcessService } from '../../../common/adapters';
+import { DataSource, Repository } from 'typeorm';
+import { ProcessDataService } from '../../../common/adapters';
 import { ConfigPlanner_et } from '../entities';
-import { FunnelBody_et } from '../../funnels/entities';
-import { FunnelsService } from '../../funnels/services/funnels.service';
 import { _response_I } from '../../../common/interfaces';
+import { FunnelLibrary_et } from '../../funnel-library/entities';
+import { FunnelLibraryService } from '../../funnel-library/services/funnel-library.service';
+import { _LoggerService } from '../../../common/services';
+
+import * as uuid from 'uuid';
+import * as _ from "lodash";
 
 @Injectable()
 
 export class PlannerService {
 
-    constructor(
 
+    constructor(
         @InjectRepository(ConfigPlanner_et)
         private readonly _ConfigPlanner_et_repository: Repository<ConfigPlanner_et>,
 
-        // @InjectRepository(FunnelBody_et)
-        // private readonly _FunnelBody_et_repository: Repository<FunnelBody_et>,
+        private readonly _LoggerService: _LoggerService,
+        private readonly dataSource: DataSource,
 
-        // private readonly _funnelService: FunnelsService,
+        private readonly _funnelLibraryService: FunnelLibraryService,
 
         private readonly _processData: ProcessDataService,
-        private readonly _dateService: DateProcessService,
 
     ) {
 
     }
 
-    // async create(createPlannerDto: any, user: AuthPayload_I) {
+    async create_configsPlanner(createPlannerDto: any, user: AuthPayload_I) {
 
-    //     let _Response: _response_I<any>;
+        let _Response: _response_I<any>;
 
-    //     // TODO
-    //     // 1. Validar que  el funnel_id exista y sea propiedad del usuario
-    //     // Mejorar la forma en la que se guardan estos datos
-    //     let funnel: FunnelBody_et = {} as FunnelBody_et;
+        // TODO
+        // Refactorizar a futuro la posibilidad de que sean más de un library funnel por usuario
+        const funnelLibrary: FunnelLibrary_et = await this._funnelLibraryService.findOne_byUser(user).then(resp => {
+            return resp.data;
+        });
 
-    //     await this._funnelService.findOne(funnel_id, user).then(resp => {
-    //         funnel = structuredClone(resp.data);
-    //     })
+        if (!funnelLibrary || funnelLibrary === null) {
 
-    //     let data_config: any = {
-    //         dash: null,
-    //         toolsSettingsConfig: createPlannerDto.toolsSettingsConfig!,
-    //     }
+            _Response = {
+                ok: false,
+                data: null,
+                statusCode: 404,
+                message: [
+                    {
+                        text: 'No se encontró un funnel asociado a este usuario',
+                        type: 'global'
+                    }
+                ]
+            }
 
-    //     await this._processData.process_create<ConfigPlanner_et>(this._ConfigPlanner_et_repository, data_config).then(response => {
+            this._LoggerService.warn({
+                // message: `No se encontró una carpeta de embudos asociado a este Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} -`,
+                message: `Usuario ${user.email} - No tiene una carpeta de embudos asociado`,
+                response: {
+                    user: {
+                        ...user
+                    }
+                },
+                context: 'Rel_Planner_Funnels_Library_Users_Service - create_configsPlanner',
+            })
 
-    //         data_config = response.data;
+            throw new HttpException(_Response, _Response.statusCode);
 
-    //     }, err => {
-    //         _Response = err;
-    //         console.log('err', err);
-    //         throw new HttpException(_Response, _Response.statusCode);
-    //     })
+        }
 
-    //     let data = {
-    //         config_step_id: data_config._id
-    //     }
+        const config_step_id: string = _.get(funnelLibrary, 'config_step_id._id', uuid.v4());
 
-    //     await this._funnelService.update( funnel._id, data, user).then( resp => {
+        const configPlanner: ConfigPlanner_et = await this._ConfigPlanner_et_repository.create({
+            _id: config_step_id,
+            dash: null,
+            toolsSettingsConfig: createPlannerDto.toolsSettingsConfig,
+            funnelLibrary_id: funnelLibrary,
 
-    //         _Response = resp;
+        })
 
-    //     } );
+        funnelLibrary.config_step_id = configPlanner;
 
-    //     return _Response;
+        const queryRunner = this.dataSource.createQueryRunner();
 
-    // }
+        await queryRunner.connect();
 
-    findAll() {
-        return `This action returns all planner`;
+        await queryRunner.startTransaction();
+
+        try {
+
+            await queryRunner.manager.save(ConfigPlanner_et, configPlanner);
+
+            // await queryRunner.manager.save(FunnelBody_et, funnels);
+            await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary);
+
+            /* TODO
+                Mostrar más detalles de la información que se guarda en el configurador
+             */
+            this._LoggerService.log({
+                // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - guardó el configurador: _id: "${configPlanner._id}" y se asoció a la carpeta de embudos: _id: "${funnelLibrary._id}"`,
+                message: `Usuario ${user.email} - Guardó configuraciones de herramientas de su carpeta de embudos`,
+                response: {
+                    user: {
+                        ...user
+                    },
+                    body: {
+                        configuraciones: {
+                            ..._.pick(configPlanner, ['_id', 'toolsSettingsConfig'])
+                        },
+                        carpeta: {
+                            ..._.pick(funnelLibrary, ['_id', 'name'])
+                        }
+                    }
+                },
+                context: 'Rel_Planner_Funnels_Library_Users_Service - create_configsPlanner',
+            })
+
+            await queryRunner.commitTransaction();
+            await queryRunner.release();
+
+
+        } catch (error) {
+
+            console.log('error', error);
+            await queryRunner.rollbackTransaction();
+            await queryRunner.release();
+
+            this._LoggerService.error({
+                // message: `Error: ${error}`,
+                message: `Usuario ${user.email} - Error al guardar configuraciones de herramientas de su carpeta de embudos`,
+                response: {
+                    user: {
+                        ...user
+                    },
+                    body: {
+                        error: error
+                    }
+                },
+                context: 'Rel_Planner_Funnels_Library_Users_Service - create_configsPlanner',
+            })
+
+        }
+
+        return _Response;
+
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} planner`;
-    }
 
-    // update(id: number, updatePlannerDto: UpdatePlannerDto) {
-    //     return `This action updates a #${id} planner`;
-    // }
 
-    // remove(id: number) {
-    //     return `This action removes a #${id} planner`;
-    // }
 }

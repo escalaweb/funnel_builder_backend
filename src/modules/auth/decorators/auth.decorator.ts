@@ -1,9 +1,6 @@
 import { applyDecorators, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-// import { RoleType } from "../../roles/enum/roletype.enum";
-import { SameUserAuthGuard, SameUserOrAdminGuard } from "../guards";
-// import { UserRoleGuard } from "../guards/user-role.guard";
-// import { RoleProtect } from "./role-protect.decorator";
+import { Admin_Internal_Guard, SameUserAuthGuard, SameUserOrAdminGuard } from "../guards";
 
 
 export function Auth() {
@@ -15,6 +12,13 @@ export function Auth() {
         // UseGuards(AuthGuard, RolesGuard),
         // ApiBearerAuth(),
         // ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+    );
+}
+
+export function Auth_Admin_Internal() {
+
+    return applyDecorators(
+        UseGuards(AuthGuard('jwt'), Admin_Internal_Guard)
     );
 }
 

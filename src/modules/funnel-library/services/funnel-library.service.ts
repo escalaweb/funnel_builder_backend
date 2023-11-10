@@ -1,15 +1,12 @@
 import { HttpException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindOneOptions, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { ProcessDataService, DateProcessService } from "../../../common/adapters";
 
 import { FunnelLibrary_et } from "../entities";
 import { _argsFind, _argsPagination, _response_I } from "../../../common/interfaces";
 import { CreateFunnelLibraryDto } from "../dto";
 import { AuthPayload_I } from "../../auth/interfaces/_jwt-payload.interface";
-import { FunnelLibrary_I } from "../interfaces";
-import { FunnelBody_et } from "../../funnels/entities";
-import { ConfigPlanner_et } from "../../planner/entities";
 
 
 

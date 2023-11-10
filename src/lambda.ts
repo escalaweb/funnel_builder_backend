@@ -1,34 +1,4 @@
-// import { NestFactory } from '@nestjs/core';
-// import { AppModule } from './app.module';
-// import { ExpressAdapter } from '@nestjs/platform-express';
-// import * as serverless from 'serverless-http';
-// // import { Express } from 'express';
 
-
-// const express = require('express');
-
-
-// let cachedServer;
-
-// async function bootstrap() {
-//   const expressApp = express();
-//   const adapter = new ExpressAdapter(expressApp);
-
-//   const app = await NestFactory.create(AppModule, adapter);
-//   await app.init();
-
-//   return expressApp;
-// }
-
-// export const handler = async (event, context) => {
-//   if (!cachedServer) {
-//     cachedServer = await bootstrap();
-//   }
-//   return serverless(cachedServer)(event, context);
-// };
-
-
-// --------------
 
 import { Handler, Context } from 'aws-lambda';
 import { Server } from 'http';
@@ -90,13 +60,13 @@ async function bootstrapServer(): Promise<Server> {
             },
         });
 
-
         const config = new DocumentBuilder()
             .setTitle('Funnel builder Escala Restful Api')
             .setDescription('Funnel builder Escala endpoints')
             .setVersion('1.0')
             .build();
         const document = SwaggerModule.createDocument(app, config);
+
         SwaggerModule.setup('api-doc', app, document);
 
         await app.init().then(resp => {
@@ -107,8 +77,8 @@ async function bootstrapServer(): Promise<Server> {
         //     logger.log(`App Nestjs running on port: ${Config.get(_Configuration_Keys.PORT)}`);
         // });
 
-
         cachedServer = createServer(expressApp, undefined, binaryMimeTypes);
+
     }
     return cachedServer;
 }
