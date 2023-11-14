@@ -64,7 +64,8 @@ module.exports = {
   plugins: [
     new CopyPlugin({
       patterns: [
-        { from: "env/env.empty.prod", to: "env/.env.prod" }
+        { from: "env/env.empty.prod", to: "env/.env.prod" },
+        { from: "src/database/migrations", to: "migrations" }
       ],
     }),
   ],
