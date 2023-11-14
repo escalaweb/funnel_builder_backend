@@ -18,23 +18,14 @@ export class FunnelBody_et extends EntityKey_et {
     })
     name: string;
 
-    @Column({
-        type: "smallint",
-        default: 0,
-        nullable: true
-    })
-    pos?: number;
+
 
     @Column({
         type: "varchar",
     })
     type: FunnelStage_Item_Type;
 
-    @Column({
-        type: "varchar",
-        default: "daily"
-    })
-    timingMetrics?: Funnel_TimingMetrics_Type;
+
 
     @OneToMany(() => FunnelBody_stages_et, stage => stage.funnel_id, { cascade: true })
     stages: FunnelBody_stages_et[];
@@ -58,6 +49,19 @@ export class FunnelBody_et extends EntityKey_et {
     // @ManyToOne(() => ConfigPlanner_et, configStep => configStep.funnel_id)
     // @JoinColumn({ name: 'config_step_id' })
     // config_step_id?: ConfigPlanner_et;
+
+        @Column({
+        type: "smallint",
+        default: 0,
+        nullable: true
+    })
+    pos?: number;
+
+    @Column({
+        type: "varchar",
+        default: "daily"
+    })
+    timingMetrics?: Funnel_TimingMetrics_Type;
 
     @ManyToOne(() => FunnelLibrary_et, funnelLibrary => funnelLibrary.funnels_id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'funnelLibrary_id' }) // Esta columna se creará en la tabla de libros
