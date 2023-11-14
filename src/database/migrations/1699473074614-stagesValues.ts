@@ -44,3 +44,29 @@ export class StagesValues1699473074614 implements MigrationInterface {
 
 }
 
+
+
+[
+    {
+        name: 'StagesValues1699473074614',
+        up: [
+            `UPDATE "stages_funnel"
+                  SET "value" = jsonb_build_object(
+                  'income_value', 0,
+                  'current_value', 0,
+                  'goal_value', "value"
+                )`,
+            `
+                  ALTER TABLE "stages_funnel"
+                  RENAME COLUMN "value" TO "metrics"
+                `,
+            `UPDATE "stages_funnel" SET "__v" = 1 WHERE "__v" IS NOT NULL`
+        ],
+        down: [
+            `UPDATE "stages_funnel" SET "metrics" = ("metrics"->'goal_value')::jsonb`,
+            `ALTER TABLE "stages_funnel" RENAME COLUMN "metrics" TO "value"`,
+            `UPDATE "stages_funnel" SET "__v" = 0 WHERE "__v" = 1`
+        ],
+        register: true
+    }
+]

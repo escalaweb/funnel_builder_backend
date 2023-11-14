@@ -65,6 +65,10 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: "env/env.empty.prod", to: "env/.env.prod" }
+<<<<<<< Updated upstream
+=======
+        // { from: "src/database/migrations", to: "migrations" }
+>>>>>>> Stashed changes
       ],
     }),
   ],

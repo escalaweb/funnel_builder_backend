@@ -20,19 +20,10 @@ export class MigrationService {
     }
 
     async runMigrations(): Promise<string> {
-        // try {
-        //     const { stdout, stderr } = await execAsync('npm run typeorm:run-mig');
-        //     if (stderr) {
-        //         console.error(`error: ${stderr}`);
-        //     }
-        //     return stdout;
-        // } catch (error) {
-        //     console.error(error);
-        //     throw new Error('Failed to run migrations');
-        // }
 
         try {
 
+<<<<<<< Updated upstream
             const connection = await createConnection({
 
                 type: 'postgres',
@@ -54,6 +45,8 @@ export class MigrationService {
 
             // Cerrar conexión
             await connection.close();
+=======
+>>>>>>> Stashed changes
 
 
             return 'Migrations executed'
@@ -66,19 +59,10 @@ export class MigrationService {
     }
 
     async revertMigrations(): Promise<string> {
-        // try {
-        //     const { stdout, stderr } = await execAsync('npm run typeorm:revert-mig');
-        //     if (stderr) {
-        //         console.error(`error: ${stderr}`);
-        //     }
-        //     return stdout;
-        // } catch (error) {
-        //     console.error(error);
-        //     throw new Error('Failed to revert migrations');
-        // }
 
         try {
 
+<<<<<<< Updated upstream
             const connection = await createConnection({
 
                 type: 'postgres',
@@ -100,6 +84,8 @@ export class MigrationService {
 
             // Cerrar conexión
             await connection.close();
+=======
+>>>>>>> Stashed changes
 
 
             return 'Migrations reverted'
