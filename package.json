@@ -1,6 +1,6 @@
 {
     "name": "fb_backend_escala",
-    "version": "1.000.918",
+    "version": "1.000.919",
     "description": "",
     "author": "",
     "private": true,
@@ -67,6 +67,7 @@
         "rxjs": "^7.8.1",
         "serverless": "^3.34.0",
         "serverless-http": "^3.2.0",
+        "serverless-pg-migrations": "^1.0.1",
         "serverless-plugin-browserifier": "^3.1.1",
         "socket.io": "^4.6.0",
         "typeorm": "^0.3.17",
