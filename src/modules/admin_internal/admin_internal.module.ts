@@ -14,6 +14,10 @@ import { Admin_Internal_Rel_Module } from './rel.module';
     ],
     imports: [
         Admin_Internal_Rel_Module
+    ],
+    exports: [
+        AdminInternalService,
+        MigrationService
     ]
 })
 export class AdminInternalModule { }

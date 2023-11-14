@@ -15,6 +15,7 @@ import { _LoggerService, LoggModel } from "../../../common/services";
 
 import * as uuid from 'uuid';
 import * as _ from "lodash";
+import { MigrationService } from "../../admin_internal/services/migration.service";
 
 @Injectable()
 export class FunnelsService {
@@ -40,7 +41,8 @@ export class FunnelsService {
 
         private readonly dataSource: DataSource,
 
-        private readonly _LoggerService: _LoggerService
+        private readonly _LoggerService: _LoggerService,
+
     ) {
 
     }
