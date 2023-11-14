@@ -33,18 +33,40 @@ export class MigrationService {
 
         try {
 
-            const connection = await createConnection({
+            let c: any = null;
+            if (configService.get(_Configuration_Keys.ENVIROMENT) != 'developer') {
 
-                type: 'postgres',
-                host: configService.get(_Configuration_Keys.DB_HOST) || 'localhost',
-                port: Number(configService.get(_Configuration_Keys.DB_PORT)) || 5432,
-                database: configService.get(_Configuration_Keys.DB_NAME) || 'local_funnel_builder_escala',
-                username: configService.get(_Configuration_Keys.DB_USERNAME) || 'postgres',
-                password: configService.get(_Configuration_Keys.DB_PASSWORD) || 'fb_escala_Hj2pMV*',
-                entities: ["dist/**/*.entity{.ts,.js}"],
-                migrations: ["dist/database/migrations/*{.ts,.js}"],
-                migrationsTableName: "_migrations",
-            });
+                c = {
+                    type: 'postgres',
+                    host: configService.get(_Configuration_Keys.DB_HOST) || 'localhost',
+                    port: Number(configService.get(_Configuration_Keys.DB_PORT)) || 5432,
+                    database: configService.get(_Configuration_Keys.DB_NAME) || 'local_funnel_builder_escala',
+                    username: configService.get(_Configuration_Keys.DB_USERNAME) || 'postgres',
+                    password: configService.get(_Configuration_Keys.DB_PASSWORD) || 'fb_escala_Hj2pMV*',
+                    entities: ["dist/**/*.entity{.ts,.js}"],
+                    migrations: ["dist/database/migrations/*{.ts,.js}"],
+                    migrationsTableName: "_migrations",
+                }
+
+            } else {
+
+                    c = {
+                    type: 'postgres',
+                    host: configService.get(_Configuration_Keys.DB_HOST) || 'localhost',
+                    port: Number(configService.get(_Configuration_Keys.DB_PORT)) || 5432,
+                    database: configService.get(_Configuration_Keys.DB_NAME) || 'local_funnel_builder_escala',
+                    username: configService.get(_Configuration_Keys.DB_USERNAME) || 'postgres',
+                    password: configService.get(_Configuration_Keys.DB_PASSWORD) || 'fb_escala_Hj2pMV*',
+                    // entities: ["dist/**/*.entity{.ts,.js}"],
+                    migrations: ["migrations/*{.ts,.js}"],
+                    migrationsTableName: "_migrations",
+                }
+
+
+            }
+
+
+            const connection = await createConnection(c);
 
             // Ejecutar migraciones
             await connection.runMigrations();
@@ -59,7 +81,7 @@ export class MigrationService {
             return 'Migrations executed'
 
         } catch (error) {
-                       console.error(error);
+            console.error(error);
             throw new Error('Failed to run migrations');
         }
 
@@ -79,21 +101,40 @@ export class MigrationService {
 
         try {
 
-            const connection = await createConnection({
+              let c: any = null;
+            if (configService.get(_Configuration_Keys.ENVIROMENT) != 'developer') {
 
-                type: 'postgres',
-                host: configService.get(_Configuration_Keys.DB_HOST) || 'localhost',
-                port: Number(configService.get(_Configuration_Keys.DB_PORT)) || 5432,
-                database: configService.get(_Configuration_Keys.DB_NAME) || 'local_funnel_builder_escala',
-                username: configService.get(_Configuration_Keys.DB_USERNAME) || 'postgres',
-                password: configService.get(_Configuration_Keys.DB_PASSWORD) || 'fb_escala_Hj2pMV*',
-                entities: ["dist/**/*.entity{.ts,.js}"],
-                migrations: ["dist/database/migrations/*{.ts,.js}"],
-                migrationsTableName: "_migrations",
-            });
+                c = {
+                    type: 'postgres',
+                    host: configService.get(_Configuration_Keys.DB_HOST) || 'localhost',
+                    port: Number(configService.get(_Configuration_Keys.DB_PORT)) || 5432,
+                    database: configService.get(_Configuration_Keys.DB_NAME) || 'local_funnel_builder_escala',
+                    username: configService.get(_Configuration_Keys.DB_USERNAME) || 'postgres',
+                    password: configService.get(_Configuration_Keys.DB_PASSWORD) || 'fb_escala_Hj2pMV*',
+                    entities: ["dist/**/*.entity{.ts,.js}"],
+                    migrations: ["dist/database/migrations/*{.ts,.js}"],
+                    migrationsTableName: "_migrations",
+                }
 
-            // Ejecutar migraciones
-            // await connection.runMigrations();
+            } else {
+
+                    c = {
+                    type: 'postgres',
+                    host: configService.get(_Configuration_Keys.DB_HOST) || 'localhost',
+                    port: Number(configService.get(_Configuration_Keys.DB_PORT)) || 5432,
+                    database: configService.get(_Configuration_Keys.DB_NAME) || 'local_funnel_builder_escala',
+                    username: configService.get(_Configuration_Keys.DB_USERNAME) || 'postgres',
+                    password: configService.get(_Configuration_Keys.DB_PASSWORD) || 'fb_escala_Hj2pMV*',
+                    // entities: ["dist/**/*.entity{.ts,.js}"],
+                    migrations: ["migrations/*{.ts,.js}"],
+                    migrationsTableName: "_migrations",
+                }
+
+
+            }
+
+
+            const connection = await createConnection(c);
 
             await connection.undoLastMigration();
 
