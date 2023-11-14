@@ -34,7 +34,7 @@ export class FunnelBody_et extends EntityKey_et {
         type: "varchar",
         default: "daily"
     })
-    timingMetrics: Funnel_TimingMetrics_Type;
+    timingMetrics?: Funnel_TimingMetrics_Type;
 
     @OneToMany(() => FunnelBody_stages_et, stage => stage.funnel_id, { cascade: true })
     stages: FunnelBody_stages_et[];
