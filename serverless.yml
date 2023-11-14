@@ -170,16 +170,16 @@ functions:
           cors: true
           private: true
 
-  up:
-    handler: migrations.up
-    timeout: 30
-    environment:
-      DATABASE_URL: postgres://${self:custom.database_user.${self:provider.stage}}:${self:custom.database_password.${self:provider.stage}}@${self:custom.database_host.${self:provider.stage}}:5432/${self:custom.database_name.${self:provider.stage}}
-  down:
-    handler: migrations.down
-    timeout: 30
-    environment:
-      DATABASE_URL: postgres://${self:custom.database_user.${self:provider.stage}}:${self:custom.database_password.${self:provider.stage}}@${self:custom.database_host.${self:provider.stage}}:5432/${self:custom.database_name.${self:provider.stage}}
+  # up:
+  #   handler: migrations.up
+  #   timeout: 30
+  #   environment:
+  #     DATABASE_URL: postgres://${self:custom.database_user.${self:provider.stage}}:${self:custom.database_password.${self:provider.stage}}@${self:custom.database_host.${self:provider.stage}}:5432/${self:custom.database_name.${self:provider.stage}}
+  # down:
+  #   handler: migrations.down
+  #   timeout: 30
+  #   environment:
+  #     DATABASE_URL: postgres://${self:custom.database_user.${self:provider.stage}}:${self:custom.database_password.${self:provider.stage}}@${self:custom.database_host.${self:provider.stage}}:5432/${self:custom.database_name.${self:provider.stage}}
 
 resources:
   Resources:
