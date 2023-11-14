@@ -16,7 +16,7 @@ export class MigrationService {
 
     async runMigrations(): Promise<string> {
         try {
-            const { stdout, stderr } = await execAsync('sls migrate up');
+            const { stdout, stderr } = await execAsync('npm run typeorm:run-mig');
             if (stderr) {
                 console.error(`error: ${stderr}`);
             }
@@ -29,7 +29,7 @@ export class MigrationService {
 
     async revertMigrations(): Promise<string> {
         try {
-            const { stdout, stderr } = await execAsync('sls migrate down');
+            const { stdout, stderr } = await execAsync('npm run typeorm:revert-mig');
             if (stderr) {
                 console.error(`error: ${stderr}`);
             }
