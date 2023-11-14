@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { EntityManager } from 'typeorm';
+import { EntityManager, createConnection } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import { _Configuration_Keys } from '../../../config/config.keys';
 
 const execAsync = promisify(exec);
+
+const configService = new ConfigService();
+
 
 @Injectable()
 export class MigrationService {
@@ -15,28 +20,92 @@ export class MigrationService {
     }
 
     async runMigrations(): Promise<string> {
+        // try {
+        //     const { stdout, stderr } = await execAsync('npm run typeorm:run-mig');
+        //     if (stderr) {
+        //         console.error(`error: ${stderr}`);
+        //     }
+        //     return stdout;
+        // } catch (error) {
+        //     console.error(error);
+        //     throw new Error('Failed to run migrations');
+        // }
+
         try {
-            const { stdout, stderr } = await execAsync('npm run typeorm:run-mig');
-            if (stderr) {
-                console.error(`error: ${stderr}`);
-            }
-            return stdout;
+
+            const connection = await createConnection({
+
+                type: 'postgres',
+                host: configService.get(_Configuration_Keys.DB_HOST) || 'localhost',
+                port: Number(configService.get(_Configuration_Keys.DB_PORT)) || 5432,
+                database: configService.get(_Configuration_Keys.DB_NAME) || 'local_funnel_builder_escala',
+                username: configService.get(_Configuration_Keys.DB_USERNAME) || 'postgres',
+                password: configService.get(_Configuration_Keys.DB_PASSWORD) || 'fb_escala_Hj2pMV*',
+                entities: ["dist/**/*.entity{.ts,.js}"],
+                migrations: ["dist/database/migrations/*{.ts,.js}"],
+                migrationsTableName: "_migrations",
+            });
+
+            // Ejecutar migraciones
+            await connection.runMigrations();
+
+            // await connection.undoLastMigration();
+
+
+            // Cerrar conexión
+            await connection.close();
+
+
+            return 'Migrations executed'
+
         } catch (error) {
-            console.error(error);
+                       console.error(error);
             throw new Error('Failed to run migrations');
         }
+
     }
 
     async revertMigrations(): Promise<string> {
+        // try {
+        //     const { stdout, stderr } = await execAsync('npm run typeorm:revert-mig');
+        //     if (stderr) {
+        //         console.error(`error: ${stderr}`);
+        //     }
+        //     return stdout;
+        // } catch (error) {
+        //     console.error(error);
+        //     throw new Error('Failed to revert migrations');
+        // }
+
         try {
-            const { stdout, stderr } = await execAsync('npm run typeorm:revert-mig');
-            if (stderr) {
-                console.error(`error: ${stderr}`);
-            }
-            return stdout;
+
+            const connection = await createConnection({
+
+                type: 'postgres',
+                host: configService.get(_Configuration_Keys.DB_HOST) || 'localhost',
+                port: Number(configService.get(_Configuration_Keys.DB_PORT)) || 5432,
+                database: configService.get(_Configuration_Keys.DB_NAME) || 'local_funnel_builder_escala',
+                username: configService.get(_Configuration_Keys.DB_USERNAME) || 'postgres',
+                password: configService.get(_Configuration_Keys.DB_PASSWORD) || 'fb_escala_Hj2pMV*',
+                entities: ["dist/**/*.entity{.ts,.js}"],
+                migrations: ["dist/database/migrations/*{.ts,.js}"],
+                migrationsTableName: "_migrations",
+            });
+
+            // Ejecutar migraciones
+            // await connection.runMigrations();
+
+            await connection.undoLastMigration();
+
+
+            // Cerrar conexión
+            await connection.close();
+
+
+            return 'Migrations reverted'
+
         } catch (error) {
-            console.error(error);
-            throw new Error('Failed to revert migrations');
+
         }
     }
 
