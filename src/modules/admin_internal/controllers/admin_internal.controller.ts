@@ -1,7 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AdminInternalService } from '../services/admin_internal.service';
-import { CreateAdminInternalDto } from '../dto/create-admin_internal.dto';
-import { UpdateAdminInternalDto } from '../dto/update-admin_internal.dto';
 import { Auth_Admin_Internal } from '../../auth/decorators/auth.decorator';
 import { MigrationService } from '../services/migration.service';
 

@@ -1,18 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import { DataSource, EntityManager, createConnection } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
+import { EntityManager } from 'typeorm';
 import { _Configuration_Keys } from '../../../config/config.keys';
 
 import { Connection } from 'typeorm';
 import { MigrationModel_I, _MigrationTable_I } from '../../../database/interfaces/_migrationModel.interface';
 import { _LoggerService } from '../../../common/services/_logger.service';
 import { ConfigProjectService } from '../../../config/config.service';
-
-const execAsync = promisify(exec);
-
-
 
 @Injectable()
 export class MigrationService {
