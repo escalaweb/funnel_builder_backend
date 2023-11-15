@@ -2,9 +2,13 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from
 import { Observable } from "rxjs";
 import { ADM_CODE } from "../../../common/constants";
 import { AuthPayload_I } from "../interfaces";
+import { ConfigProjectService } from "../../../config/config.service";
+import { _Configuration_Keys } from "../../../config/config.keys";
 
 @Injectable()
 export class Admin_Internal_Guard implements CanActivate {
+
+    _config = new ConfigProjectService();
 
     canActivate(
         context: ExecutionContext,
@@ -16,6 +20,15 @@ export class Admin_Internal_Guard implements CanActivate {
             const emailParam = request.params.email;
             const admCode = request.headers['adm-code'];
             const xApiKey = request.headers['x-api-key'];
+
+            if (this._config._get(_Configuration_Keys.NODE_ENV) != 'development') {
+
+                if(request.hostname.includes('internal.dev') || request.hostname.includes('internal.escala')){
+                }else{
+                    throw new UnauthorizedException('Access denied: Unable access to internal.');
+                }
+
+            }
 
             // Revisar si el correo del usuario es el correcto
             if (user?.email !== 'alvaro@escala.com') {

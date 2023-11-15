@@ -29,19 +29,19 @@ export class ConfigProjectService {
 
 
             case "development":
-                // isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+                // isEnviroment = this._configService.get(_Configuration_Keys.NODE_ENV);
                 dotenv.config({ path: path + ".env" })
                 this.envConfig = parse(fs.readFileSync(path + ".env"));
 
                 break;
             case "staging":
-                isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+                isEnviroment = this._configService.get(_Configuration_Keys.NODE_ENV);
                 dotenv.config({ path: path + ".env.staging" })
                 this.envConfig = parse(fs.readFileSync(path + ".env.staging"));
 
                 break;
             case "production":
-                // isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+                // isEnviroment = this._configService.get(_Configuration_Keys.NODE_ENV);
                 // dotenv.config({ path: path + ".env.prod" })
                 // this.envConfig = parse(fs.readFileSync(path + ".env.prod"));
 
@@ -54,7 +54,7 @@ export class ConfigProjectService {
 
         // if (fs.existsSync(path + "/.env")) {
 
-        //     isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+        //     isEnviroment = this._configService.get(_Configuration_Keys.NODE_ENV);
 
         //     dotenv.config({ path: path + "/.env" })
 
@@ -62,7 +62,7 @@ export class ConfigProjectService {
 
         // } else if (fs.existsSync(path + "/.env.prod")) {
 
-        //     isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT);
+        //     isEnviroment = this._configService.get(_Configuration_Keys.NODE_ENV);
 
         //     dotenv.config({ path: path + "/.env.prod" })
 
@@ -75,7 +75,7 @@ export class ConfigProjectService {
         //     return;
         // }
 
-        isEnviroment = this._configService.get(_Configuration_Keys.ENVIROMENT)
+        isEnviroment = this._configService.get(_Configuration_Keys.NODE_ENV)
 
         if (isEnviroment != 'none') {
 

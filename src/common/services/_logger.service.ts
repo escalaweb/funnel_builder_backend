@@ -30,7 +30,7 @@ export class _LoggerService implements LoggerService {
             new winston.transports.Console()
         ];
 
-        if (this._ConfigProjectService._get(_Configuration_Keys.ENVIROMENT) === 'developer') {
+        if (this._ConfigProjectService._get(_Configuration_Keys.NODE_ENV) === 'development') {
             aux_transports.push(new winston.transports.File({ filename: 'debug.log' }));
         }
 

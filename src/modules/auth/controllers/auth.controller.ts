@@ -46,7 +46,7 @@ export class AuthController {
             // host: _config._get(_Configuration_Keys.DB_HOST),
             PORT: _config._get(_Configuration_Keys.PORT),
             LOG_LEVEL: _config._get(_Configuration_Keys.LOG_LEVEL),
-            ENVIROMENT: _config._get(_Configuration_Keys.ENVIROMENT),
+            ENVIROMENT: _config._get(_Configuration_Keys.NODE_ENV),
 
         }
 

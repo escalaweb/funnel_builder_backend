@@ -8,14 +8,16 @@ import { _Configuration_Keys } from '../../../config/config.keys';
 import { Connection } from 'typeorm';
 import { MigrationModel_I, _MigrationTable_I } from '../../../database/interfaces/_migrationModel.interface';
 import { _LoggerService } from '../../../common/services/_logger.service';
+import { ConfigProjectService } from '../../../config/config.service';
 
 const execAsync = promisify(exec);
 
-const configService = new ConfigService();
 
 
 @Injectable()
 export class MigrationService {
+
+    _config = new ConfigProjectService();
 
     private migrations: MigrationModel_I[] = [];
 
@@ -89,8 +91,7 @@ export class MigrationService {
                 context: 'MigrationService - runMigrations',
             })
 
-
-            return 'Migrations run UP successfully';
+            return 'Migrations run UP successfully ';
 
         } catch (error) {
             await queryRunner.rollbackTransaction();
