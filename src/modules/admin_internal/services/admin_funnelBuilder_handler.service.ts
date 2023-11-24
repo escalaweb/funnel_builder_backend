@@ -64,6 +64,8 @@ export class Admin_FunnelBuilder_handler_Service {
 
             let funnelLibrary_id: FunnelLibrary_et = (await this._FunnelLibraryService.findAll(1, user).then()).data[0] || null;
 
+            const pos_number: number = _.get(funnelLibrary_id, 'funnels_id.length', 0);
+
             const config_step_id: string = _.get(funnelLibrary_id, 'config_step_id._id', uuid.v4());
 
             let funnels: FunnelBody_et[] = models.data.funnels.map((item, idx) => {
@@ -74,6 +76,7 @@ export class Admin_FunnelBuilder_handler_Service {
                     name: `${item.name} - [RECUPERADO]`,
                     customizeProcess_step_id: null,
                     funnelLibrary_id: funnelLibrary_id,
+                    pos: pos_number + idx,
                 })
 
             });
@@ -85,6 +88,7 @@ export class Admin_FunnelBuilder_handler_Service {
                     _id: uuid.v4(),
                     name: `${item.customizeProcess_step_id.name} - [RECUPERADO]`,
                     funnel_id: funnels[idx],
+                    pos: pos_number + idx,
                 })
 
             });
