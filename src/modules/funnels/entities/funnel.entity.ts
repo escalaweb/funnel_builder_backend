@@ -19,7 +19,6 @@ export class FunnelBody_et extends EntityKey_et {
     name: string;
 
 
-
     @Column({
         type: "varchar",
     })

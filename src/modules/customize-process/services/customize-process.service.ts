@@ -86,8 +86,8 @@ export class CustomizeProcessService {
         const queryRunner = this.dataSource.createQueryRunner();
 
         await queryRunner.connect();
-
         await queryRunner.startTransaction();
+
         try {
 
             const customizeProcessPromises = data.customizeModels.map(async (customizeProcess: any) => {
@@ -127,8 +127,8 @@ export class CustomizeProcessService {
                 return this._CustomizeProcess_et_repository.create({
                     ...customizeProcess,
                     _id: cust_id,
+                    __v: 0,
                     funnel_id: funnel,
-
                 });
 
             });

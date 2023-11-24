@@ -219,9 +219,10 @@ export class FunnelsService {
                 .select('funnels')
                 .getMany();
 
-            await this._FunnelBody_et_repository.remove(structuredClone(funnels_deleteEty)).then((resp) => {
 
-                if (funnels_deleteEty.length > 0) {
+            await queryRunner.manager.delete(FunnelBody_et, funnels_deleteEty).then((resp) => {
+
+                   if (funnels_deleteEty.length > 0) {
 
                     let funnelsString: any[] = funnels_deleteEty.map((funnel: FunnelBody_et) => {
                         return {
@@ -243,8 +244,10 @@ export class FunnelsService {
                             }
                         }
                     });
+
                 }
 
+            }).catch( err => {
             });
 
             const deleteStages_ids = await this._FunnelBody_stages_et_repository
@@ -253,8 +256,11 @@ export class FunnelsService {
                 .select('stages_funnel._id')
                 .getMany();
 
-            await this._FunnelBody_stages_et_repository.remove(deleteStages_ids);
+            await queryRunner.manager.delete(FunnelBody_stages_et, deleteStages_ids).then( resp => {
 
+            }).catch( err => {
+
+             });
         }
 
         let stages: FunnelBody_stages_et[] = [];
@@ -263,11 +269,11 @@ export class FunnelsService {
 
             for (const [_i, _item] of item.stages.entries()) {
 
-                let aux: any = this._FunnelBody_stages_et_repository.create({
-                    ..._item,
+                let aux: FunnelBody_stages_et = this._FunnelBody_stages_et_repository.create({
+                    ..._item as FunnelBody_stages_et,
                     _id: _.get(_item, '_id', uuid.v4()),
                     funnel_id: item,
-
+                    __v: 1,
                 });
 
                 stages.push(aux)
@@ -317,6 +323,7 @@ export class FunnelsService {
 
             return this._FunnelBody_et_repository.create({
                 ...funnel,
+                __v: 1,
                 _id: _.get(funnel, '_id', uuid.v4()),
                 customizeProcess_step_id: funnel.customizeProcess_step_id || null,
                 funnelLibrary_id: funnelLibrary_id,
@@ -328,10 +335,7 @@ export class FunnelsService {
         funnelLibrary_id.funnels_id = [...funnels];
         funnelLibrary_id.updatedAt = this._dateService.setDate();
 
-
-
             await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
-            // await queryRunner.manager.save(FunnelBody_et, funnels);
             await queryRunner.manager.save(FunnelBody_stages_et, stages);
 
             await queryRunner.commitTransaction();

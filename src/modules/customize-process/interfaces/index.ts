@@ -27,10 +27,11 @@ export type Process_Customization_Type = typeof process_customization_type_defau
 
 export interface FunnelCustomizeBody_I {
 
-    _id: string;
     name: string;
     stages: Customize_Stage_I[];
     funnel_id?: string;
+    _id?: string;
+    __v?: number;
 
 }
 

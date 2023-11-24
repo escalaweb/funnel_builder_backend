@@ -78,7 +78,6 @@ export class PlannerService {
             dash: null,
             toolsSettingsConfig: createPlannerDto.toolsSettingsConfig,
             funnelLibrary_id: funnelLibrary,
-
         })
 
         funnelLibrary.config_step_id = configPlanner;

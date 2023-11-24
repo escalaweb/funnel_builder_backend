@@ -62,4 +62,6 @@ export interface CST_ToolSettingsConfig_I {
 export interface Config_Step_I {
     dash: CST_Dash_I;
     toolsSettingsConfig: CST_ToolSettingsConfig_I[]
+    _id?: string;
+    __v?: number;
 }
