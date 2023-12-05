@@ -7,7 +7,6 @@ import { FunnelLibrary_et } from "../../funnel-library/entities/funnel-library.e
 import { DateProcessService } from "../../../common/adapters";
 import { CustomizeProcess_et } from "../../customize-process/entities";
 
-
 @Entity({
     name: "funnels"
 })
@@ -18,13 +17,10 @@ export class FunnelBody_et extends EntityKey_et {
     })
     name: string;
 
-
     @Column({
         type: "varchar",
     })
     type: FunnelStage_Item_Type;
-
-
 
     @OneToMany(() => FunnelBody_stages_et, stage => stage.funnel_id, { cascade: true })
     stages: FunnelBody_stages_et[];
@@ -45,11 +41,7 @@ export class FunnelBody_et extends EntityKey_et {
     })
     customizeProcess_step_id: CustomizeProcess_et;
 
-    // @ManyToOne(() => ConfigPlanner_et, configStep => configStep.funnel_id)
-    // @JoinColumn({ name: 'config_step_id' })
-    // config_step_id?: ConfigPlanner_et;
-
-        @Column({
+    @Column({
         type: "smallint",
         default: 0,
         nullable: true
@@ -115,6 +107,5 @@ export class FunnelBody_stages_et extends EntityKey_et {
     @ManyToOne(() => FunnelBody_et, funnel => funnel.stages, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'funnel_id' })
     funnel_id?: FunnelBody_et;
-
 
 }

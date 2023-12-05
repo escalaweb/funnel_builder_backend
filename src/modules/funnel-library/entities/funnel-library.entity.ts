@@ -4,6 +4,7 @@ import { FunnelBody_et } from "../../funnels/entities";
 import { DateProcessService } from "../../../common/adapters";
 import { User_et } from "../../users/entities";
 import { ConfigPlanner_et } from "../../planner/entities";
+import { LibraryPermision_et } from "../../library-permisions/entities";
 
 
 @Entity({
@@ -31,7 +32,6 @@ export class FunnelLibrary_et extends EntityKey_et {
     })
     config_step_id: ConfigPlanner_et;
 
-
     @Column({
         type: 'varchar',
         default: 0
@@ -46,5 +46,12 @@ export class FunnelLibrary_et extends EntityKey_et {
         })
     @JoinColumn({ name: 'user_id' })
     user_id: User_et
+
+    @OneToOne( () => LibraryPermision_et, funnelLibraryPermisions => funnelLibraryPermisions.funnelLibrary_id )
+    @JoinColumn({
+        name: 'funnel_library_permisions_id'
+    })
+    funnel_library_permisions_id?: LibraryPermision_et;
+
 
 }

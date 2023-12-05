@@ -2,6 +2,7 @@ import { Entity, Column, JoinColumn, OneToOne, BeforeInsert, BeforeUpdate, After
 import { EntityKey_et, _blank_dateTypeModel, _init_dateTypeModel } from "../../../common/entities";
 import { DateProcessService } from "../../../common/adapters";
 import { FunnelLibrary_et } from "../../funnel-library/entities";
+import { LibraryPermision_et } from "../../library-permisions/entities/library-permision.entity";
 
 
 
@@ -60,6 +61,18 @@ export class User_et extends EntityKey_et {
         }
     )
     funnelLibrary_id?: FunnelLibrary_et
+
+    @OneToMany(
+        () => LibraryPermision_et,
+        ( funnelLibraryPermisions ) => {
+            funnelLibraryPermisions.user_id
+        },
+        {
+            cascade: true
+        }
+    )
+    funnel_library_permisions_id?: LibraryPermision_et
+
 
 
 

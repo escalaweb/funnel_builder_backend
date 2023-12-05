@@ -7,7 +7,9 @@ import { FunnelLibraryService } from './services/funnel-library.service';
 
 
 @Module({
-    controllers: [FunnelLibraryController],
+    controllers: [
+        FunnelLibraryController
+    ],
     providers: [
         FunnelLibraryService
     ],

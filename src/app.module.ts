@@ -12,6 +12,7 @@ import {
 } from "./modules";
 
 import { CustomizeProcessModule } from "./modules/customize-process/customize-process.module";
+import { LibraryPermisionsModule } from './modules/library-permisions/library-permisions.module';
 
 
 
@@ -27,6 +28,7 @@ import { CustomizeProcessModule } from "./modules/customize-process/customize-pr
         TestModule,
         PlannerModule,
         AdminInternalModule,
+        LibraryPermisionsModule,
     ],
 })
 export class AppModule { }
