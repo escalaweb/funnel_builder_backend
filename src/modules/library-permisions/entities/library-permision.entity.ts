@@ -6,13 +6,12 @@ import { User_et } from "../../users/entities";
 @Entity({
     name: "library_permisions"
 })
-export class LibraryPermision_et extends EntityKey_et {
-
+export class LibraryPermisions_et extends EntityKey_et {
     @Column({
-        type: "varchar",
-        default: "all"
+        type: 'varchar',
+        default: 'all'
     })
-    elements_effect?: string;
+    elementsEffect?: string;
 
     /*
         0: Read - Write - Delete - Create
@@ -23,19 +22,18 @@ export class LibraryPermision_et extends EntityKey_et {
     @Column({
         type: "smallint",
         default: 0,
-        nullable: true
     })
-    type?: number;
+    permisionType?: number;
 
-     @Column({
+    @Column({
         type: 'varchar',
         default: 0
     })
     updatedAt?: string;
 
-    @OneToOne(() => FunnelLibrary_et, { onDelete: 'CASCADE' })
+    @ManyToOne(() => FunnelLibrary_et, funnel => funnel.funnel_library_permision_id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'funnelLibrary_id' })
-    funnelLibrary_id: FunnelLibrary_et;
+    funnelLibrary_id?: FunnelLibrary_et;
 
     @ManyToOne(
         () => User_et, (user) => user.funnelLibrary_id,
@@ -44,6 +42,6 @@ export class LibraryPermision_et extends EntityKey_et {
             // eager: true // Que cargue la siguiente relación siempre
         })
     @JoinColumn({ name: 'user_id' })
-    user_id: User_et
-
+    user_id?: User_et
 }
+

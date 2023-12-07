@@ -4,7 +4,7 @@ import { FunnelBody_et } from "../../funnels/entities";
 import { DateProcessService } from "../../../common/adapters";
 import { User_et } from "../../users/entities";
 import { ConfigPlanner_et } from "../../planner/entities";
-import { LibraryPermision_et } from "../../library-permisions/entities";
+import { LibraryPermisions_et } from "../../library-permisions/entities";
 
 
 @Entity({
@@ -47,11 +47,15 @@ export class FunnelLibrary_et extends EntityKey_et {
     @JoinColumn({ name: 'user_id' })
     user_id: User_et
 
-    @OneToOne( () => LibraryPermision_et, funnelLibraryPermisions => funnelLibraryPermisions.funnelLibrary_id )
-    @JoinColumn({
-        name: 'funnel_library_permisions_id'
-    })
-    funnel_library_permisions_id?: LibraryPermision_et;
-
+    @OneToMany(
+        () => LibraryPermisions_et,
+        ( funnelLibraryPermision ) => {
+            funnelLibraryPermision.funnelLibrary_id
+        },
+        {
+            cascade: true
+        }
+    )
+    funnel_library_permision_id?: LibraryPermisions_et[]
 
 }

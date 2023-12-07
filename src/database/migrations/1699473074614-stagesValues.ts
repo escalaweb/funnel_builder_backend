@@ -2,11 +2,14 @@ import { MigrationInterface, QueryRunner } from "typeorm"
 
 export class StagesValues1699473074614 implements MigrationInterface {
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
+    name = 'StagesValues1699473074614';
+
+    public async up(queryRunner?: QueryRunner): Promise<void> {
         // Renombrar columna `value` a `metrics` y cambiar su estructura
-
-
         // Actualizar la estructura de la columna `metrics` para que el contenido anterior sea ahora `metrics.goal_value.value`
+
+        console.log('hola');
+
         await queryRunner.query(`
       UPDATE "stages_funnel"
     SET "value" = jsonb_build_object(
@@ -25,7 +28,7 @@ export class StagesValues1699473074614 implements MigrationInterface {
 
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
+    public async down(queryRunner?: QueryRunner): Promise<void> {
         // Extraer el valor de `metrics.goal_value.value` y revertir a la estructura original
         await queryRunner.query(`
       UPDATE "stages_funnel"

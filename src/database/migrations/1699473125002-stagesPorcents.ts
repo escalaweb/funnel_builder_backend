@@ -2,7 +2,9 @@ import { MigrationInterface, QueryRunner } from "typeorm"
 
 export class StagesPorcents1699473125002 implements MigrationInterface {
 
- public async up(queryRunner: QueryRunner): Promise<void> {
+    name = 'StagesPorcents1699473125002';
+
+ public async up(queryRunner?: QueryRunner): Promise<void> {
 
   // Actualizar la estructura de la columna `metricsPorcents`
   await queryRunner.query(`
@@ -33,7 +35,7 @@ export class StagesPorcents1699473125002 implements MigrationInterface {
 
 }
 
-   public async down(queryRunner: QueryRunner): Promise<void> {
+   public async down(queryRunner?: QueryRunner): Promise<void> {
   // Restaurar la estructura original de la columna `relations`
   await queryRunner.query(`
     UPDATE "funnels" f

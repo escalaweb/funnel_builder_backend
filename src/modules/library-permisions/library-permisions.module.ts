@@ -9,7 +9,8 @@ import { EntitiesModule } from '../../database/entities/entities.module';
         LibraryPermisionsController
     ],
     providers: [
-        LibraryPermisionsService],
+        LibraryPermisionsService
+    ],
     imports: [
         EntitiesModule,
         LibraryPermisions_Rel_Module
