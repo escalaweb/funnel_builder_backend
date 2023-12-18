@@ -1,6 +1,6 @@
-import { HttpException, Inject, Injectable, forwardRef } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, FindOneOptions, Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { ProcessDataService, DateProcessService } from "../../../common/adapters";
 import { FunnelBody_et, FunnelBody_stages_et } from "../entities";
 import { _argsFind, _response_I } from "../../../common/interfaces";
@@ -15,7 +15,7 @@ import { _LoggerService, LoggModel } from "../../../common/services";
 
 import * as uuid from 'uuid';
 import * as _ from "lodash";
-import { MigrationService } from "../../admin_internal/services/migration.service";
+
 
 @Injectable()
 export class FunnelsService {
@@ -180,160 +180,160 @@ export class FunnelsService {
 
         try {
 
-        if (funnelLibrary_id === null) {
+            if (funnelLibrary_id === null) {
 
-            funnelLibrary_id = await this._FunnelLibrary_et_repository.create({
-                _id: uuid.v4(),
-                name: 'Carpeta de embudo',
-                user_id: User_data,
-                funnels_id: [],
-            })
-
-            LoggerModels.push({
-                type: 'log',
-                // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado una carpeta de embudos`,
-                message: `Usuario ${user.email} - ha creado una carpeta de embudos`,
-                response: {
-                    user: {
-                        ...user
-                    },
-                    body: {
-                        carpeta: {
-                            ..._.pick(funnelLibrary_id, ['_id', 'name'])
-                        }
-                    }
-                },
-                context: 'FunnelsService - create_funnels'
-            });
-
-        } else {
-
-            // Se eliminan los funnels que no vienen en el guardado
-            const aux_funnelLibrary_id = funnelLibrary_id._id;
-            const funnels_ids: string[] = data.map((funnel: FunnelBody_et) => funnel._id);
-
-            funnels_deleteEty = await this._FunnelBody_et_repository
-                .createQueryBuilder('funnels')
-                .where('funnels.funnelLibrary_id = :aux_funnelLibrary_id', { aux_funnelLibrary_id })
-                .andWhere('funnels._id NOT IN (:...funnelIds)', { funnelIds: funnels_ids })
-                .select('funnels')
-                .getMany();
-
-
-            await queryRunner.manager.delete(FunnelBody_et, funnels_deleteEty).then((resp) => {
-
-                   if (funnels_deleteEty.length > 0) {
-
-                    let funnelsString: any[] = funnels_deleteEty.map((funnel: FunnelBody_et) => {
-                        return {
-                            _id: funnel._id,
-                            Embudo: funnel.name
-                        }
-                    });
-
-                    LoggerModels.push({
-                        type: 'log',
-                        context: 'FunnelsService - create_funnels',
-                        message: `Usuario ${user.email} - ha eliminado los embudos que no vienen en el guardado`,
-                        response: {
-                            user: {
-                                ...user
-                            },
-                            body: {
-                                embudos: [...funnelsString]
-                            }
-                        }
-                    });
-
-                }
-
-            }).catch( err => {
-            });
-
-            const deleteStages_ids = await this._FunnelBody_stages_et_repository
-                .createQueryBuilder('stages_funnel')
-                .where('stages_funnel.funnel_id IN (:...funnelIds)', { funnelIds: funnels_ids })
-                .select('stages_funnel._id')
-                .getMany();
-
-            await queryRunner.manager.delete(FunnelBody_stages_et, deleteStages_ids).then( resp => {
-
-            }).catch( err => {
-
-             });
-        }
-
-        let stages: FunnelBody_stages_et[] = [];
-
-        for (const [i, item] of data.entries()) {
-
-            for (const [_i, _item] of item.stages.entries()) {
-
-                let aux: FunnelBody_stages_et = this._FunnelBody_stages_et_repository.create({
-                    ..._item as FunnelBody_stages_et,
-                    _id: _.get(_item, '_id', uuid.v4()),
-                    funnel_id: item,
-                    __v: 1,
-                });
-
-                stages.push(aux)
-
-            }
-
-        }
-
-        const aux_funnelLibrary_id = funnelLibrary_id._id;
-        const aux_funnels_Ety = await this._FunnelBody_et_repository
-            .createQueryBuilder('funnels')
-            .where('funnels.funnelLibrary_id = :aux_funnelLibrary_id', { aux_funnelLibrary_id })
-            .select('funnels')
-            .getMany();
-
-        let funnels: FunnelBody_et[] = data.map((funnel: FunnelBody_et) => {
-
-            if (aux_funnels_Ety.some(item => item._id === funnel._id)) {
-
-                /*
-                LoggerModels.push({
-                     type: 'log',
-                     message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha re escrito un embudo:
-                    _id: "${funnel._id}" Embudo: "${funnel.name}"`,
-                     context: 'FunnelsService - create_funnels'
-                 });
-             */
-
-            } else {
+                funnelLibrary_id = await this._FunnelLibrary_et_repository.create({
+                    _id: uuid.v4(),
+                    name: 'Carpeta de embudo',
+                    user_id: User_data,
+                    funnels_id: [],
+                })
 
                 LoggerModels.push({
                     type: 'log',
-                    // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado un embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
-                    message: `Usuario ${user.email} - ha creado un embudo`,
+                    // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado una carpeta de embudos`,
+                    message: `Usuario ${user.email} - ha creado una carpeta de embudos`,
                     response: {
                         user: {
                             ...user
                         },
                         body: {
-                            ..._.pick(funnel, ['_id', 'name'])
+                            carpeta: {
+                                ..._.pick(funnelLibrary_id, ['_id', 'name'])
+                            }
                         }
                     },
                     context: 'FunnelsService - create_funnels'
                 });
 
+            } else {
+
+                // Se eliminan los funnels que no vienen en el guardado
+                const aux_funnelLibrary_id = funnelLibrary_id._id;
+                const funnels_ids: string[] = data.map((funnel: FunnelBody_et) => funnel._id);
+
+                funnels_deleteEty = await this._FunnelBody_et_repository
+                    .createQueryBuilder('funnels')
+                    .where('funnels.funnelLibrary_id = :aux_funnelLibrary_id', { aux_funnelLibrary_id })
+                    .andWhere('funnels._id NOT IN (:...funnelIds)', { funnelIds: funnels_ids })
+                    .select('funnels')
+                    .getMany();
+
+
+                await queryRunner.manager.delete(FunnelBody_et, funnels_deleteEty).then((resp) => {
+
+                    if (funnels_deleteEty.length > 0) {
+
+                        let funnelsString: any[] = funnels_deleteEty.map((funnel: FunnelBody_et) => {
+                            return {
+                                _id: funnel._id,
+                                Embudo: funnel.name
+                            }
+                        });
+
+                        LoggerModels.push({
+                            type: 'log',
+                            context: 'FunnelsService - create_funnels',
+                            message: `Usuario ${user.email} - ha eliminado los embudos que no vienen en el guardado`,
+                            response: {
+                                user: {
+                                    ...user
+                                },
+                                body: {
+                                    embudos: [...funnelsString]
+                                }
+                            }
+                        });
+
+                    }
+
+                }).catch(err => {
+                });
+
+                const deleteStages_ids = await this._FunnelBody_stages_et_repository
+                    .createQueryBuilder('stages_funnel')
+                    .where('stages_funnel.funnel_id IN (:...funnelIds)', { funnelIds: funnels_ids })
+                    .select('stages_funnel._id')
+                    .getMany();
+
+                await queryRunner.manager.delete(FunnelBody_stages_et, deleteStages_ids).then(resp => {
+
+                }).catch(err => {
+
+                });
             }
 
-            return this._FunnelBody_et_repository.create({
-                ...funnel,
-                __v: 1,
-                _id: _.get(funnel, '_id', uuid.v4()),
-                customizeProcess_step_id: funnel.customizeProcess_step_id || null,
-                funnelLibrary_id: funnelLibrary_id,
-                updatedAt: this._dateService.setDate(),
+            let stages: FunnelBody_stages_et[] = [];
+
+            for (const [i, item] of data.entries()) {
+
+                for (const [_i, _item] of item.stages.entries()) {
+
+                    let aux: FunnelBody_stages_et = this._FunnelBody_stages_et_repository.create({
+                        ..._item as FunnelBody_stages_et,
+                        _id: _.get(_item, '_id', uuid.v4()),
+                        funnel_id: item,
+                        __v: 1,
+                    });
+
+                    stages.push(aux)
+
+                }
+
+            }
+
+            const aux_funnelLibrary_id = funnelLibrary_id._id;
+            const aux_funnels_Ety = await this._FunnelBody_et_repository
+                .createQueryBuilder('funnels')
+                .where('funnels.funnelLibrary_id = :aux_funnelLibrary_id', { aux_funnelLibrary_id })
+                .select('funnels')
+                .getMany();
+
+            let funnels: FunnelBody_et[] = data.map((funnel: FunnelBody_et) => {
+
+                if (aux_funnels_Ety.some(item => item._id === funnel._id)) {
+
+                    /*
+                    LoggerModels.push({
+                         type: 'log',
+                         message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha re escrito un embudo:
+                        _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                         context: 'FunnelsService - create_funnels'
+                     });
+                 */
+
+                } else {
+
+                    LoggerModels.push({
+                        type: 'log',
+                        // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado un embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+                        message: `Usuario ${user.email} - ha creado un embudo`,
+                        response: {
+                            user: {
+                                ...user
+                            },
+                            body: {
+                                ..._.pick(funnel, ['_id', 'name'])
+                            }
+                        },
+                        context: 'FunnelsService - create_funnels'
+                    });
+
+                }
+
+                return this._FunnelBody_et_repository.create({
+                    ...funnel,
+                    __v: 1,
+                    _id: _.get(funnel, '_id', uuid.v4()),
+                    customizeProcess_step_id: funnel.customizeProcess_step_id || null,
+                    funnelLibrary_id: funnelLibrary_id,
+                    updatedAt: this._dateService.setDate(),
+                });
+
             });
 
-        });
-
-        funnelLibrary_id.funnels_id = [...funnels];
-        funnelLibrary_id.updatedAt = this._dateService.setDate();
+            funnelLibrary_id.funnels_id = [...funnels];
+            funnelLibrary_id.updatedAt = this._dateService.setDate();
 
             await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
             await queryRunner.manager.save(FunnelBody_stages_et, stages);

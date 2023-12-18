@@ -1,12 +1,12 @@
 
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { DateProcessService } from '.';
 import { Reformat_Populate_I, _argsFind, _responseMessage_I, _response_I } from '../interfaces';
 import { _argsUpdate } from '../interfaces/responseUpdate.interface';
-import { Repository, FindOneOptions } from 'typeorm';
+import { Repository, FindOneOptions, QueryRunner } from 'typeorm';
 import { _argsPagination, _paginateByArray_I } from '../interfaces/_responsePaginator.interface';
 import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
-import { _paginatorModel_I } from '../interfaces/_response.interface';
+import { _ProcessData_Model_I, _paginatorModel_I } from '../interfaces/_response.interface';
 
 import * as _ from 'lodash';
 import { _argsFindMany_I } from '../interfaces/_responseFindParameters.interface';
@@ -66,42 +66,56 @@ export class ProcessDataService {
 
     }
 
-    async process_create<T>(Model: Repository<T>, body: any): Promise<_response_I<T>> {
+    async process_create<T>(process: _ProcessData_Model_I): Promise<_response_I<T>> {
 
         return new Promise(async (resolve, reject) => {
 
-            // const entity = Model.create(body) as T;
+            // let aux_body: T = process.Model.create(
+            //     {
+            //         ...process.body
+            //     }
+            // ) as T;
 
-            // console.log('entity', entity);
+            let _resp: _response_I<T>
 
+            // console.log('process.body', process);
 
+            await process.queryRunner.manager.save( process.entity, process.body ).then(async (resp) => {
 
-            await Model.save(body).then(async (resp) => {
-
-                let _resp: _response_I<T> = {
+                _resp = {
                     ok: true,
                     statusCode: 201,
-                    data: resp,
+                    data: resp as T,
                 }
-                resolve(_resp)
 
-            }, err => {
+                resolve(_resp);
 
-                let _resp: _response_I<T> = {
+            }).catch(err => {
+
+                _resp = {
                     ok: false,
                     statusCode: 400,
-                    data: body,
+                    data: process.body,
                     err: err,
                     message: [
                         {
                             text: 'Algo ha salido mal, intente más tarde',
                             type: 'global'
+                        },
+                        {
+                            text: 'Context [ProcessDataService - process_create]',
+                            type: 'context'
                         }
                     ]
                 }
-                reject(_resp);
 
+                console.log('_resp', _resp);
+
+                // throw new HttpException(_resp, _resp.statusCode);
+
+                reject(_resp);
             })
+
 
         })
 
@@ -397,6 +411,62 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
 
     // }
 
+    async _process_getAll<T>(process: _ProcessData_Model_I): Promise<_response_I<T[]>> {
+
+        return new Promise(async (resolve, reject) => {
+
+            await process.queryRunner.manager.find( process.entity , { ...process.argsFind.findObject } ).then((resp: T[]) => {
+
+                let msg: _responseMessage_I[] = [];
+                let _resp: _response_I<T[]> = {} as _response_I<T[]>;
+
+                if (resp.length === 0) {
+
+                    msg.push({
+                        text: 'No se han encontrado resultados',
+                        type: 'global'
+                    });
+
+                    _resp = {
+                        ok: true,
+                        statusCode: 404,
+                        data: [],
+                        message: msg
+                    }
+                    resolve(_resp);
+                }
+
+                _resp = {
+                    ok: true,
+                    statusCode: 200,
+                    data: [...resp],
+                    message: msg
+                }
+
+                resolve(_resp);
+
+            }).catch((err) => {
+
+                let _resp: _response_I<T> = {
+                    ok: false,
+                    statusCode: 400,
+                    data: null,
+                    err: err,
+                    message: [
+                        {
+                            text: 'Algo ha salido mal, intente más tarde',
+                            type: 'global'
+                        }
+                    ]
+                }
+                reject(_resp);
+
+            });
+
+         })
+
+    }
+
     async process_getOne<T>(Model: Repository<T>, args: _argsFind): Promise<_response_I<T>> {
 
         return new Promise(async (resolve, reject) => {
@@ -441,10 +511,10 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
 
             }, (err) => {
 
-                let _resp: _response_I<T[]> = {
+                let _resp: _response_I<T> = {
                     ok: false,
                     statusCode: 400,
-                    data: [],
+                    data: null,
                     err: err,
                     message: [
                         {

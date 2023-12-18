@@ -18,7 +18,7 @@ export class FunnelLibrary_et extends EntityKey_et {
     name?: string;
 
     @OneToMany(() => FunnelBody_et, funnels => funnels.funnelLibrary_id, { cascade: true })
-    funnels_id: FunnelBody_et[];
+    funnels_id?: FunnelBody_et[];
 
     @Column({
         type: 'varchar',
@@ -30,7 +30,7 @@ export class FunnelLibrary_et extends EntityKey_et {
     @JoinColumn({
         name: 'config_step_id'
     })
-    config_step_id: ConfigPlanner_et;
+    config_step_id?: ConfigPlanner_et;
 
     @Column({
         type: 'varchar',
@@ -45,17 +45,9 @@ export class FunnelLibrary_et extends EntityKey_et {
             // eager: true // Que cargue la siguiente relación siempre
         })
     @JoinColumn({ name: 'user_id' })
-    user_id: User_et
-
-    @OneToMany(
-        () => LibraryPermisions_et,
-        ( funnelLibraryPermision ) => {
-            funnelLibraryPermision.funnelLibrary_id
-        },
-        {
-            cascade: true
-        }
-    )
+    user_id?: User_et
+                                            // OJO ESTO SIEMPRE DEBE RETORNAR LA RELACIÓN OJITO CON ESTO JAMAS PONER SIN RETURN
+    @OneToMany( () => LibraryPermisions_et, permisions  => permisions.funnelLibrary_id , { cascade: true })
     funnel_library_permision_id?: LibraryPermisions_et[]
 
 }

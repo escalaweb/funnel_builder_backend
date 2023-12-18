@@ -1,10 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { _argsFind, _argsPagination, _response_I } from '../../../common/interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, FindOneOptions, Repository } from 'typeorm';
+import { DataSource, FindOneOptions, QueryRunner, Repository } from 'typeorm';
 import { User_et } from '../entities';
 import { DateProcessService, ProcessDataService } from '../../../common/adapters';
 import { User_I } from '../interfaces';
+import { TransactionsService } from '../../../database/services/transactions.service';
 
 
 @Injectable()
@@ -19,50 +20,13 @@ export class UsersService {
         private readonly _dateService: DateProcessService,
         private readonly dataSource: DataSource,
 
+        private readonly _TransactionsService: TransactionsService
+
     ) {
 
     }
 
-    async test_transaction() {
 
-        // await this.dataSource.manager.transaction(async (transactionalEntityManager: EntityManager) => {
-        //     // Aquí puedes realizar tus operaciones dentro de la transacción
-
-        //     let createdAt_FK = this._datesService.create_noSv();
-
-        //     let lastAccessAt_FK = this._datesService.create_noSv();
-
-        //     await transactionalEntityManager.save(createdAt_FK).then((resp) => {
-        //         createdAt_FK = resp;
-        //     });
-        //     await transactionalEntityManager.save(lastAccessAt_FK).then((resp) => {
-        //         lastAccessAt_FK = resp;
-        //     });
-
-        //     let user = this._Users_et_repository.create(
-        //         {
-        //             username_id: "ewqdsdsdf",
-        //             createdAt_FK: createdAt_FK,
-        //             lastAccessAt_FK: lastAccessAt_FK
-        //         }
-        //     )
-
-        //     await transactionalEntityManager.save(user).then((resp) => {
-
-        //         user = resp;
-        //         console.log("resp", user);
-
-
-        //     });
-
-
-
-        // }).catch((err) => {
-
-        // });
-
-
-    }
 
 
 
@@ -81,7 +45,7 @@ export class UsersService {
             }
         }).then(async (resp) => {
 
-            if(resp.statusCode !== 200){
+            if (resp.statusCode !== 200) {
                 _Response = resp;
                 throw new HttpException(_Response, _Response.statusCode);
 
@@ -121,26 +85,40 @@ export class UsersService {
 
 
 
-    async create(data: User_et): Promise<_response_I<User_et>> {
+    async create(data: User_et, _prev_queryRunner?: QueryRunner): Promise<_response_I<User_et>> {
 
         let _Response: _response_I<User_et>;
 
-        await this._processData.process_create<User_et>(this._Users_et_repository, data).then(response => {
+        let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
-            _Response = response;
+        try {
 
-            _Response.message = [
-                {
-                    text: 'Datos de usuario guardados',
-                    type: 'global'
-                }
-            ]
+            await this._processData.process_create<User_et>({
+                body: data,
+                entity: User_et,
+                queryRunner: queryRunner
+            }).then(response => {
 
-        }, err => {
-            _Response = err;
-            console.log('err', err);
-            throw new HttpException(_Response, _Response.statusCode);
-        })
+                _Response = response;
+
+                _Response.message = [
+                    {
+                        text: 'Datos de usuario guardados',
+                        type: 'global'
+                    }
+                ]
+
+            });
+
+            await this._TransactionsService.commitTransaction(queryRunner, _prev_queryRunner);
+
+        } catch (error) {
+
+            _Response = error;
+            await this._TransactionsService.rollbackTransaction(queryRunner, _prev_queryRunner);
+
+            // throw new HttpException(_Response, _Response.statusCode);
+        }
 
         return _Response;
 
@@ -168,14 +146,14 @@ export class UsersService {
 
             _Response = resp;
 
-            if(_Response.statusCode != 200){
+            if (_Response.statusCode != 200) {
                 _Response.message = [
                     {
                         text: 'No se encontró un usuario con este id',
                         type: 'global'
                     }
                 ]
-                   throw new HttpException(_Response, _Response.statusCode);
+                throw new HttpException(_Response, _Response.statusCode);
             }
 
             _Response.message = [
@@ -190,7 +168,7 @@ export class UsersService {
         }, (err) => {
 
             _Response = {
-               ...err
+                ...err
             }
 
 

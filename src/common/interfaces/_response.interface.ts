@@ -1,4 +1,6 @@
-
+import { QueryRunner, Repository } from "typeorm";
+import { _argsFind } from ".";
+import { _argsFindMany_I, _argsFind_I } from "./_responseFindParameters.interface";
 
 
 export interface _paginatorModel_I {
@@ -30,6 +32,7 @@ export interface _response_I<T = any> {
 const type_message_default = [
     "global",
     "inline",
+    "context",
 ] as const;
 
 export type message_T = typeof type_message_default[number];
@@ -38,4 +41,14 @@ export interface _responseMessage_I {
     text: string;
     type: message_T;
     index?: string;
+}
+
+
+export interface _ProcessData_Model_I<T = any> {
+    // Model: Repository<T>,
+    body?: T,
+    entity?: T,
+    argsFind?: _argsFind_I,
+    argsFindMany?: _argsFindMany_I,
+    queryRunner?: QueryRunner
 }

@@ -20,13 +20,9 @@ export class ConfigPlanner_et extends EntityKey_et {
     })
     toolsSettingsConfig: CST_ToolSettingsConfig_I[];
 
-
     @OneToOne(() => FunnelLibrary_et, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'funnelLibrary_id' })
     funnelLibrary_id: FunnelLibrary_et;
-
-
-
 
 
 }

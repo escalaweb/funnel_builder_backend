@@ -2,9 +2,12 @@ import { Logger, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import helmet from "helmet";
 import { AppModule } from "./app.module";
 import { _Configuration_Keys } from "./config/config.keys";
+import helmet from "helmet";
+
+import * as express from 'express';
+
 
 const Config = new ConfigService();
 
@@ -41,6 +44,9 @@ async function bootstrap() {
             forbidNonWhitelisted: true,
         })
     );
+
+      app.use(express.json({ limit: '10mb' }));
+
 
     const config = new DocumentBuilder()
         .setTitle('Funnel builder Escala Restful Api')

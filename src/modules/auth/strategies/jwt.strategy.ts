@@ -98,7 +98,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
             if ((response.statusCode != 200) || (response.data === undefined || response.data === null)) {
 
-
                 await this.register_user(newPayload).then(resp => {
                     newPayload._id = resp._id;
                 });
@@ -135,10 +134,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 tenant_id: payload.tenant_id,
             }).then(resp => {
 
+                // console.log(resp);
                 resolve(resp.data);
 
             }, err => {
 
+                // console.log(err);
                 reject(err);
 
             });
