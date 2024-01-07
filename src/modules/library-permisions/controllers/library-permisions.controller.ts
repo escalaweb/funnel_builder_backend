@@ -1,53 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
+import { Controller, Get, Param, Request, Body, Post } from '@nestjs/common';
 import { LibraryPermisionsService } from '../services/library-permisions.service';
-import { CreateLibraryPermisionDto } from '../dto/create-library-permision.dto';
-import { UpdateLibraryPermisionDto } from '../dto/update-library-permision.dto';
 import { AuthPayload_I } from '../../auth/interfaces';
+import { Auth } from '../../auth/decorators';
 
 @Controller('library-permisions')
+@Auth()
 export class LibraryPermisionsController {
     constructor(
         private readonly libraryPermisionsService: LibraryPermisionsService
     ) { }
 
-
-
-
-    //   @Post()
-    //   create(@Body() createLibraryPermisionDto: CreateLibraryPermisionDto) {
-    //     return this.libraryPermisionsService.create(createLibraryPermisionDto);
-    //   }
-
-
-
     @Get(':libraryPermision_id')
-    findOne_byId(@Param('libraryPermision_id') libraryPermision_id: string, @Request() req: any) {
+    async findOne_byId(@Param('libraryPermision_id') libraryPermision_id: string, @Request() req: any) {
 
         const user: AuthPayload_I = req.user;
-        return this.libraryPermisionsService.findOne_byId(libraryPermision_id, user);
+        let resp = await this.libraryPermisionsService.findOne_byId(libraryPermision_id, user);
+        return resp;
 
     }
 
     @Get('/byLibrary/:funnelLibrary_id')
-    findOne_byLibraryId(@Param('funnelLibrary_id') funnelLibrary_id: string, @Request() req: any) {
+    async findOne_byLibraryId(@Param('funnelLibrary_id') funnelLibrary_id: string, @Request() req: any) {
 
         const user: AuthPayload_I = req.user;
-        return this.libraryPermisionsService.findAll_byLibraryId(funnelLibrary_id, user);
+        return await this.libraryPermisionsService.findAll_byLibraryId(funnelLibrary_id, user);
 
     }
 
-    //   @Get(':id')
-    //   findOne(@Param('id') id: string) {
-    //     return this.libraryPermisionsService.findOne(+id);
-    //   }
+    @Post('setPermisions/:funnelLibrary_id')
+    async setPermisions_toLibrary(@Body() libraryPermisions: any, @Param('funnelLibrary_id') funnelLibrary_id: string, @Request() req: any) {
 
-    //   @Patch(':id')
-    //   update(@Param('id') id: string, @Body() updateLibraryPermisionDto: UpdateLibraryPermisionDto) {
-    //     return this.libraryPermisionsService.update(+id, updateLibraryPermisionDto);
-    //   }
+        const user: AuthPayload_I = req.user;
+        const token: string = req.headers.authorization.replace('Bearer ', '');
+        return await this.libraryPermisionsService.createPermisions_toLibrary(libraryPermisions, funnelLibrary_id, user, token);
 
-    //   @Delete(':id')
-    //   remove(@Param('id') id: string) {
-    //     return this.libraryPermisionsService.remove(+id);
-    //   }
+     }
+
+
 }

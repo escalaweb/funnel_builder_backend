@@ -1,50 +1,116 @@
 
-import { HttpException, Injectable } from '@nestjs/common';
-import { DateProcessService } from '.';
-import { Reformat_Populate_I, _argsFind, _responseMessage_I, _response_I } from '../interfaces';
+import { Injectable } from '@nestjs/common';
 import { _argsUpdate } from '../interfaces/responseUpdate.interface';
-import { Repository, FindOneOptions, QueryRunner } from 'typeorm';
+import { Repository } from 'typeorm';
 import { _argsPagination, _paginateByArray_I } from '../interfaces/_responsePaginator.interface';
-import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
-import { _ProcessData_Model_I, _paginatorModel_I } from '../interfaces/_response.interface';
+import { Pagination } from 'nestjs-typeorm-paginate';
 
 import * as _ from 'lodash';
-import { _argsFindMany_I } from '../interfaces/_responseFindParameters.interface';
+import { _Populate_I, _ProcessData_Model_I, _argsFindMany_I, _argsFind_I, _responseMessage_I, _response_I } from '../interfaces';
 
+
+
+interface AnyObj {
+    [key: string]: any;
+}
 
 @Injectable()
 export class ProcessDataService {
 
-
     constructor(
-        // private readonly _dateProcessService: DateProcessService,
-
-
     ) {
+    }
 
+    populateData(data: AnyObj, populateOptions: _Populate_I, isRoot: boolean = true): Promise<AnyObj> {
+        return new Promise((resolve) => {
+            const processObject = (obj: AnyObj, options: _Populate_I, isRoot: boolean): AnyObj => {
+                let resultObj = isRoot ? { ...obj } : {};
+
+                for (const [key, value] of Object.entries(options)) {
+                    if (obj.hasOwnProperty(key)) {
+                        const select = Array.isArray(value.select) ? value.select : [value.select];
+                        const isExcluding = select.some(selectKey => selectKey.startsWith('-'));
+
+                        if (isExcluding) {
+                            // Exclusión en arrays
+                            if (Array.isArray(obj[key])) {
+                                resultObj[key] = obj[key].map(item => {
+                                    const itemCopy = { ...item };
+                                    select.forEach(selectKey => {
+                                        if (selectKey.startsWith('-')) {
+                                            delete itemCopy[selectKey.substring(1)];
+                                        }
+                                    });
+                                    return itemCopy;
+                                });
+                            } else {
+                                // Exclusión en objetos
+                                resultObj[key] = { ...obj[key] };
+                                select.forEach(selectKey => {
+                                    if (selectKey.startsWith('-')) {
+                                        delete resultObj[key][selectKey.substring(1)];
+                                    }
+                                });
+                            }
+                        } else {
+                            // Inclusión de campos específicos
+                            if (Array.isArray(obj[key])) {
+                                resultObj[key] = obj[key].map(item => {
+                                    return select.reduce((acc, curr) => {
+                                        if (item.hasOwnProperty(curr)) {
+                                            acc[curr] = item[curr];
+                                        }
+                                        return acc;
+                                    }, {});
+                                });
+                            } else {
+                                resultObj[key] = select.reduce((acc, curr) => {
+                                    if (obj[key].hasOwnProperty(curr)) {
+                                        acc[curr] = obj[key][curr];
+                                    }
+                                    return acc;
+                                }, {});
+                            }
+                        }
+
+                        // Aplicación recursiva para sub-relaciones
+                        if (value.populate && typeof obj[key] === 'object') {
+                            resultObj[key] = Array.isArray(obj[key])
+                                ? obj[key].map((item: AnyObj) => this.populateData(item, value.populate!, false))
+                                : this.populateData(obj[key], value.populate!, false);
+                        }
+                    }
+                }
+
+                return resultObj;
+            };
+
+            resolve(processObject(data, populateOptions, true));
+        });
     }
 
 
-    async process_delete<T>(Model: Repository<T>, args: _argsFind<any>): Promise<_response_I<T>> {
+    async process_delete<T>(process: _ProcessData_Model_I<T>): Promise<_response_I<T>> {
 
         return new Promise(async (resolve, reject) => {
 
-            await Model.delete({ ...args.findObject.where as any }).then(resp => {
+            // await Model.delete({ ...args.findObject.where as any }).then(resp => {
+            await process.queryRunner.manager.delete(process.entity as any, process.body).then(resp => {
 
                 let _resp: _response_I<T> = {
                     ok: true,
                     statusCode: 200,
-                    data: args.findObject.where as any,
+                    data: resp.raw,
                     message: [
                         {
-                            text: 'Elemento removido correctamente',
+                            text: 'Removido correctamente',
                             type: 'global'
                         }
                     ]
                 }
                 resolve(_resp)
 
-            }, err => {
+            }).catch(err => {
 
                 let _resp: _response_I<T> = {
                     ok: true,
@@ -66,37 +132,42 @@ export class ProcessDataService {
 
     }
 
-    async process_create<T>(process: _ProcessData_Model_I): Promise<_response_I<T>> {
+    async process_createMany<T>(process: _ProcessData_Model_I<T>): Promise<_response_I<T[]>> {
 
         return new Promise(async (resolve, reject) => {
 
-            // let aux_body: T = process.Model.create(
-            //     {
-            //         ...process.body
-            //     }
-            // ) as T;
+            let _Response: _response_I<T[]>
 
-            let _resp: _response_I<T>
 
-            // console.log('process.body', process);
+            try {
 
-            await process.queryRunner.manager.save( process.entity, process.body ).then(async (resp) => {
+                let processSaved: T[] = [];
 
-                _resp = {
-                    ok: true,
-                    statusCode: 201,
-                    data: resp as T,
+                for (const [i, item] of process.bodyMany.entries()) {
+
+                    await process.queryRunner.manager.save(process.entity, process.body).then(async (resp) => {
+
+                        processSaved.push(resp as T);
+
+                    })
+
+                    _Response = {
+                        ok: true,
+                        statusCode: 201,
+                        data: processSaved,
+                    }
+
                 }
 
-                resolve(_resp);
+                resolve(_Response);
 
-            }).catch(err => {
+            } catch (error) {
 
-                _resp = {
+                _Response = {
                     ok: false,
                     statusCode: 400,
-                    data: process.body,
-                    err: err,
+                    data: process.bodyMany,
+                    err: error,
                     message: [
                         {
                             text: 'Algo ha salido mal, intente más tarde',
@@ -109,13 +180,49 @@ export class ProcessDataService {
                     ]
                 }
 
-                console.log('_resp', _resp);
+                reject(_Response);
 
-                // throw new HttpException(_resp, _resp.statusCode);
+            }
+        })
+
+    }
+
+    async process_create<T>(process: _ProcessData_Model_I): Promise<_response_I<T>> {
+
+        return new Promise(async (resolve, reject) => {
+
+            let _resp: _response_I<T>
+
+            await process.queryRunner.manager.save(process.entity, process.body).then(async (resp) => {
+
+                _resp = {
+                    ok: true,
+                    statusCode: 201,
+                    data: resp as T,
+                }
+
+                resolve(_resp);
+
+            }).catch(error => {
+                _resp = {
+                    ok: false,
+                    statusCode: 400,
+                    data: process.body,
+                    err: error,
+                    message: [
+                        {
+                            text: 'Algo ha salido mal, intente más tarde',
+                            type: 'global'
+                        },
+                        {
+                            text: 'Context [ProcessDataService - process_create]',
+                            type: 'context'
+                        }
+                    ]
+                }
 
                 reject(_resp);
             })
-
 
         })
 
@@ -158,69 +265,7 @@ export class ProcessDataService {
 
     }
 
-    /*
-
-async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_response_I<T[]>> {
-
-    return new Promise(async (resolve, reject) => {
-
-        let transactionHub: any[] = [];
-
-        let _resp: _response_I<T[]> = {
-            ok: true,
-            statusCode: 201,
-            message: [{
-                text: 'Elementos creados correctamente',
-                type: 'global'
-            }],
-            data: []
-        }
-
-        for (const iterator of body.entries()) {
-            transactionHub.push(
-                await Model.transaction.create(iterator[1])
-
-            )
-        }
-
-        await this.transaction(transactionHub).then(resp => {
-
-
-
-            for (const iterator of transactionHub.entries()) {
-
-                _resp.data.push(
-                    iterator[1]['Put']['Item']
-                );
-            }
-
-            resolve(_resp);
-        }, err => {
-
-                    let _resp: _response_I<T[]> = {
-                        ok: false,
-                        statusCode: 400,
-                        data: body,
-                        err: err,
-                        message: [
-                            {
-                                text: 'Algo ha salido mal, intente más tarde',
-                                type: 'global'
-                            }
-                        ]
-                    }
-
-                    reject(_resp)
-
-                })
-
-
-    })
-
-}
-
-*/
-    async process_getAll_paginate_array<T>(Model: T[], args: _argsPagination): Promise<_paginateByArray_I<T>> {
+    async process_getAll_paginate_array<T>(Model: T[], args: _argsFindMany_I): Promise<_paginateByArray_I<T>> {
 
         return new Promise(async (resolve, reject) => {
 
@@ -229,7 +274,7 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
             limit = Number(limit);
             page = Number(page);
 
-            const objectsArray: any[] = Model; // Reemplaza esto con tu propia lógica para obtener el array
+            const objectsArray: any[] = Model;
             const totalCount = objectsArray.length;
 
             const start = (page - 1) * limit;
@@ -265,7 +310,7 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
         })
 
     }
-    async process_getAll_paginate<T>(Model: Repository<T>, args: _argsPagination): Promise<_response_I<T[]>> {
+    async process_getAll_paginate<T>(process: _ProcessData_Model_I): Promise<_response_I<T[]>> {
 
         return new Promise(async (resolve, reject) => {
 
@@ -273,14 +318,13 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
             let elements: T[] = [];
             let _resp: _response_I<T[]> = {} as _response_I<T[]>;
 
-            const args_all: _argsFindMany_I = {
-                findObject: {
-                    ...args.findObject
-                },
 
-            }
 
-            await this.process_getAll(Model, args_all).then((resp) => {
+            await this.process_getAll<T>({
+                entity: process.entity,
+                argsFindMany: process.argsFindMany,
+                queryRunner: process.queryRunner,
+            }).then((resp) => {
 
                 elements = resp.data;
 
@@ -311,7 +355,7 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
                 return;
             }
 
-            await this.process_getAll_paginate_array<T>(elements, args).then(resp => {
+            await this.process_getAll_paginate_array<T>(elements, process.argsFindMany).then(resp => {
 
                 _resp = {
                     ok: true,
@@ -327,95 +371,12 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
 
         })
 
-
     }
-
-    async process_getAll<T>(Model: Repository<T>, args: _argsFindMany_I<any>): Promise<_response_I<T[]>> {
+    async process_getAll<T>(process: _ProcessData_Model_I): Promise<_response_I<T[]>> {
 
         return new Promise(async (resolve, reject) => {
 
-
-            // console.log('argumentos finales', args);
-
-            await Model.find(args.findObject).then(resp => {
-
-                let msg: _responseMessage_I[] = [];
-                let _resp: _response_I<T[]> = {} as _response_I<T[]>;
-
-                if (resp.length === 0) {
-
-                    msg.push({
-                        text: 'No se han encontrado resultados',
-                        type: 'global'
-                    });
-
-                    _resp = {
-                        ok: true,
-                        statusCode: 404,
-                        data: [],
-                        message: msg
-                    }
-                    resolve(_resp)
-                }
-
-                _resp = {
-                    ok: true,
-                    statusCode: 200,
-                    data: [...resp],
-                    message: msg
-                }
-
-                resolve(_resp)
-
-            }, err => {
-
-                let _resp: _response_I<T[]> = {
-                    ok: false,
-                    statusCode: 400,
-                    data: [],
-                    err: err,
-                    message: [
-                        {
-                            text: 'Algo ha salido mal, intente más tarde',
-                            type: 'global'
-                        }
-                    ]
-                }
-                reject(_resp);
-
-            })
-
-
-        })
-
-    }
-
-    // generarObjeto(obj) {
-    //     const resultado = {};
-    //     for (const [clave, valor] of Object.entries(obj)) {
-    //         resultado[clave] = { contains: valor };
-    //     }
-    //     return resultado;
-    //     //   return JSON.stringify(resultado);
-    // }
-
-    // async _populate<T>(documents: T, args: _argsFind){
-
-    //     return new Promise( async (resolve, reject) => {
-
-    //         let aux: T = await this._dynamooseHelpers.populate(documents, args.populate);
-
-    //         resolve(aux);
-
-    //     });
-
-    // }
-
-    async _process_getAll<T>(process: _ProcessData_Model_I): Promise<_response_I<T[]>> {
-
-        return new Promise(async (resolve, reject) => {
-
-            await process.queryRunner.manager.find( process.entity , { ...process.argsFind.findObject } ).then((resp: T[]) => {
+            await process.queryRunner.manager.find(process.entity, { ...process.argsFindMany.findObject as any }).then((resp: T[]) => {
 
                 let msg: _responseMessage_I[] = [];
                 let _resp: _response_I<T[]> = {} as _response_I<T[]>;
@@ -463,21 +424,16 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
 
             });
 
-         })
+        })
 
     }
 
-    async process_getOne<T>(Model: Repository<T>, args: _argsFind): Promise<_response_I<T>> {
+    // async process_getOne<T>(Model: Repository<T>, args: _argsFind_I): Promise<_response_I<T>> {
+    async process_getOne<T>(process: _ProcessData_Model_I): Promise<_response_I<T>> {
 
         return new Promise(async (resolve, reject) => {
 
-            await Model.findOne(
-                {
-                    where: args.findObject.where,
-                    relations: args.findObject.relations,
-                    select: args.findObject.select as any
-                }
-            ).then((resp) => {
+            await process.queryRunner.manager.findOne(process.entity, { ...process.argsFind.findObject }).then(async (resp: T) => {
 
                 let msg: _responseMessage_I[] = [];
                 let _resp: _response_I<T> = {} as _response_I<T>;
@@ -491,107 +447,45 @@ async process_create_many<T, I>(Model: Model<any, any>, body: T[]): Promise<_res
                     _resp = {
                         ok: true,
                         statusCode: 404,
+                        message: msg,
                         data: null,
-                        message: msg
                     }
 
                     resolve(_resp);
 
                 } else {
 
+                    if (process.argsFind.populate) {
+                        resp = await this.populateData(resp, process.argsFind.populate) as T;
+                    }
+
                     _resp = {
                         ok: true,
                         statusCode: 200,
-                        data: { ...resp },
-                        message: msg
+                        message: msg,
+                        data: { ...resp }
                     }
 
                 }
                 resolve(_resp)
 
-            }, (err) => {
+            }).catch((err) => {
 
                 let _resp: _response_I<T> = {
                     ok: false,
                     statusCode: 400,
-                    data: null,
                     err: err,
                     message: [
                         {
                             text: 'Algo ha salido mal, intente más tarde',
                             type: 'global'
                         }
-                    ]
+                    ],
+                    data: null,
                 }
-                // throw new HttpException(_resp, _resp.statusCode);
                 reject(_resp);
 
             });
-
-        })
-
-    }
-
-    /*
-        async process_updateOne<T, I>(Model: Model<T, any>, args: _argsUpdate<T>): Promise<_response_I<T>> {
-
-            return new Promise((resolve, reject) => {
-
-                // {"breed": {"contains": "Terrier"} }
-
-                Model.update(args.findObject, args.set).then(resp => {
-
-                    let _resp: _response_I<T> = {
-                        ok: true,
-                        statusCode: 200,
-                        data: resp,
-                    }
-                    resolve(_resp)
-
-                }, err => {
-
-                    console.log('err', err);
-
-                    let _resp: _response_I<T> = {
-                        ok: false,
-                        statusCode: 400,
-                        data: null,
-                        err: err,
-                        message: [
-                            {
-                                text: 'Algo ha salido mal, intente más tarde',
-                                type: 'global'
-                            }
-                        ]
-                    }
-                    reject(_resp);
-
-                })
-
-            })
-
-        }
-
-    */
-
-    async reconvert_format_populate<T>(format: Reformat_Populate_I, model: any): Promise<T> {
-
-        return new Promise((resolve, reject) => {
-
-            let aux_param: any = structuredClone(model[format.param]);
-
-            let aux_model: any = structuredClone(model);
-
-            let aux_select: any = _.pick(aux_param, format.select.split(' '));
-
-
-            aux_model[format.to] = aux_select;
-
-            // delete aux_model[format.param]
-            // delete aux_model[format.param];
-
-            // console.log('aux_model', aux_model);
-            resolve(aux_model);
 
         })
 

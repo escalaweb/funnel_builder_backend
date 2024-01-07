@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { _response_I, _argsFind } from '../../../common/interfaces';
+import { _response_I, _argsFind_I } from '../../../common/interfaces';
 import { AuthPayload_I } from '../../auth/interfaces';
 import { CustomizeProcess_et } from '../../customize-process/entities';
 import { FunnelLibrary_et } from '../../funnel-library/entities';
@@ -170,7 +170,7 @@ export class Admin_FunnelBuilder_handler_Service {
 
     async get_userData_byEmail(email: string): Promise<AuthPayload_I> {
 
-        const args: _argsFind<User_et> = {
+        const args: _argsFind_I<User_et> = {
             findObject: {
                 where: {
                     email: email,

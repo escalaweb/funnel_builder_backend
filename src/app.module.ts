@@ -15,7 +15,6 @@ import { CustomizeProcessModule } from "./modules/customize-process/customize-pr
 import { LibraryPermisionsModule } from './modules/library-permisions/library-permisions.module';
 
 
-
 @Module({
     imports: [
         ConfigProjectModule,

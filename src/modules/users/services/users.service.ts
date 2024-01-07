@@ -1,11 +1,14 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { _argsFind, _argsPagination, _response_I } from '../../../common/interfaces';
+import { _argsFind_I, _argsPagination, _response_I } from '../../../common/interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, FindOneOptions, QueryRunner, Repository } from 'typeorm';
 import { User_et } from '../entities';
-import { DateProcessService, ProcessDataService } from '../../../common/adapters';
-import { User_I } from '../interfaces';
+import { DateProcessService, ProcessDataService, _HttpService } from '../../../common/adapters';
+import { User_Escala_I, User_Escala_Request_I, User_I } from '../interfaces';
 import { TransactionsService } from '../../../database/services/transactions.service';
+import { AuthPayload_I } from '../../auth/interfaces';
+import { ConfigProjectService } from '../../../config/config.service';
+import { _Configuration_Keys } from '../../../config/config.keys';
 
 
 @Injectable()
@@ -20,14 +23,113 @@ export class UsersService {
         private readonly _dateService: DateProcessService,
         private readonly dataSource: DataSource,
 
-        private readonly _TransactionsService: TransactionsService
+        private readonly _HttpService: _HttpService,
+
+        private readonly _TransactionsService: TransactionsService,
+        private readonly _ConfigProjectService: ConfigProjectService
 
     ) {
 
     }
 
 
+    async getUsers_byOwner(user: AuthPayload_I, token: string, _prev_queryRunner?: QueryRunner): Promise<_response_I<AuthPayload_I[]>> {
 
+        let _Response: _response_I<AuthPayload_I[]>;
+
+        let usersReturn: AuthPayload_I[] = [];
+
+        let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
+
+        try {
+
+            let url: string = (this._ConfigProjectService._get(_Configuration_Keys.NODE_ENV) === 'development') ? 'https://api.dev.exitoweb.com' : 'https://api.escala.com';
+
+            const users = await this._HttpService._get<User_Escala_Request_I>(
+                url + '/app/customer/users/search?page=0&size=200&sort_field=modified&sort_direction=DESC',
+                {
+                    "headers": {
+                        "Authorization": token
+                    }
+                }
+            );
+
+            // const aux_users: User_Escala_I[] = users.data.data.filter(resp => resp.email !== user.email);
+            const aux_users: User_Escala_I[] = users.data.data;
+
+            for (const [i, item] of aux_users.entries()) {
+
+                // Valido que el usuario exista previamente
+                const args: _argsFind_I<User_et> = {
+                    findObject: {
+                        where: {
+                            email: item.email,
+                        }
+                    }
+                }
+
+                let User_data: User_et = await this.findOne(args).then(resp => resp.data);
+
+                if (!User_data) {
+
+                    User_data = await this.create({
+                        username_id: item.properties.sub,
+                        name: item.name,
+                        email: item.email,
+                        tenant_id: item.tenant_id,
+                    }, queryRunner).then(resp => resp.data)
+
+                }
+
+                usersReturn.push({
+                    _id: User_data._id,
+                    email: User_data.email,
+                    name: User_data.name,
+                    tenant_id: User_data.tenant_id,
+                    username_id: User_data.username_id
+                })
+
+            }
+
+            if (usersReturn.length === 0) {
+
+                _Response = {
+                    ok: true,
+                    statusCode: 404,
+                    message: [{
+                        text: 'Usuarios no encontrados',
+                        type: 'global'
+                    }],
+                    data: []
+                }
+
+                throw new HttpException(_Response, _Response.statusCode);
+
+            }
+
+            _Response = {
+                ok: true,
+                statusCode: 200,
+                message: [{
+                    text: 'Usuarios encontrados',
+                    type: 'global'
+                }],
+                data: [...usersReturn]
+            }
+
+            if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
+
+        } catch (error) {
+
+            _Response = error;
+
+            if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
+
+        }
+
+        return _Response;
+
+    }
 
 
     async delete_user(_id: string): Promise<_response_I<User_et>> {
@@ -56,13 +158,16 @@ export class UsersService {
 
         })
 
-
-        await this._processData.process_delete<User_et>(this._Users_et_repository, {
+        await this._processData.process_delete<any>({
+            argsFind: {
             findObject: {
                 where: {
                     _id: user._id
                 }
-            }
+            },
+            },
+            queryRunner: null,
+            entity: User_et
         }).then(response => {
 
             _Response = response;
@@ -82,8 +187,6 @@ export class UsersService {
         return _Response;
 
     }
-
-
 
     async create(data: User_et, _prev_queryRunner?: QueryRunner): Promise<_response_I<User_et>> {
 
@@ -110,12 +213,12 @@ export class UsersService {
 
             });
 
-            await this._TransactionsService.commitTransaction(queryRunner, _prev_queryRunner);
+            await this._TransactionsService.commitTransaction(queryRunner);
 
         } catch (error) {
 
             _Response = error;
-            await this._TransactionsService.rollbackTransaction(queryRunner, _prev_queryRunner);
+            await this._TransactionsService.rollbackTransaction(queryRunner);
 
             // throw new HttpException(_Response, _Response.statusCode);
         }
@@ -125,125 +228,146 @@ export class UsersService {
     }
 
 
-
-    // forma de usar
-    /*
-       const args: _argsFind<FindOneOptions> = {
-                findObject: {
-                    where: {
-                        host_id: host_id,
-                        host_email: Not(IsNull())
-                    }
-                }
-            }
-
-    */
-    async findOne(args: _argsFind): Promise<_response_I<User_et>> {
+    async findOne(args: _argsFind_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<User_et>> {
 
         let _Response: _response_I<User_et>;
 
-        await this._processData.process_getOne<User_et>(this._Users_et_repository, args).then(async (resp) => {
+        let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
-            _Response = resp;
+        try {
 
-            if (_Response.statusCode != 200) {
+            await this._processData.process_getOne<User_et>({
+                argsFind: args,
+                entity: User_et,
+                queryRunner: queryRunner
+            }).then(async (resp) => {
+
+                _Response = resp;
+
+                if (_Response.statusCode != 200) {
+                    _Response.message = [
+                        {
+                            text: 'No se encontró un usuario con este id',
+                            type: 'global'
+                        }
+                    ]
+                    throw new HttpException(_Response, _Response.statusCode);
+                }
+
                 _Response.message = [
                     {
-                        text: 'No se encontró un usuario con este id',
+                        text: 'Usuario obtenido',
                         type: 'global'
                     }
                 ]
-                throw new HttpException(_Response, _Response.statusCode);
-            }
 
-            _Response.message = [
-                {
-                    text: 'Usuario obtenido',
-                    type: 'global'
-                }
-            ]
+                return _Response;
 
-            return _Response;
-
-        }, (err) => {
-
-            _Response = {
-                ...err
-            }
+            });
 
 
-            throw new HttpException(_Response, _Response.statusCode);
+            if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
 
-        });
+
+        } catch (error) {
+
+            _Response = error;
+
+            if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
+
+        }
 
 
         return _Response;
 
     }
 
-    async findAll(page: number = 1): Promise<_response_I<User_et[]>> {
+    async findAll(page: number = 1, _prev_queryRunner?: QueryRunner): Promise<_response_I<User_et[]>> {
 
         let _Response: _response_I<User_et[]>;
 
-        const args: _argsPagination = {
-            findObject: {
-                relations: ['users']
-            },
-            options: {
-                page: page,
-                limit: 12,
-                // limit: this._configP._get(_Configuration_Keys.DEFAULT_LIMIT),
-                route: '/',
+        let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
+
+        try {
+
+            const args: _argsPagination = {
+                findObject: {
+                    relations: ['users']
+                },
+                options: {
+                    page: page,
+                    limit: 12,
+                    // limit: this._configP._get(_Configuration_Keys.DEFAULT_LIMIT),
+                    route: '/',
+                }
             }
+
+            await this._processData.process_getAll_paginate<User_et>({
+                argsFindMany: { ...args },
+                queryRunner: queryRunner,
+                entity: User_et
+            }).then(async (resp) => {
+
+                _Response = structuredClone(resp);
+
+            })
+
+            if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
+
+        } catch (error) {
+            _Response = error;
+            if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
         }
-
-        await this._processData.process_getAll_paginate<User_et>(this._Users_et_repository, args).then(async (resp) => {
-
-            _Response = structuredClone(resp);
-
-        }, (err) => {
-            _Response = err;
-
-            throw new HttpException(_Response, _Response.statusCode);
-        });
-
         return _Response;
 
     }
 
 
-    async findOneByTerm(term: any): Promise<_response_I<User_et>> {
+    async findOneByTerm(term: any, _prev_queryRunner?: QueryRunner): Promise<_response_I<User_et>> {
 
         let _Response: _response_I<User_et>;
 
-        let args: _argsFind = {
-            findObject: {
-                ...term
-            }
-        }
+        let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
-        await this._processData.process_getOne<User_et>(this._Users_et_repository, args).then(response => {
+        try {
 
-            _Response = response;
-
-            _Response.message = [
-                {
-                    text: 'Usuario obtenido',
-                    type: 'global'
+            let args: _argsFind_I = {
+                findObject: {
+                    ...term
                 }
-            ]
+            }
 
-        }, err => {
-            _Response = err;
+            await this._processData.process_getOne<User_et>({
+                argsFind: args,
+                entity: User_et,
+                queryRunner: queryRunner
+            }).then(response => {
 
-            // throw new HttpException(_Response, _Response.statusCode);
-        })
+                _Response = response;
+
+                _Response.message = [
+                    {
+                        text: 'Usuario obtenido',
+                        type: 'global'
+                    }
+                ]
+
+            })
+
+            if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
+
+
+        } catch (error) {
+
+            _Response = error;
+
+            if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
+
+        }
 
         return _Response;
 
     }
-
-
 
 
 }

@@ -7,6 +7,7 @@ import { _Configuration_Keys } from "./config/config.keys";
 import helmet from "helmet";
 
 import * as express from 'express';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 
 const Config = new ConfigService();
@@ -45,7 +46,10 @@ async function bootstrap() {
         })
     );
 
-      app.use(express.json({ limit: '10mb' }));
+    app.use(express.json({ limit: '10mb' }));
+
+    app.useGlobalInterceptors(new ResponseInterceptor());
+
 
 
     const config = new DocumentBuilder()

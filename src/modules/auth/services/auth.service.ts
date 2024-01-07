@@ -5,7 +5,7 @@
 // import { DateProcessService, ProcessDataService } from "../../../common/adapters";
 // import { _response_I } from "../../../common/interfaces";
 // import { _argsUpdate } from "../../../common/interfaces/responseUpdate.interface";
-// import { _argsFind } from "../../../common/interfaces/_responseFindParameters.interface";
+// import { _argsFind_I } from "../../../common/interfaces/_responseFindParameters.interface";
 // import { RolesService } from "../../roles/services/roles.service";
 // import { Users } from "../../users/schemas";
 // import { JwtPayload_I, session_I } from "../interfaces";
@@ -52,7 +52,7 @@
 
 //         let _Response: _response_I;
 
-//         const args: _argsFind = {
+//         const args: _argsFind_I = {
 //             findObject: {
 //                 email: email
 //             },

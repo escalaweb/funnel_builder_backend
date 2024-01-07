@@ -13,11 +13,6 @@ export class TransactionsService {
 
         if (_prev_queryRunner && _prev_queryRunner != undefined && _prev_queryRunner != null) return _prev_queryRunner;
 
-        // const queryRunner = this.entityManager.createQueryRunner();
-        // await queryRunner.connect();
-        // await queryRunner.startTransaction();
-        // return queryRunner;
-
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -25,18 +20,18 @@ export class TransactionsService {
 
     }
 
-    async commitTransaction(queryRunner: QueryRunner, _prev_queryRunner: QueryRunner = undefined): Promise<void> {
+    async commitTransaction(queryRunner: QueryRunner): Promise<void> {
 
-        if (_prev_queryRunner && _prev_queryRunner != undefined && _prev_queryRunner != null) return;
+        // if (_prev_queryRunner && _prev_queryRunner != undefined && _prev_queryRunner != null) return;
 
         await queryRunner.commitTransaction();
         await queryRunner.release();
 
     }
 
-    async rollbackTransaction(queryRunner: QueryRunner, _prev_queryRunner: QueryRunner = undefined): Promise<void> {
+    async rollbackTransaction(queryRunner: QueryRunner): Promise<void> {
 
-        if (_prev_queryRunner && _prev_queryRunner != undefined && _prev_queryRunner != null) return;
+        // if (_prev_queryRunner && _prev_queryRunner != undefined && _prev_queryRunner != null) return;
 
         await queryRunner.rollbackTransaction();
         await queryRunner.release();

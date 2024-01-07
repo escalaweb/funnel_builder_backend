@@ -1,19 +1,24 @@
 import { Module, Global } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
-import { DateProcessService, ProcessDataService } from './adapters';
+import { DateProcessService, ProcessDataService, _HttpService } from './adapters';
 import { HttpExceptionFilter } from './filters';
 import { MiddlewareModule } from './middlewares/middleware.module';
 import { CommonService, ExeptionsHandlersService, _LoggerService } from './services';
 import { SocketsGateway } from './sockets/sockets.gateway';
 import { SocketsService } from './sockets/sockets.service';
-import { DynamooseHelper } from './helpers';
+import { HttpModule } from '@nestjs/axios';
 
 
 @Global()
 @Module({
     // controllers: [],
     imports: [
-        MiddlewareModule
+        MiddlewareModule,
+        HttpModule.register({
+            timeout: 5000,
+            maxRedirects: 5,
+        }),
+
     ],
     providers: [
         {
@@ -22,6 +27,7 @@ import { DynamooseHelper } from './helpers';
         },
         CommonService,
         ProcessDataService,
+        _HttpService,
         DateProcessService,
         SocketsGateway,
         SocketsService,
@@ -32,6 +38,7 @@ import { DynamooseHelper } from './helpers';
     exports: [
         CommonService,
         ProcessDataService,
+        _HttpService,
         DateProcessService,
         SocketsService,
         _LoggerService,

@@ -2,6 +2,7 @@ import { EntityKey_et } from "../../../common/entities";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { FunnelLibrary_et } from "../../funnel-library/entities";
 import { User_et } from "../../users/entities";
+import { DateProcessService } from "../../../common/adapters";
 
 @Entity({
     name: "library_permisions"
@@ -14,10 +15,11 @@ export class LibraryPermisions_et extends EntityKey_et {
     elementsEffect?: string;
 
     /*
-        0: Read - Write - Delete - Create
+        0: Read - Write - Delete - Create (owner)
         1: Read
         2: Read - Write
         3: Read - Write - Delete
+        4: No access
      */
     @Column({
         type: "smallint",

@@ -1,21 +1,23 @@
+
+import { _LoggerService, LoggModel } from "../../../common/services";
+import { ConfigPlanner_et } from "../../planner/entities";
+import { CustomizeProcess_et } from "../../customize-process/entities";
+import { DataSource, QueryRunner, Repository } from "typeorm";
+import { FunnelBody_et, FunnelBody_stages_et } from "../entities";
+import { FunnelLibrary_et } from "../../funnel-library/entities";
+import { FunnelLibraryService } from '../../funnel-library/services/funnel-library.service';
 import { HttpException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, Repository } from "typeorm";
 import { ProcessDataService, DateProcessService } from "../../../common/adapters";
-import { FunnelBody_et, FunnelBody_stages_et } from "../entities";
-import { _argsFind, _response_I } from "../../../common/interfaces";
-import { FunnelLibraryService } from "../../funnel-library/services/funnel-library.service";
-import { AuthPayload_I } from "../../auth/interfaces";
-import { FunnelLibrary_et } from "../../funnel-library/entities";
-import { UsersService } from "../../users/services/users.service";
-import { CustomizeProcess_et } from "../../customize-process/entities";
-import { ConfigPlanner_et } from "../../planner/entities";
+import { TransactionsService } from "../../../database/services/transactions.service";
 import { User_et } from "../../users/entities";
-import { _LoggerService, LoggModel } from "../../../common/services";
+import { UsersService } from "../../users/services/users.service";
 
-import * as uuid from 'uuid';
 import * as _ from "lodash";
+import * as uuid from 'uuid';
 
+import { AuthPayload_I } from "../../auth/interfaces";
+import { _argsFind_I, _response_I } from "../../../common/interfaces";
 
 @Injectable()
 export class FunnelsService {
@@ -42,6 +44,7 @@ export class FunnelsService {
         private readonly dataSource: DataSource,
 
         private readonly _LoggerService: _LoggerService,
+        private readonly _TransactionsService: TransactionsService,
 
     ) {
 
@@ -72,81 +75,93 @@ export class FunnelsService {
 
     }
 
-    async findAll(user: AuthPayload_I): Promise<_response_I<FunnelBody_et[]>> {
+    async findAll(user: AuthPayload_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<FunnelBody_et[]>> {
 
         let _Response: _response_I<FunnelBody_et[]>;
 
-        let args: _argsFind = {
-            findObject: {
-                where: {
+        let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
+
+        try {
+
+            let args: _argsFind_I = {
+                findObject: {
+                    where: {
+                    },
+                    relations: ['funnelLibrary_id', 'stages'],
+                    select: {
+
+                    }
+
                 },
-                relations: ['funnelLibrary_id', 'stages'],
-                select: {
 
-                }
+            }
 
-            },
+            await this._processData.process_getAll<FunnelBody_et>({
+                entity: FunnelBody_et,
+                argsFindMany: { ...args },
+                queryRunner: queryRunner
+            }).then(async (resp) => {
 
+                _Response = structuredClone(resp);
+
+            })
+
+
+            if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
+
+        } catch (error) {
+            _Response = error;
+            if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
         }
-
-        await this._processData.process_getAll<FunnelBody_et>(this._FunnelBody_et_repository, args).then(async (resp) => {
-
-            _Response = structuredClone(resp);
-
-        }, (err) => {
-            _Response = err;
-
-            throw new HttpException(_Response, _Response.statusCode);
-        });
-
         return _Response;
 
     }
 
-    async findOne(_id: string, user: AuthPayload_I): Promise<_response_I<FunnelBody_et>> {
+    async findOne(_id: string, user: AuthPayload_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<FunnelBody_et>> {
 
         let _Response: _response_I<FunnelBody_et>;
 
-        let args: _argsFind = {
-            findObject: {
-                where: {
-                    _id: _id,
+        let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
+
+        try {
+
+            let args: _argsFind_I = {
+                findObject: {
+                    where: {
+                        _id: _id,
+                    },
+                    relations: ['stages'],
+
                 },
-                relations: ['stages'],
-                select: {
-                }
-
-            },
-        }
-
-        await this._processData.process_getOne<FunnelBody_et>(this._FunnelBody_et_repository, args).then(async (resp) => {
-
-            _Response = structuredClone(resp);
-
-        }, (err) => {
-
-            let _Response: _response_I<any> = {
-                ok: false,
-                statusCode: 404,
-                data: null,
-                err: err,
-                message: [
-                    {
-                        text: 'El id o termino especificado, no es válido',
-                        type: 'global'
-                    }
-                ]
             }
 
-            throw new HttpException(_Response, _Response.statusCode);
+            await this._processData.process_getOne<FunnelBody_et>(
+                {
+                    argsFind: args,
+                    entity: FunnelBody_et,
+                    queryRunner: queryRunner
+                }
+            ).then(async (resp) => {
 
-        });
+                _Response = structuredClone(resp);
+
+            });
+
+
+            if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
+
+
+        } catch (error) {
+
+            _Response = error;
+
+            if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
+
+        }
 
         return _Response;
 
     }
-
-
 
     async create_funnels(data: any[], user: AuthPayload_I): Promise<_response_I<FunnelLibrary_et>> {
 
@@ -157,7 +172,7 @@ export class FunnelsService {
         let funnelLibrary_id: FunnelLibrary_et;
 
         // console.log('entra aqui');
-        const args: _argsFind<User_et> = {
+        const args: _argsFind_I<User_et> = {
             findObject: {
                 where: {
                     _id: user._id,
@@ -172,22 +187,15 @@ export class FunnelsService {
 
         let funnels_deleteEty: FunnelBody_et[] = [];
 
-        const queryRunner = this.dataSource.createQueryRunner();
-
-        await queryRunner.connect();
-
-        await queryRunner.startTransaction();
+        let queryRunner = await this._TransactionsService.startTransaction();
 
         try {
 
             if (funnelLibrary_id === null) {
 
-                funnelLibrary_id = await this._FunnelLibrary_et_repository.create({
-                    _id: uuid.v4(),
+                await this._FunnelLibraryService.create({
                     name: 'Carpeta de embudo',
-                    user_id: User_data,
-                    funnels_id: [],
-                })
+                },User_data, queryRunner).then(resp => funnelLibrary_id = resp.data)
 
                 LoggerModels.push({
                     type: 'log',
@@ -291,6 +299,8 @@ export class FunnelsService {
 
             let funnels: FunnelBody_et[] = data.map((funnel: FunnelBody_et) => {
 
+                console.log('funnels', funnel);
+
                 if (aux_funnels_Ety.some(item => item._id === funnel._id)) {
 
                     /*
@@ -332,14 +342,18 @@ export class FunnelsService {
 
             });
 
+
+
             funnelLibrary_id.funnels_id = [...funnels];
             funnelLibrary_id.updatedAt = this._dateService.setDate();
 
             await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
             await queryRunner.manager.save(FunnelBody_stages_et, stages);
 
-            await queryRunner.commitTransaction();
-            await queryRunner.release();
+            // await queryRunner.commitTransaction();
+            // await queryRunner.release();
+
+            await this._TransactionsService.commitTransaction(queryRunner);
 
             _Response = {
                 ok: true,
@@ -360,8 +374,12 @@ export class FunnelsService {
 
         } catch (error) {
 
-            await queryRunner.rollbackTransaction();
-            await queryRunner.release();
+            console.log('error', error);
+
+            // await queryRunner.rollbackTransaction();
+            // await queryRunner.release();
+
+                await this._TransactionsService.rollbackTransaction(queryRunner);
 
             _Response = {
                 ok: false,
@@ -400,7 +418,7 @@ export class FunnelsService {
     }
 
 
-    async set_customizeProcess_step_id(funnel: FunnelBody_et): Promise<CustomizeProcess_et> {
+    async set_customizeProcess_step_id( funnel: FunnelBody_et ): Promise<CustomizeProcess_et> {
 
         if (!funnel.customizeProcess_step_id || funnel.customizeProcess_step_id === null) {
 
@@ -442,10 +460,9 @@ export class FunnelsService {
 
     }
 
-    async get_initial_funnel(user: AuthPayload_I): Promise<_response_I<FunnelBody_et[]>> {
+    async get_initial_funnel( user: AuthPayload_I ): Promise<_response_I<FunnelBody_et[]>> {
 
         let _Response: _response_I<any>;
-
         this._LoggerService.log({
             message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial `,
             response: {
@@ -467,6 +484,12 @@ export class FunnelsService {
                     // TODO
                     // establecer un interface o tipo de dato en funnel que soporte string y entity para config_step_id y replicar ese metodo en otros lugares
                     let aux_funnels: FunnelBody_et[] = structuredClone(aux_Response.data[0].funnels_id);
+
+                    // Reorganización por posición
+                    aux_funnels =  await aux_funnels.sort((a, b) => a.pos - b.pos);
+                    for (const [i, element] of aux_funnels.entries()) {
+                        element.stages = await element.stages.sort((a, b) => a.pos - b.pos);
+                    }
 
                     let config_step: ConfigPlanner_et = _.get(aux_Response.data[0], 'config_step_id', null);
 
@@ -548,7 +571,6 @@ export class FunnelsService {
                 });
             }
 
-
         });
 
         return _Response;
@@ -559,7 +581,7 @@ export class FunnelsService {
 
         let _Response: _response_I<FunnelBody_et[]>;
 
-        const args: _argsFind<User_et> = {
+        const args: _argsFind_I<User_et> = {
             findObject: {
                 where: {
                     email: email,
@@ -582,14 +604,9 @@ export class FunnelsService {
             _Response = resp;
         })
 
-
-
         return _Response;
 
     }
-
-
-
 
 
 }

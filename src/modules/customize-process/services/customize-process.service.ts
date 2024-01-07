@@ -3,7 +3,7 @@ import { AuthPayload_I } from '../../auth/interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { ProcessDataService, DateProcessService } from '../../../common/adapters';
-import { _response_I, _argsFind } from '../../../common/interfaces';
+import { _response_I, _argsFind_I } from '../../../common/interfaces';
 import { LoggModel, _LoggerService } from '../../../common/services';
 import { FunnelLibrary_et } from '../../funnel-library/entities';
 import { FunnelLibraryService } from '../../funnel-library/services/funnel-library.service';
@@ -211,7 +211,7 @@ export class CustomizeProcessService {
 
         let _Response: _response_I<CustomizeProcess_et[]>;
 
-        const args: _argsFind<User_et> = {
+        const args: _argsFind_I<User_et> = {
             findObject: {
                 where: {
                     email: email,

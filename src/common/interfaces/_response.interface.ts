@@ -1,5 +1,4 @@
 import { QueryRunner, Repository } from "typeorm";
-import { _argsFind } from ".";
 import { _argsFindMany_I, _argsFind_I } from "./_responseFindParameters.interface";
 
 
@@ -33,6 +32,7 @@ const type_message_default = [
     "global",
     "inline",
     "context",
+    "internal"
 ] as const;
 
 export type message_T = typeof type_message_default[number];
@@ -47,6 +47,8 @@ export interface _responseMessage_I {
 export interface _ProcessData_Model_I<T = any> {
     // Model: Repository<T>,
     body?: T,
+    bodyMany?: T[],
+    // bodyMany: T[],
     entity?: T,
     argsFind?: _argsFind_I,
     argsFindMany?: _argsFindMany_I,

@@ -50,7 +50,7 @@ export class PlannerService {
                 statusCode: 404,
                 message: [
                     {
-                        text: 'No se encontró un funnel asociado a este usuario',
+                        text: 'No se encontró un funnel library asociado a este usuario',
                         type: 'global'
                     }
                 ]
