@@ -16,11 +16,31 @@ export class FunnelLibraryController {
 
     }
 
+     @Get('initial/shared_me/:funnelLibrary_id')
+    find_initialBy_library_sharedMe(@Request() req: any, @Param('funnelLibrary_id', ParseUUIDPipe) funnelLibrary_id: string) {
+        const user: AuthPayload_I = req.user;
+        return this.funnelLibraryService.find_initialBy_library_sharedMe(funnelLibrary_id, user);
+    }
+
+    @Get('initial/:funnelLibrary_id')
+    find_initialBy_libraryId(@Request() req: any, @Param('funnelLibrary_id', ParseUUIDPipe) funnelLibrary_id: string) {
+        const user: AuthPayload_I = req.user;
+        return this.funnelLibraryService.find_initialBy_libraryId(funnelLibrary_id, user);
+    }
+
     @Post()
     create(@Body() createFunnelLibraryDto: CreateFunnelLibraryDto, @Request() req: any) {
 
         const user: AuthPayload_I = req.user;
         return this.funnelLibraryService.create(createFunnelLibraryDto, user);
+
+    }
+
+    @Post(":id")
+    save_single_folderState(@Body() folderState: any,@Param('id', ParseUUIDPipe) id: string, @Request() req: any) {
+
+        const user: AuthPayload_I = req.user;
+        return this.funnelLibraryService.save_single_folderState(id, folderState, user);
 
     }
 
@@ -38,17 +58,7 @@ export class FunnelLibraryController {
 
     }
 
-    @Get('initial/shared_me/:funnelLibrary_id')
-    find_initialBy_library_sharedMe(@Request() req: any, @Param('funnelLibrary_id', ParseUUIDPipe) funnelLibrary_id: string) {
-        const user: AuthPayload_I = req.user;
-        return this.funnelLibraryService.find_initialBy_library_sharedMe(funnelLibrary_id, user);
-    }
 
-    @Get('initial/:funnelLibrary_id')
-    find_initialBy_libraryId(@Request() req: any, @Param('funnelLibrary_id', ParseUUIDPipe) funnelLibrary_id: string) {
-        const user: AuthPayload_I = req.user;
-        return this.funnelLibraryService.find_initialBy_libraryId(funnelLibrary_id, user);
-    }
 
     @Get(':id')
     findOne(@Param('id') id: string, @Request() req: any) {

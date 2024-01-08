@@ -35,7 +35,7 @@ export class FunnelBody_et extends EntityKey_et {
     })
     metricsPorcents: FunnelMetricsPorcents_I[];
 
-    @OneToOne(() => CustomizeProcess_et, CustomizeProcess => CustomizeProcess.funnel_id)
+    @OneToOne(() => CustomizeProcess_et, CustomizeProcess => CustomizeProcess.funnel_id, { cascade: true })
     @JoinColumn({
         name: 'customizeProcess_step_id'
     })

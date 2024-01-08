@@ -25,7 +25,7 @@ export class CustomizeProcess_et  extends EntityKey_et {
     })
     pos?: number;
 
-    @OneToOne(() => FunnelBody_et, { onDelete: 'CASCADE' })
+    @OneToOne(() => FunnelBody_et, funnel => funnel._id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'funnel_id' })
     funnel_id: FunnelBody_et;
 

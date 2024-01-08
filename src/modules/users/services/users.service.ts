@@ -54,7 +54,6 @@ export class UsersService {
                 }
             );
 
-            // const aux_users: User_Escala_I[] = users.data.data.filter(resp => resp.email !== user.email);
             const aux_users: User_Escala_I[] = users.data.data;
 
             for (const [i, item] of aux_users.entries()) {

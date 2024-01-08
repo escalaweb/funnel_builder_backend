@@ -163,10 +163,9 @@ export class FunnelsService {
 
     }
 
-    async create_funnels(data: any[], user: AuthPayload_I): Promise<_response_I<FunnelLibrary_et>> {
+    async create_funnels_v1(data: any[], user: AuthPayload_I): Promise<_response_I<FunnelLibrary_et>> {
 
         let _Response: _response_I<FunnelLibrary_et>;
-
         let LoggerModels: LoggModel[] = [];
 
         let funnelLibrary_id: FunnelLibrary_et;

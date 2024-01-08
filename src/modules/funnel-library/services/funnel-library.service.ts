@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Not, QueryRunner, Repository } from "typeorm";
 import { ProcessDataService, DateProcessService } from "../../../common/adapters";
@@ -13,6 +13,7 @@ import * as _ from "lodash";
 import { LibraryPermisions_et } from "../../library-permisions/entities";
 import { TransactionsService } from "../../../database/services/transactions.service";
 import { _LoggerService } from "../../../common/services";
+import { FunnelBuilderService } from ".";
 
 @Injectable()
 export class FunnelLibraryService {
@@ -34,30 +35,46 @@ export class FunnelLibraryService {
         private readonly _LoggerService: _LoggerService,
         private readonly _TransactionsService: TransactionsService,
 
+        private readonly _funnelBuilderService: FunnelBuilderService,
+
         private readonly dataSource: DataSource,
 
     ) {
 
     }
 
-    async find_initialBy_library_sharedMe(funnelLibrary_id: string, user: AuthPayload_I): Promise<_response_I<FunnelLibrary_et>> {
+    async save_single_folderState(funnelLibrary_id: string, folderState: any, user: AuthPayload_I): Promise<_response_I<FunnelLibrary_et>> {
 
         let _Response: _response_I<FunnelLibrary_et>;
 
-        this._LoggerService.log({
-            message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial, de una carpeta compartida`,
-            response: {
-                user: {
-                    ...user
-                },
-                body: {
-                    data: {
-                        funnelLibrary_id: funnelLibrary_id
-                    }
-                }
-            },
-            context: 'FunnelLibraryService - initial_byLibrary_sharedMe',
-        });
+        let aux_folderState: FunnelLibrary_et = folderState as FunnelLibrary_et;
+
+        let queryRunner = await this._TransactionsService.startTransaction();
+
+        try {
+
+            // Se guardan embudos
+            const funnels_resp = await this._funnelBuilderService.create_funnels_v2(funnelLibrary_id, aux_folderState, user, queryRunner);
+
+            this._TransactionsService.commitTransaction(queryRunner);
+
+            _Response = {
+                ...funnels_resp
+            }
+
+        } catch (error) {
+            console.log(error);
+            _Response = error;
+            this._TransactionsService.rollbackTransaction(queryRunner);
+        }
+
+        return _Response;
+
+    }
+
+    async find_initialBy_library_sharedMe(funnelLibrary_id: string, user: AuthPayload_I): Promise<_response_I<FunnelLibrary_et>> {
+
+        let _Response: _response_I<FunnelLibrary_et>;
 
         let queryRunner = await this._TransactionsService.startTransaction();
 
@@ -89,6 +106,22 @@ export class FunnelLibraryService {
                 argsFind: args,
                 entity: LibraryPermisions_et,
                 queryRunner: queryRunner
+            }).then(r => {
+                     this._LoggerService.log({
+            message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial, de una carpeta compartida`,
+            response: {
+                user: {
+                    ...user
+                },
+                body: {
+                    data: {
+                        funnelLibrary_id: funnelLibrary_id
+                    }
+                }
+            },
+            context: 'FunnelLibraryService - initial_byLibrary_sharedMe',
+        });
+            return r;
             });
 
             if (!resp_permision.data) {
@@ -106,47 +139,39 @@ export class FunnelLibraryService {
 
                 resp.funnel_library_permision_id = resp.funnel_library_permision_id.filter(permision => permision.user_id._id === user._id);
 
+                // Reorganización por posición
+                if (resp.funnels_id.length > 0) {
+
+                    resp.funnels_id = await resp.funnels_id.sort((a, b) => a.pos - b.pos);
+                    for (const [i, element] of resp.funnels_id.entries()) {
+                        element.stages = await element.stages.sort((a, b) => a.pos - b.pos);
+                    }
+                }
+
                 _Response = {
                     ok: true,
                     statusCode: 200,
                     data: { ...resp }
                 };
 
-                this._LoggerService.debug({
-                    // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha obtenido su información de funnel builder inicial `,
-                    message: `El Usuario ${user.email} - Ha obtenido su información de funnel builder inicial `,
-                    response: {
-                        user: {
-                            ...user
-                        },
-                        body: {
-                            data: { ..._Response.data }
-                        }
-                    },
-                    context: 'FunnelLibraryService - initial_byLibrary_sharedMe',
-                });
-
-            }
-
-        } catch (error) {
-            console.log('error', error);
-            _Response = error;
-            _Response.data = null
-
-            this._LoggerService.log({
-                // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
-                message: `El Usuario ${user.email} - No tiene información de embudos inicial `,
+                  this._LoggerService.debug({
+                message: `El Usuario ${user.email} - Ha obtenido su información de funnel builder inicial de un folder compartido `,
                 response: {
                     user: {
                         ...user
                     },
                     body: {
-                        data: null
+                        data: { ..._Response.data }
                     }
                 },
                 context: 'FunnelLibraryService - initial_byLibrary_sharedMe',
             });
 
+            }
+
+        } catch (error) {
+            _Response = error;
+            _Response.data = null
         }
 
         this._TransactionsService.commitTransaction(queryRunner);
@@ -157,21 +182,6 @@ export class FunnelLibraryService {
     async find_initialBy_libraryId(funnelLibrary_id: string, user: AuthPayload_I): Promise<_response_I<FunnelLibrary_et>> {
 
         let _Response: _response_I<FunnelLibrary_et>;
-
-        this._LoggerService.log({
-            message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial de una carpeta de su autoria `,
-            response: {
-                user: {
-                    ...user
-                },
-                body: {
-                    data: {
-                        funnelLibrary_id: funnelLibrary_id
-                    }
-                }
-            },
-            context: 'FunnelLibraryService - initial_byLibrary',
-        });
 
         let where = {
             _id: funnelLibrary_id,
@@ -217,17 +227,59 @@ export class FunnelLibraryService {
 
         let queryRunner = await this._TransactionsService.startTransaction();
 
-        try {
 
-            const resp: _response_I<FunnelLibrary_et> = await this._processData.process_getOne<FunnelLibrary_et>({
+            const resp_1: _response_I<FunnelLibrary_et> = await this._processData.process_getOne<FunnelLibrary_et>({
                 argsFind: args,
                 entity: FunnelLibrary_et,
                 queryRunner: queryRunner
             }
-            );
+            ).then(r => {
+                return r;
+            }).catch( r => r );
+
+        try {
+            if(resp_1.statusCode != 200){
+
+                const resp_2 = await this.find_initialBy_library_sharedMe(funnelLibrary_id,user)
+
+                if(resp_2.statusCode !== 200) throw new HttpException(resp_2, resp_2.statusCode);
+
+                _Response = {
+                ...resp_2,
+                statusCode: 200
+            }
+
+            }
+
+            // Si el folder es personal entonces:
+            if(resp_1.statusCode === 200){
+
+                     this._LoggerService.log({
+                    message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial de una carpeta de su autoria `,
+                    response: {
+                        user: {
+                            ...user
+                        },
+                        body: {
+                            data: {
+                                funnelLibrary_id: funnelLibrary_id
+                            }
+                        }
+                    },
+                    context: 'FunnelLibraryService - initial_byLibrary',
+                });
+
+
+            // Reorganización por posición
+            if (resp_1.data.funnels_id.length > 0) {
+                resp_1.data.funnels_id = await resp_1.data.funnels_id.sort((a, b) => a.pos - b.pos);
+                for (const [i, element] of resp_1.data.funnels_id.entries()) {
+                    element.stages = await element.stages.sort((a, b) => a.pos - b.pos);
+                }
+            }
 
             _Response = {
-                ...resp,
+                ...resp_1,
                 statusCode: 200
             }
 
@@ -245,15 +297,19 @@ export class FunnelLibraryService {
                 context: 'FunnelLibraryService - initial_byLibrary',
             });
 
+            }
+            // Si el folder es compartido
+
+
+
         } catch (error) {
 
-            console.log('error', error);
             _Response = error;
             _Response.data = null
 
             this._LoggerService.log({
                 // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
-                message: `El Usuario ${user.email} - No tiene información de embudos inicial `,
+                message: `El Usuario ${user.email} - No tiene información de embudos inicial ni compartida con este folder`,
                 response: {
                     user: {
                         ...user

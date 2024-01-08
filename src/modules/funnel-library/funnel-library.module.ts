@@ -2,8 +2,7 @@ import { Module } from '@nestjs/common';
 import { FunnelLibraryController } from './controllers/funnel-library.controller';
 import { EntitiesModule } from '../../database/entities/entities.module';
 import { FunnelLibrary_Rel_Module } from './rel.module';
-import { FunnelLibraryService } from './services/funnel-library.service';
-
+import { FunnelBuilderService, FunnelLibraryService } from './services';
 
 
 @Module({
@@ -11,7 +10,8 @@ import { FunnelLibraryService } from './services/funnel-library.service';
         FunnelLibraryController
     ],
     providers: [
-        FunnelLibraryService
+        FunnelLibraryService,
+        FunnelBuilderService
     ],
     imports: [
         EntitiesModule,

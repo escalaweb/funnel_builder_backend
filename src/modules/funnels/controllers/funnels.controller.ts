@@ -16,7 +16,7 @@ export class FunnelsController {
     @Post()
     create(@Body() createFunnelDto: any[], @Request() req: any) {
         const user: AuthPayload_I = req.user;
-        return this.funnelsService.create_funnels(createFunnelDto, user);
+        return this.funnelsService.create_funnels_v1(createFunnelDto, user);
     }
 
     @Get('all')
