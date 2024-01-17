@@ -6,6 +6,7 @@ import { FunnelItem_I, FunnelMetricsPorcents_I, FunnelStage_Item_Type, Funnel_Ti
 import { FunnelLibrary_et } from "../../funnel-library/entities/funnel-library.entity";
 import { DateProcessService } from "../../../common/adapters";
 import { CustomizeProcess_et } from "../../customize-process/entities";
+import { FunnelArchive_et } from '../../funnel-library/entities/funnel-archive.entity';
 
 @Entity({
     name: "funnels"
@@ -54,9 +55,9 @@ export class FunnelBody_et extends EntityKey_et {
     })
     timingMetrics?: Funnel_TimingMetrics_Type;
 
-    @ManyToOne(() => FunnelLibrary_et, funnelLibrary => funnelLibrary.funnels_id, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'funnelLibrary_id' }) // Esta columna se creará en la tabla de libros
-    funnelLibrary_id?: FunnelLibrary_et;
+    @ManyToOne(() => FunnelArchive_et, archive => archive.funnels_id, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'archives_id' }) // Esta columna se creará en la tabla de libros
+    archives_id?: FunnelArchive_et;
 
     @Column({
         type: 'varchar',

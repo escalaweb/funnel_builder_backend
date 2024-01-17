@@ -30,18 +30,14 @@ export class FunnelLibraryController {
 
     @Post()
     create(@Body() createFunnelLibraryDto: CreateFunnelLibraryDto, @Request() req: any) {
-
         const user: AuthPayload_I = req.user;
         return this.funnelLibraryService.create(createFunnelLibraryDto, user);
-
     }
 
     @Post(":id")
     save_single_folderState(@Body() folderState: any,@Param('id', ParseUUIDPipe) id: string, @Request() req: any) {
-
         const user: AuthPayload_I = req.user;
         return this.funnelLibraryService.save_single_folderState(id, folderState, user);
-
     }
 
     @Get()
@@ -52,13 +48,9 @@ export class FunnelLibraryController {
 
     @Get('shared_me')
     findShareWithMe(@Request() req: any) {
-
         const user: AuthPayload_I = req.user;
         return this.funnelLibraryService.findShareWithMe( user );
-
     }
-
-
 
     @Get(':id')
     findOne(@Param('id') id: string, @Request() req: any) {
