@@ -13,6 +13,7 @@ import {
 
 import { CustomizeProcessModule } from "./modules/customize-process/customize-process.module";
 import { LibraryPermisionsModule } from './modules/library-permisions/library-permisions.module';
+import { FunnelArchivesModule } from './modules/funnel_archives/funnel_archives.module';
 
 
 @Module({
@@ -28,6 +29,7 @@ import { LibraryPermisionsModule } from './modules/library-permisions/library-pe
         PlannerModule,
         AdminInternalModule,
         LibraryPermisionsModule,
+        FunnelArchivesModule,
     ],
 })
 export class AppModule { }
