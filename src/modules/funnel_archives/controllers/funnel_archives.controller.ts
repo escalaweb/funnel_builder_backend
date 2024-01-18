@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { FunnelArchivesService } from './funnel_archives.service';
-import { CreateFunnelArchiveDto } from './dto/create-funnel_archive.dto';
-import { UpdateFunnelArchiveDto } from './dto/update-funnel_archive.dto';
+import { FunnelArchivesService } from '../services/funnel_archives.service';
+import { CreateFunnelArchiveDto } from '../dto/create-funnel_archive.dto';
+import { UpdateFunnelArchiveDto } from '../dto/update-funnel_archive.dto';
 
 @Controller('funnel-archives')
 export class FunnelArchivesController {

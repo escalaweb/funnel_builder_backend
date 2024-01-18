@@ -6,7 +6,7 @@ import { FunnelItem_I, FunnelMetricsPorcents_I, FunnelStage_Item_Type, Funnel_Ti
 import { FunnelLibrary_et } from "../../funnel-library/entities/funnel-library.entity";
 import { DateProcessService } from "../../../common/adapters";
 import { CustomizeProcess_et } from "../../customize-process/entities";
-import { FunnelArchive_et } from '../../funnel-library/entities/funnel-archive.entity';
+import { FunnelArchive_et } from '../../funnel_archives/entities/funnel-archive.entity';
 
 @Entity({
     name: "funnels"

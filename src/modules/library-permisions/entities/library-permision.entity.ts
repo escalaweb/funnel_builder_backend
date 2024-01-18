@@ -37,7 +37,7 @@ export class LibraryPermisions_et extends EntityKey_et {
     // @JoinColumn({ name: 'funnelLibrary_id' })
     // funnelLibrary_id?: FunnelLibrary_et;
 
-    @ManyToOne(() => FunnelLibrary_et, funnelLibrary => funnelLibrary.funnels_id, { onDelete: 'CASCADE' })
+    @ManyToOne(() => FunnelLibrary_et, funnelLibrary => funnelLibrary.funnel_library_permision_id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'funnelLibrary_id' })
     funnelLibrary_id?: FunnelLibrary_et;
 

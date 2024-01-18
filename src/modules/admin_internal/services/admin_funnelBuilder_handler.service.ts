@@ -51,117 +51,119 @@ export class Admin_FunnelBuilder_handler_Service {
     ): Promise<_response_I> {
 
         let _Response: _response_I;
-
-        const queryRunner = this.dataSource.createQueryRunner();
-
-        await queryRunner.connect();
-
-        await queryRunner.startTransaction();
-
-        try {
-
-            const user: AuthPayload_I = await this.get_userData_byEmail(email);
-
-            let funnelLibrary_id: FunnelLibrary_et = (await this._FunnelLibraryService.findAll(1, user).then()).data[0] || null;
-
-            const pos_number: number = _.get(funnelLibrary_id, 'funnels_id.length', 0);
-
-            const config_step_id: string = _.get(funnelLibrary_id, 'config_step_id._id', uuid.v4());
-
-            let funnels: FunnelBody_et[] = models.data.funnels.map((item, idx) => {
-
-                return this._FunnelBody_et_repository.create({
-                    ...item,
-                    _id: uuid.v4(),
-                    name: `${item.name} - [RECUPERADO]`,
-                    customizeProcess_step_id: null,
-                    funnelLibrary_id: funnelLibrary_id,
-                    pos: pos_number + idx,
-                })
-
-            });
-
-            let customizeProcess: CustomizeProcess_et[] = models.data.funnels.map((item, idx) => {
-
-                return this._CustomizeProcess_et_repository.create({
-                    ...item.customizeProcess_step_id,
-                    _id: uuid.v4(),
-                    name: `${item.customizeProcess_step_id.name} - [RECUPERADO]`,
-                    funnel_id: funnels[idx],
-                    pos: pos_number + idx,
-                })
-
-            });
-
-            funnelLibrary_id.funnels_id = funnelLibrary_id.funnels_id.concat(funnels);
-
-            if (req.query.configPlanner && Number(req.query.configPlanner) === 1) {
-
-                const configPlanner: ConfigPlanner_et = await this._ConfigPlanner_et_repository.create({
-                    _id: config_step_id,
-                    dash: null,
-                    toolsSettingsConfig: models.data.config_step.toolsSettingsConfig,
-                    funnelLibrary_id: funnelLibrary_id,
-                })
-
-                funnelLibrary_id.config_step_id = configPlanner;
-
-                await queryRunner.manager.save(ConfigPlanner_et, configPlanner);
-
-            }
-
-            await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
-
-            await queryRunner.manager.save(CustomizeProcess_et, customizeProcess);
-
-            for (const [i, item] of customizeProcess.entries()) {
-
-                let funnel: FunnelBody_et = structuredClone(funnels[i]);
-                funnel.customizeProcess_step_id = item;
-                await queryRunner.manager.save(FunnelBody_et, funnel);
-
-            }
-
-            _Response = {
-                ok: true,
-                statusCode: 201,
-                data: {
-                    funnelLibrary_id: funnelLibrary_id
-                } as any,
-                message: [
-                    {
-                        text: 'Datos de embudos recuperados',
-                        type: 'global'
-                    }
-                ]
-            }
+        // TODO Refactor by new structure
 
 
-            await queryRunner.commitTransaction();
-            await queryRunner.release();
+        // const queryRunner = this.dataSource.createQueryRunner();
 
-        } catch (error) {
+        // await queryRunner.connect();
 
-            _Response = {
-                ok: false,
-                statusCode: 400,
-                data: null,
-                err: error,
-                message: [
-                    {
-                        text: 'Error al recuperar datos de embudos',
-                        type: 'global'
-                    }
-                ]
-            }
+        // await queryRunner.startTransaction();
+
+        // try {
+
+        //     const user: AuthPayload_I = await this.get_userData_byEmail(email);
+
+        //     let funnelLibrary_id: FunnelLibrary_et = (await this._FunnelLibraryService.findAll(1, user).then()).data[0] || null;
+
+        //     const pos_number: number = _.get(funnelLibrary_id, 'funnels_id.length', 0);
+
+        //     const config_step_id: string = _.get(funnelLibrary_id, 'config_step_id._id', uuid.v4());
+
+        //     let funnels: FunnelBody_et[] = models.data.funnels.map((item, idx) => {
+
+        //         return this._FunnelBody_et_repository.create({
+        //             ...item,
+        //             _id: uuid.v4(),
+        //             name: `${item.name} - [RECUPERADO]`,
+        //             customizeProcess_step_id: null,
+        //             funnelLibrary_id: funnelLibrary_id,
+        //             pos: pos_number + idx,
+        //         })
+
+        //     });
+
+        //     let customizeProcess: CustomizeProcess_et[] = models.data.funnels.map((item, idx) => {
+
+        //         return this._CustomizeProcess_et_repository.create({
+        //             ...item.customizeProcess_step_id,
+        //             _id: uuid.v4(),
+        //             name: `${item.customizeProcess_step_id.name} - [RECUPERADO]`,
+        //             funnel_id: funnels[idx],
+        //             pos: pos_number + idx,
+        //         })
+
+        //     });
+
+        //     funnelLibrary_id.funnels_id = funnelLibrary_id.funnels_id.concat(funnels);
+
+        //     if (req.query.configPlanner && Number(req.query.configPlanner) === 1) {
+
+        //         const configPlanner: ConfigPlanner_et = await this._ConfigPlanner_et_repository.create({
+        //             _id: config_step_id,
+        //             dash: null,
+        //             toolsSettingsConfig: models.data.config_step.toolsSettingsConfig,
+        //             funnelLibrary_id: funnelLibrary_id,
+        //         })
+
+        //         funnelLibrary_id.config_step_id = configPlanner;
+
+        //         await queryRunner.manager.save(ConfigPlanner_et, configPlanner);
+
+        //     }
+
+        //     await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
+
+        //     await queryRunner.manager.save(CustomizeProcess_et, customizeProcess);
+
+        //     for (const [i, item] of customizeProcess.entries()) {
+
+        //         let funnel: FunnelBody_et = structuredClone(funnels[i]);
+        //         funnel.customizeProcess_step_id = item;
+        //         await queryRunner.manager.save(FunnelBody_et, funnel);
+
+        //     }
+
+        //     _Response = {
+        //         ok: true,
+        //         statusCode: 201,
+        //         data: {
+        //             funnelLibrary_id: funnelLibrary_id
+        //         } as any,
+        //         message: [
+        //             {
+        //                 text: 'Datos de embudos recuperados',
+        //                 type: 'global'
+        //             }
+        //         ]
+        //     }
 
 
-            await queryRunner.rollbackTransaction();
-            await queryRunner.release();
+        //     await queryRunner.commitTransaction();
+        //     await queryRunner.release();
+
+        // } catch (error) {
+
+        //     _Response = {
+        //         ok: false,
+        //         statusCode: 400,
+        //         data: null,
+        //         err: error,
+        //         message: [
+        //             {
+        //                 text: 'Error al recuperar datos de embudos',
+        //                 type: 'global'
+        //             }
+        //         ]
+        //     }
+
+
+        //     await queryRunner.rollbackTransaction();
+        //     await queryRunner.release();
 
 
 
-        }
+        // }
 
         return _Response;
 

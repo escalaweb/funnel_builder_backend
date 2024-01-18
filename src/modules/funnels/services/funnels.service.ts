@@ -166,251 +166,253 @@ export class FunnelsService {
     async create_funnels_v1(data: any[], user: AuthPayload_I): Promise<_response_I<FunnelLibrary_et>> {
 
         let _Response: _response_I<FunnelLibrary_et>;
-        let LoggerModels: LoggModel[] = [];
+        // TODO Refactor by new structure
 
-        let funnelLibrary_id: FunnelLibrary_et;
+        // let LoggerModels: LoggModel[] = [];
 
-        // console.log('entra aqui');
-        const args: _argsFind_I<User_et> = {
-            findObject: {
-                where: {
-                    _id: user._id,
-                }
-            }
-        }
-        const User_data: User_et = await this._usersService.findOne(args).then(resp => {
-            return resp.data;
-        })
+        // let funnelLibrary_id: FunnelLibrary_et;
 
-        funnelLibrary_id = (await this._FunnelLibraryService.findAll(1, user).then()).data[0] || null;
+        // // console.log('entra aqui');
+        // const args: _argsFind_I<User_et> = {
+        //     findObject: {
+        //         where: {
+        //             _id: user._id,
+        //         }
+        //     }
+        // }
+        // const User_data: User_et = await this._usersService.findOne(args).then(resp => {
+        //     return resp.data;
+        // })
 
-        let funnels_deleteEty: FunnelBody_et[] = [];
+        // funnelLibrary_id = (await this._FunnelLibraryService.findAll(1, user).then()).data[0] || null;
 
-        let queryRunner = await this._TransactionsService.startTransaction();
+        // let funnels_deleteEty: FunnelBody_et[] = [];
 
-        try {
+        // let queryRunner = await this._TransactionsService.startTransaction();
 
-            if (funnelLibrary_id === null) {
+        // try {
 
-                await this._FunnelLibraryService.create({
-                    name: 'Carpeta de embudo',
-                },User_data, queryRunner).then(resp => funnelLibrary_id = resp.data)
+        //     if (funnelLibrary_id === null) {
 
-                LoggerModels.push({
-                    type: 'log',
-                    // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado una carpeta de embudos`,
-                    message: `Usuario ${user.email} - ha creado una carpeta de embudos`,
-                    response: {
-                        user: {
-                            ...user
-                        },
-                        body: {
-                            carpeta: {
-                                ..._.pick(funnelLibrary_id, ['_id', 'name'])
-                            }
-                        }
-                    },
-                    context: 'FunnelsService - create_funnels'
-                });
+        //         await this._FunnelLibraryService.create({
+        //             name: 'Carpeta de embudo',
+        //         },User_data, queryRunner).then(resp => funnelLibrary_id = resp.data)
 
-            } else {
+        //         LoggerModels.push({
+        //             type: 'log',
+        //             // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado una carpeta de embudos`,
+        //             message: `Usuario ${user.email} - ha creado una carpeta de embudos`,
+        //             response: {
+        //                 user: {
+        //                     ...user
+        //                 },
+        //                 body: {
+        //                     carpeta: {
+        //                         ..._.pick(funnelLibrary_id, ['_id', 'name'])
+        //                     }
+        //                 }
+        //             },
+        //             context: 'FunnelsService - create_funnels'
+        //         });
 
-                // Se eliminan los funnels que no vienen en el guardado
-                const aux_funnelLibrary_id = funnelLibrary_id._id;
-                const funnels_ids: string[] = data.map((funnel: FunnelBody_et) => funnel._id);
+        //     } else {
 
-                funnels_deleteEty = await this._FunnelBody_et_repository
-                    .createQueryBuilder('funnels')
-                    .where('funnels.funnelLibrary_id = :aux_funnelLibrary_id', { aux_funnelLibrary_id })
-                    .andWhere('funnels._id NOT IN (:...funnelIds)', { funnelIds: funnels_ids })
-                    .select('funnels')
-                    .getMany();
+        //         // Se eliminan los funnels que no vienen en el guardado
+        //         const aux_funnelLibrary_id = funnelLibrary_id._id;
+        //         const funnels_ids: string[] = data.map((funnel: FunnelBody_et) => funnel._id);
 
-
-                await queryRunner.manager.delete(FunnelBody_et, funnels_deleteEty).then((resp) => {
-
-                    if (funnels_deleteEty.length > 0) {
-
-                        let funnelsString: any[] = funnels_deleteEty.map((funnel: FunnelBody_et) => {
-                            return {
-                                _id: funnel._id,
-                                Embudo: funnel.name
-                            }
-                        });
-
-                        LoggerModels.push({
-                            type: 'log',
-                            context: 'FunnelsService - create_funnels',
-                            message: `Usuario ${user.email} - ha eliminado los embudos que no vienen en el guardado`,
-                            response: {
-                                user: {
-                                    ...user
-                                },
-                                body: {
-                                    embudos: [...funnelsString]
-                                }
-                            }
-                        });
-
-                    }
-
-                }).catch(err => {
-                });
-
-                const deleteStages_ids = await this._FunnelBody_stages_et_repository
-                    .createQueryBuilder('stages_funnel')
-                    .where('stages_funnel.funnel_id IN (:...funnelIds)', { funnelIds: funnels_ids })
-                    .select('stages_funnel._id')
-                    .getMany();
-
-                await queryRunner.manager.delete(FunnelBody_stages_et, deleteStages_ids).then(resp => {
-
-                }).catch(err => {
-
-                });
-            }
-
-            let stages: FunnelBody_stages_et[] = [];
-
-            for (const [i, item] of data.entries()) {
-
-                for (const [_i, _item] of item.stages.entries()) {
-
-                    let aux: FunnelBody_stages_et = this._FunnelBody_stages_et_repository.create({
-                        ..._item as FunnelBody_stages_et,
-                        _id: _.get(_item, '_id', uuid.v4()),
-                        funnel_id: item,
-                        __v: 1,
-                    });
-
-                    stages.push(aux)
-
-                }
-
-            }
-
-            const aux_funnelLibrary_id = funnelLibrary_id._id;
-            const aux_funnels_Ety = await this._FunnelBody_et_repository
-                .createQueryBuilder('funnels')
-                .where('funnels.funnelLibrary_id = :aux_funnelLibrary_id', { aux_funnelLibrary_id })
-                .select('funnels')
-                .getMany();
-
-            let funnels: FunnelBody_et[] = data.map((funnel: FunnelBody_et) => {
-
-                console.log('funnels', funnel);
-
-                if (aux_funnels_Ety.some(item => item._id === funnel._id)) {
-
-                    /*
-                    LoggerModels.push({
-                         type: 'log',
-                         message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha re escrito un embudo:
-                        _id: "${funnel._id}" Embudo: "${funnel.name}"`,
-                         context: 'FunnelsService - create_funnels'
-                     });
-                 */
-
-                } else {
-
-                    LoggerModels.push({
-                        type: 'log',
-                        // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado un embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
-                        message: `Usuario ${user.email} - ha creado un embudo`,
-                        response: {
-                            user: {
-                                ...user
-                            },
-                            body: {
-                                ..._.pick(funnel, ['_id', 'name'])
-                            }
-                        },
-                        context: 'FunnelsService - create_funnels'
-                    });
-
-                }
-
-                return this._FunnelBody_et_repository.create({
-                    ...funnel,
-                    __v: 1,
-                    _id: _.get(funnel, '_id', uuid.v4()),
-                    customizeProcess_step_id: funnel.customizeProcess_step_id || null,
-                    funnelLibrary_id: funnelLibrary_id,
-                    updatedAt: this._dateService.setDate(),
-                });
-
-            });
+        //         funnels_deleteEty = await this._FunnelBody_et_repository
+        //             .createQueryBuilder('funnels')
+        //             .where('funnels.funnelLibrary_id = :aux_funnelLibrary_id', { aux_funnelLibrary_id })
+        //             .andWhere('funnels._id NOT IN (:...funnelIds)', { funnelIds: funnels_ids })
+        //             .select('funnels')
+        //             .getMany();
 
 
+        //         await queryRunner.manager.delete(FunnelBody_et, funnels_deleteEty).then((resp) => {
 
-            funnelLibrary_id.funnels_id = [...funnels];
-            funnelLibrary_id.updatedAt = this._dateService.setDate();
+        //             if (funnels_deleteEty.length > 0) {
 
-            await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
-            await queryRunner.manager.save(FunnelBody_stages_et, stages);
+        //                 let funnelsString: any[] = funnels_deleteEty.map((funnel: FunnelBody_et) => {
+        //                     return {
+        //                         _id: funnel._id,
+        //                         Embudo: funnel.name
+        //                     }
+        //                 });
 
-            // await queryRunner.commitTransaction();
-            // await queryRunner.release();
+        //                 LoggerModels.push({
+        //                     type: 'log',
+        //                     context: 'FunnelsService - create_funnels',
+        //                     message: `Usuario ${user.email} - ha eliminado los embudos que no vienen en el guardado`,
+        //                     response: {
+        //                         user: {
+        //                             ...user
+        //                         },
+        //                         body: {
+        //                             embudos: [...funnelsString]
+        //                         }
+        //                     }
+        //                 });
 
-            await this._TransactionsService.commitTransaction(queryRunner);
+        //             }
 
-            _Response = {
-                ok: true,
-                statusCode: 201,
-                data: {
-                    funnelLibrary_id: funnelLibrary_id,
-                    stages: stages
-                } as any,
-                message: [
-                    {
-                        text: 'Datos de embudos guardados',
-                        type: 'global'
-                    }
-                ]
-            }
+        //         }).catch(err => {
+        //         });
 
-            this._LoggerService._emitLoggers(LoggerModels);
+        //         const deleteStages_ids = await this._FunnelBody_stages_et_repository
+        //             .createQueryBuilder('stages_funnel')
+        //             .where('stages_funnel.funnel_id IN (:...funnelIds)', { funnelIds: funnels_ids })
+        //             .select('stages_funnel._id')
+        //             .getMany();
 
-        } catch (error) {
+        //         await queryRunner.manager.delete(FunnelBody_stages_et, deleteStages_ids).then(resp => {
 
-            console.log('error', error);
+        //         }).catch(err => {
 
-            // await queryRunner.rollbackTransaction();
-            // await queryRunner.release();
+        //         });
+        //     }
 
-                await this._TransactionsService.rollbackTransaction(queryRunner);
+        //     let stages: FunnelBody_stages_et[] = [];
 
-            _Response = {
-                ok: false,
-                statusCode: 400,
-                data: null,
-                err: error,
-                message: [
-                    {
-                        text: 'Error al guardar datos de embudos',
-                        type: 'global'
-                    }
-                ]
-            }
+        //     for (const [i, item] of data.entries()) {
+
+        //         for (const [_i, _item] of item.stages.entries()) {
+
+        //             let aux: FunnelBody_stages_et = this._FunnelBody_stages_et_repository.create({
+        //                 ..._item as FunnelBody_stages_et,
+        //                 _id: _.get(_item, '_id', uuid.v4()),
+        //                 funnel_id: item,
+        //                 __v: 1,
+        //             });
+
+        //             stages.push(aux)
+
+        //         }
+
+        //     }
+
+        //     const aux_funnelLibrary_id = funnelLibrary_id._id;
+        //     const aux_funnels_Ety = await this._FunnelBody_et_repository
+        //         .createQueryBuilder('funnels')
+        //         .where('funnels.funnelLibrary_id = :aux_funnelLibrary_id', { aux_funnelLibrary_id })
+        //         .select('funnels')
+        //         .getMany();
+
+        //     let funnels: FunnelBody_et[] = data.map((funnel: FunnelBody_et) => {
+
+        //         console.log('funnels', funnel);
+
+        //         if (aux_funnels_Ety.some(item => item._id === funnel._id)) {
+
+        //             /*
+        //             LoggerModels.push({
+        //                  type: 'log',
+        //                  message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha re escrito un embudo:
+        //                 _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+        //                  context: 'FunnelsService - create_funnels'
+        //              });
+        //          */
+
+        //         } else {
+
+        //             LoggerModels.push({
+        //                 type: 'log',
+        //                 // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha creado un embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+        //                 message: `Usuario ${user.email} - ha creado un embudo`,
+        //                 response: {
+        //                     user: {
+        //                         ...user
+        //                     },
+        //                     body: {
+        //                         ..._.pick(funnel, ['_id', 'name'])
+        //                     }
+        //                 },
+        //                 context: 'FunnelsService - create_funnels'
+        //             });
+
+        //         }
+
+        //         return this._FunnelBody_et_repository.create({
+        //             ...funnel,
+        //             __v: 1,
+        //             _id: _.get(funnel, '_id', uuid.v4()),
+        //             customizeProcess_step_id: funnel.customizeProcess_step_id || null,
+        //             funnelLibrary_id: funnelLibrary_id,
+        //             updatedAt: this._dateService.setDate(),
+        //         });
+
+        //     });
 
 
-            this._LoggerService._emitLoggers(LoggerModels);
-            this._LoggerService.error({
-                // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha tenido un error al guardar un embudo - Error: ${error}`,
-                message: `Usuario ${user.email} - ha tenido un error al guardar un embudo`,
-                response: {
-                    user: {
-                        ...user
-                    },
-                    body: {
-                        error: error
-                    }
-                },
-                context: 'FunnelsService - create_funnels',
-            });
+
+        //     funnelLibrary_id.funnels_id = [...funnels];
+        //     funnelLibrary_id.updatedAt = this._dateService.setDate();
+
+        //     await queryRunner.manager.save(FunnelLibrary_et, funnelLibrary_id);
+        //     await queryRunner.manager.save(FunnelBody_stages_et, stages);
+
+        //     // await queryRunner.commitTransaction();
+        //     // await queryRunner.release();
+
+        //     await this._TransactionsService.commitTransaction(queryRunner);
+
+        //     _Response = {
+        //         ok: true,
+        //         statusCode: 201,
+        //         data: {
+        //             funnelLibrary_id: funnelLibrary_id,
+        //             stages: stages
+        //         } as any,
+        //         message: [
+        //             {
+        //                 text: 'Datos de embudos guardados',
+        //                 type: 'global'
+        //             }
+        //         ]
+        //     }
+
+        //     this._LoggerService._emitLoggers(LoggerModels);
+
+        // } catch (error) {
+
+        //     console.log('error', error);
+
+        //     // await queryRunner.rollbackTransaction();
+        //     // await queryRunner.release();
+
+        //         await this._TransactionsService.rollbackTransaction(queryRunner);
+
+        //     _Response = {
+        //         ok: false,
+        //         statusCode: 400,
+        //         data: null,
+        //         err: error,
+        //         message: [
+        //             {
+        //                 text: 'Error al guardar datos de embudos',
+        //                 type: 'global'
+        //             }
+        //         ]
+        //     }
 
 
-        }
+        //     this._LoggerService._emitLoggers(LoggerModels);
+        //     this._LoggerService.error({
+        //         // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha tenido un error al guardar un embudo - Error: ${error}`,
+        //         message: `Usuario ${user.email} - ha tenido un error al guardar un embudo`,
+        //         response: {
+        //             user: {
+        //                 ...user
+        //             },
+        //             body: {
+        //                 error: error
+        //             }
+        //         },
+        //         context: 'FunnelsService - create_funnels',
+        //     });
+
+
+        // }
 
         return _Response;
 
@@ -462,115 +464,118 @@ export class FunnelsService {
     async get_initial_funnel( user: AuthPayload_I ): Promise<_response_I<FunnelBody_et[]>> {
 
         let _Response: _response_I<any>;
-        this._LoggerService.log({
-            message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial `,
-            response: {
-                user: {
-                    ...user
-                }
-            },
-            context: 'FunnelsService - get_funnels',
-        });
 
-        await this._FunnelLibraryService.findAll(1, user).then(async (resp) => {
+        // TODO Refactor by new structure
 
-            let aux_Response: _response_I<FunnelLibrary_et[]> = structuredClone(resp);
+        // this._LoggerService.log({
+        //     message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial `,
+        //     response: {
+        //         user: {
+        //             ...user
+        //         }
+        //     },
+        //     context: 'FunnelsService - get_funnels',
+        // });
 
-            if (aux_Response.statusCode === 200) {
+        // await this._FunnelLibraryService.findAll(1, user).then(async (resp) => {
 
-                if (aux_Response.data[0].funnels_id?.length > 0) {
+        //     let aux_Response: _response_I<FunnelLibrary_et[]> = structuredClone(resp);
 
-                    // TODO
-                    // establecer un interface o tipo de dato en funnel que soporte string y entity para config_step_id y replicar ese metodo en otros lugares
-                    let aux_funnels: FunnelBody_et[] = structuredClone(aux_Response.data[0].funnels_id);
+        //     if (aux_Response.statusCode === 200) {
 
-                    // Reorganización por posición
-                    aux_funnels =  await aux_funnels.sort((a, b) => a.pos - b.pos);
-                    for (const [i, element] of aux_funnels.entries()) {
-                        element.stages = await element.stages.sort((a, b) => a.pos - b.pos);
-                    }
+        //         if (aux_Response.data[0].funnels_id?.length > 0) {
 
-                    let config_step: ConfigPlanner_et = _.get(aux_Response.data[0], 'config_step_id', null);
+        //             // TODO
+        //             // establecer un interface o tipo de dato en funnel que soporte string y entity para config_step_id y replicar ese metodo en otros lugares
+        //             let aux_funnels: FunnelBody_et[] = structuredClone(aux_Response.data[0].funnels_id);
 
-                    if (config_step) {
+        //             // Reorganización por posición
+        //             aux_funnels =  await aux_funnels.sort((a, b) => a.pos - b.pos);
+        //             for (const [i, element] of aux_funnels.entries()) {
+        //                 element.stages = await element.stages.sort((a, b) => a.pos - b.pos);
+        //             }
 
-                        delete config_step.funnelLibrary_id;
-                    }
+        //             let config_step: ConfigPlanner_et = _.get(aux_Response.data[0], 'config_step_id', null);
 
-                    _Response = {
-                        ok: true,
-                        statusCode: 200,
-                        data: {
-                            funnels: aux_funnels,
-                            config_step: config_step
-                        }
-                    }
+        //             if (config_step) {
 
-                    this._LoggerService.debug({
-                        // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha obtenido su información de funnel builder inicial `,
-                        message: `El Usuario ${user.email} - Ha obtenido su información de funnel builder inicial `,
-                        response: {
-                            user: {
-                                ...user
-                            },
-                            body: {
-                                data: _Response.data
-                            }
-                        },
-                        context: 'FunnelsService - get_funnels',
-                    });
+        //                 delete config_step.funnelLibrary_id;
+        //             }
 
-                } else {
+        //             _Response = {
+        //                 ok: true,
+        //                 statusCode: 200,
+        //                 data: {
+        //                     funnels: aux_funnels,
+        //                     config_step: config_step
+        //                 }
+        //             }
 
-                    _Response = {
-                        ok: true,
-                        statusCode: 200,
-                        data: {
-                            funnels: [],
-                            config_step: null
-                        }
-                    }
+        //             this._LoggerService.debug({
+        //                 // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha obtenido su información de funnel builder inicial `,
+        //                 message: `El Usuario ${user.email} - Ha obtenido su información de funnel builder inicial `,
+        //                 response: {
+        //                     user: {
+        //                         ...user
+        //                     },
+        //                     body: {
+        //                         data: _Response.data
+        //                     }
+        //                 },
+        //                 context: 'FunnelsService - get_funnels',
+        //             });
 
-                    this._LoggerService.log({
-                        // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
-                        message: `El Usuario ${user.email} - No tiene información de embudos inicial `,
-                        response: {
-                            user: {
-                                ...user
-                            },
-                            body: {
-                                data: null
-                            }
-                        },
-                        context: 'FunnelsService - get_funnels',
-                    });
+        //         } else {
 
-                }
+        //             _Response = {
+        //                 ok: true,
+        //                 statusCode: 200,
+        //                 data: {
+        //                     funnels: [],
+        //                     config_step: null
+        //                 }
+        //             }
 
-            } else {
+        //             this._LoggerService.log({
+        //                 // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
+        //                 message: `El Usuario ${user.email} - No tiene información de embudos inicial `,
+        //                 response: {
+        //                     user: {
+        //                         ...user
+        //                     },
+        //                     body: {
+        //                         data: null
+        //                     }
+        //                 },
+        //                 context: 'FunnelsService - get_funnels',
+        //             });
 
-                _Response = { ...aux_Response }
-                _Response.data = {
-                    funnels: [],
-                    config_step: null
-                };
+        //         }
 
-                this._LoggerService.log({
-                    // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
-                    message: `El Usuario ${user.email} - No tiene información de embudos inicial `,
-                    response: {
-                        user: {
-                            ...user
-                        },
-                        body: {
-                            data: null
-                        }
-                    },
-                    context: 'FunnelsService - get_funnels',
-                });
-            }
+        //     } else {
 
-        });
+        //         _Response = { ...aux_Response }
+        //         _Response.data = {
+        //             funnels: [],
+        //             config_step: null
+        //         };
+
+        //         this._LoggerService.log({
+        //             // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
+        //             message: `El Usuario ${user.email} - No tiene información de embudos inicial `,
+        //             response: {
+        //                 user: {
+        //                     ...user
+        //                 },
+        //                 body: {
+        //                     data: null
+        //                 }
+        //             },
+        //             context: 'FunnelsService - get_funnels',
+        //         });
+        //     }
+
+        // });
 
         return _Response;
 

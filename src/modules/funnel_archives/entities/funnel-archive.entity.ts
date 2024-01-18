@@ -4,7 +4,7 @@ import { DateProcessService } from '../../../common/adapters/dateProcess.service
 import { FunnelBody_et } from "../../funnels/entities";
 import { ConfigPlanner_et } from "../../planner/entities";
 import { User_et } from "../../users/entities";
-import { FunnelLibrary_et } from ".";
+import { FunnelLibrary_et } from "../../funnel-library/entities";
 
 
 

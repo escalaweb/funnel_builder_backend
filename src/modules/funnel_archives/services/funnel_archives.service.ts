@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFunnelArchiveDto } from './dto/create-funnel_archive.dto';
-import { UpdateFunnelArchiveDto } from './dto/update-funnel_archive.dto';
+import { CreateFunnelArchiveDto } from '../dto/create-funnel_archive.dto';
+import { UpdateFunnelArchiveDto } from '../dto/update-funnel_archive.dto';
+
 
 @Injectable()
 export class FunnelArchivesService {

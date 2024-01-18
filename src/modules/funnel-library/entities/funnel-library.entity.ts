@@ -3,7 +3,7 @@ import { EntityKey_et } from "../../../common/entities";
 import { DateProcessService } from "../../../common/adapters";
 import { User_et } from "../../users/entities";
 import { LibraryPermisions_et } from "../../library-permisions/entities";
-import { FunnelArchive_et } from "./funnel-archive.entity";
+import { FunnelArchive_et } from "../../funnel_archives/entities/funnel-archive.entity";
 
 
 @Entity({

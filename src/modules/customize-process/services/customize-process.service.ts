@@ -43,166 +43,169 @@ export class CustomizeProcessService {
 
         let _Response: _response_I<CustomizeProcess_et[]>;
 
-        let funnels: FunnelBody_et[] = [];
-        let customizeProcess: CustomizeProcess_et[] = [];
-
-        let LoggerModels: LoggModel[] = []
-
-        // TODO
-        // Refactorizar a futuro la posibilidad de que sean más de un library funnel por usuario
-        const funnelLibrary: FunnelLibrary_et = await this._FunnelLibraryService.findOne_byUser(user).then(resp => {
-            return resp.data;
-        });
-
-        if (funnelLibrary.funnels_id === null || funnelLibrary.funnels_id?.length === 0) {
-
-            _Response = {
-                ok: false,
-                data: null,
-                statusCode: 404,
-                message: [
-                    {
-                        text: 'No se encontró un funnel asociado a este usuario',
-                        type: 'global'
-                    }
-                ]
-            }
-
-            this._LoggerService.warn({
-                // message: `No se encontró una carpeta de embudos asociado a este Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} -`,
-                message: `Usuario ${user.email} - No tiene embudos asociados a su carpeta`,
-                response: {
-                    user: {
-                        ...user
-                    }
-                },
-                context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
-            })
-
-            throw new HttpException(_Response, _Response.statusCode);
-
-        }
-
-        const queryRunner = this.dataSource.createQueryRunner();
-
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
-
-        try {
-
-            const customizeProcessPromises = data.customizeModels.map(async (customizeProcess: any) => {
-
-                const funnelId = customizeProcess.funnel_id;
-
-                const funnel = await queryRunner.manager.findOne(FunnelBody_et, {
-                    where: {
-                        _id: funnelId
-                    }
-                });
-
-                let cust_id: string = customizeProcess?._id || uuid.v4();
-
-                LoggerModels.push({
-                    type: 'log',
-                    // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha guardado un proceso comercial: _id: "${cust_id}" Nombre de proceso: "${customizeProcess.name}" para el embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
-                    message: `Usuario ${user.email} - ha guardado un proceso comercial`,
-                    response: {
-                        user: {
-                            ...user
-                        },
-                        body: {
-                            proceso_comercial: {
-                                _id: cust_id,
-                                name: customizeProcess.name,
-                                funnel_id: funnel._id,
-                                funnel_name: funnel.name
-                            }
-
-                        }
-                    },
-                    context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
-
-                })
-
-                return this._CustomizeProcess_et_repository.create({
-                    ...customizeProcess,
-                    _id: cust_id,
-                    __v: 0,
-                    funnel_id: funnel,
-                });
-
-            });
-
-            const customizeProcesses = await Promise.all(customizeProcessPromises); // Esperar a que todas las promesas se resuelvan
-
-            await queryRunner.manager.save(CustomizeProcess_et, customizeProcesses); // Guardar las entidades
-
-            for (const [i, item] of customizeProcesses.entries()) {
-
-                const funnel = await queryRunner.manager.findOne(FunnelBody_et, {
-                    where: {
-                        _id: item.funnel_id._id
-                    }
-                });
-
-                funnel.customizeProcess_step_id = item;
-                await queryRunner.manager.save(FunnelBody_et, funnel);
-
-            }
-
-            await queryRunner.commitTransaction();
-            await queryRunner.release();
-
-            _Response = {
-                ok: true,
-                statusCode: 201,
-                data: customizeProcesses,
-                message: [
-                    {
-                        text: 'Datos de proceso comercial guardados',
-                        type: 'global'
-                    }
-                ]
-            }
-
-            this._LoggerService._emitLoggers(LoggerModels);
+          // TODO Refactor by new structure
 
 
-        } catch (error) {
+        // let funnels: FunnelBody_et[] = [];
+        // let customizeProcess: CustomizeProcess_et[] = [];
 
-            console.log('error', error);
+        // let LoggerModels: LoggModel[] = []
 
-            await queryRunner.rollbackTransaction();
-            await queryRunner.release();
+        // // TODO
+        // // Refactorizar a futuro la posibilidad de que sean más de un library funnel por usuario
+        // const funnelLibrary: FunnelLibrary_et = await this._FunnelLibraryService.findOne_byUser(user).then(resp => {
+        //     return resp.data;
+        // });
 
-            _Response = {
-                ok: false,
-                statusCode: 400,
-                data: null,
-                err: error,
-                message: [
-                    {
-                        text: 'Error al guardar el proceso comercial',
-                        type: 'global'
-                    }
-                ]
-            }
+        // if (funnelLibrary.funnels_id === null || funnelLibrary.funnels_id?.length === 0) {
 
-            this._LoggerService.error({
-                // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha tenido un error al guardar proceso comercial para sus embudos`,
-                message: `Usuario ${user.email} - ha tenido un error al guardar proceso comercial para sus embudos`,
-                response: {
-                    user: {
-                        ...user
-                    },
-                    body: {
-                        error: error
-                    }
-                },
-                context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
-            })
+        //     _Response = {
+        //         ok: false,
+        //         data: null,
+        //         statusCode: 404,
+        //         message: [
+        //             {
+        //                 text: 'No se encontró un funnel asociado a este usuario',
+        //                 type: 'global'
+        //             }
+        //         ]
+        //     }
 
-        }
+        //     this._LoggerService.warn({
+        //         // message: `No se encontró una carpeta de embudos asociado a este Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} -`,
+        //         message: `Usuario ${user.email} - No tiene embudos asociados a su carpeta`,
+        //         response: {
+        //             user: {
+        //                 ...user
+        //             }
+        //         },
+        //         context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
+        //     })
+
+        //     throw new HttpException(_Response, _Response.statusCode);
+
+        // }
+
+        // const queryRunner = this.dataSource.createQueryRunner();
+
+        // await queryRunner.connect();
+        // await queryRunner.startTransaction();
+
+        // try {
+
+        //     const customizeProcessPromises = data.customizeModels.map(async (customizeProcess: any) => {
+
+        //         const funnelId = customizeProcess.funnel_id;
+
+        //         const funnel = await queryRunner.manager.findOne(FunnelBody_et, {
+        //             where: {
+        //                 _id: funnelId
+        //             }
+        //         });
+
+        //         let cust_id: string = customizeProcess?._id || uuid.v4();
+
+        //         LoggerModels.push({
+        //             type: 'log',
+        //             // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha guardado un proceso comercial: _id: "${cust_id}" Nombre de proceso: "${customizeProcess.name}" para el embudo: _id: "${funnel._id}" Embudo: "${funnel.name}"`,
+        //             message: `Usuario ${user.email} - ha guardado un proceso comercial`,
+        //             response: {
+        //                 user: {
+        //                     ...user
+        //                 },
+        //                 body: {
+        //                     proceso_comercial: {
+        //                         _id: cust_id,
+        //                         name: customizeProcess.name,
+        //                         funnel_id: funnel._id,
+        //                         funnel_name: funnel.name
+        //                     }
+
+        //                 }
+        //             },
+        //             context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
+
+        //         })
+
+        //         return this._CustomizeProcess_et_repository.create({
+        //             ...customizeProcess,
+        //             _id: cust_id,
+        //             __v: 0,
+        //             funnel_id: funnel,
+        //         });
+
+        //     });
+
+        //     const customizeProcesses = await Promise.all(customizeProcessPromises); // Esperar a que todas las promesas se resuelvan
+
+        //     await queryRunner.manager.save(CustomizeProcess_et, customizeProcesses); // Guardar las entidades
+
+        //     for (const [i, item] of customizeProcesses.entries()) {
+
+        //         const funnel = await queryRunner.manager.findOne(FunnelBody_et, {
+        //             where: {
+        //                 _id: item.funnel_id._id
+        //             }
+        //         });
+
+        //         funnel.customizeProcess_step_id = item;
+        //         await queryRunner.manager.save(FunnelBody_et, funnel);
+
+        //     }
+
+        //     await queryRunner.commitTransaction();
+        //     await queryRunner.release();
+
+        //     _Response = {
+        //         ok: true,
+        //         statusCode: 201,
+        //         data: customizeProcesses,
+        //         message: [
+        //             {
+        //                 text: 'Datos de proceso comercial guardados',
+        //                 type: 'global'
+        //             }
+        //         ]
+        //     }
+
+        //     this._LoggerService._emitLoggers(LoggerModels);
+
+
+        // } catch (error) {
+
+        //     console.log('error', error);
+
+        //     await queryRunner.rollbackTransaction();
+        //     await queryRunner.release();
+
+        //     _Response = {
+        //         ok: false,
+        //         statusCode: 400,
+        //         data: null,
+        //         err: error,
+        //         message: [
+        //             {
+        //                 text: 'Error al guardar el proceso comercial',
+        //                 type: 'global'
+        //             }
+        //         ]
+        //     }
+
+        //     this._LoggerService.error({
+        //         // message: `Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - ha tenido un error al guardar proceso comercial para sus embudos`,
+        //         message: `Usuario ${user.email} - ha tenido un error al guardar proceso comercial para sus embudos`,
+        //         response: {
+        //             user: {
+        //                 ...user
+        //             },
+        //             body: {
+        //                 error: error
+        //             }
+        //         },
+        //         context: 'Rel_CustomizeProcess_Funnels_Library_Users_Service - create_customizeProcess',
+        //     })
+
+        // }
 
         return _Response;
     }

@@ -76,105 +76,107 @@ export class FunnelLibraryService {
 
         let _Response: _response_I<FunnelLibrary_et>;
 
-        let queryRunner = await this._TransactionsService.startTransaction();
+        // TODO Refactor by new structure
 
-        try {
-            // TODO mejorar la información que viene de este query
-            const args: _argsFind_I = {
-                findObject: {
-                    where: {
-                        "user_id._id": user._id,
-                        "funnelLibrary_id._id": funnelLibrary_id,
-                        "permisionType": Not(0)
-                    },
-                    relations: [
-                        'user_id',
-                        'funnelLibrary_id',
-                        'funnelLibrary_id.user_id',
-                        'funnelLibrary_id.funnels_id',
-                        'funnelLibrary_id.config_step_id',
-                        'funnelLibrary_id.funnels_id.stages',
-                        'funnelLibrary_id.funnels_id.customizeProcess_step_id',
-                        'funnelLibrary_id.funnel_library_permision_id',
-                        'funnelLibrary_id.funnel_library_permision_id.user_id'
-                    ],
-                },
+        // let queryRunner = await this._TransactionsService.startTransaction();
 
-            }
+        // try {
+        //     // TODO mejorar la información que viene de este query
+        //     const args: _argsFind_I = {
+        //         findObject: {
+        //             where: {
+        //                 "user_id._id": user._id,
+        //                 "funnelLibrary_id._id": funnelLibrary_id,
+        //                 "permisionType": Not(0)
+        //             },
+        //             relations: [
+        //                 'user_id',
+        //                 'funnelLibrary_id',
+        //                 'funnelLibrary_id.user_id',
+        //                 'funnelLibrary_id.funnels_id',
+        //                 'funnelLibrary_id.config_step_id',
+        //                 'funnelLibrary_id.funnels_id.stages',
+        //                 'funnelLibrary_id.funnels_id.customizeProcess_step_id',
+        //                 'funnelLibrary_id.funnel_library_permision_id',
+        //                 'funnelLibrary_id.funnel_library_permision_id.user_id'
+        //             ],
+        //         },
 
-            const resp_permision: _response_I<LibraryPermisions_et> = await this._processData.process_getOne<LibraryPermisions_et>({
-                argsFind: args,
-                entity: LibraryPermisions_et,
-                queryRunner: queryRunner
-            }).then(r => {
-                     this._LoggerService.log({
-            message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial, de una carpeta compartida`,
-            response: {
-                user: {
-                    ...user
-                },
-                body: {
-                    data: {
-                        funnelLibrary_id: funnelLibrary_id
-                    }
-                }
-            },
-            context: 'FunnelLibraryService - initial_byLibrary_sharedMe',
-        });
-            return r;
-            });
+        //     }
 
-            if (!resp_permision.data) {
+        //     const resp_permision: _response_I<LibraryPermisions_et> = await this._processData.process_getOne<LibraryPermisions_et>({
+        //         argsFind: args,
+        //         entity: LibraryPermisions_et,
+        //         queryRunner: queryRunner
+        //     }).then(r => {
+        //              this._LoggerService.log({
+        //     message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial, de una carpeta compartida`,
+        //     response: {
+        //         user: {
+        //             ...user
+        //         },
+        //         body: {
+        //             data: {
+        //                 funnelLibrary_id: funnelLibrary_id
+        //             }
+        //         }
+        //     },
+        //     context: 'FunnelLibraryService - initial_byLibrary_sharedMe',
+        // });
+        //     return r;
+        //     });
 
-                _Response = {
-                    ok: true,
-                    statusCode: 404,
-                    data: null,
-                    message: [{ text: 'No se han encontrado resultados', type: 'global' }]
-                }
+        //     if (!resp_permision.data) {
 
-            } else {
+        //         _Response = {
+        //             ok: true,
+        //             statusCode: 404,
+        //             data: null,
+        //             message: [{ text: 'No se han encontrado resultados', type: 'global' }]
+        //         }
 
-                let resp: FunnelLibrary_et = { ...resp_permision.data.funnelLibrary_id };
+        //     } else {
 
-                resp.funnel_library_permision_id = resp.funnel_library_permision_id.filter(permision => permision.user_id._id === user._id);
+        //         let resp: FunnelLibrary_et = { ...resp_permision.data.funnelLibrary_id };
 
-                // Reorganización por posición
-                if (resp.funnels_id.length > 0) {
+        //         resp.funnel_library_permision_id = resp.funnel_library_permision_id.filter(permision => permision.user_id._id === user._id);
 
-                    resp.funnels_id = await resp.funnels_id.sort((a, b) => a.pos - b.pos);
-                    for (const [i, element] of resp.funnels_id.entries()) {
-                        element.stages = await element.stages.sort((a, b) => a.pos - b.pos);
-                    }
-                }
+        //         // Reorganización por posición
+        //         if (resp.funnels_id.length > 0) {
 
-                _Response = {
-                    ok: true,
-                    statusCode: 200,
-                    data: { ...resp }
-                };
+        //             resp.funnels_id = await resp.funnels_id.sort((a, b) => a.pos - b.pos);
+        //             for (const [i, element] of resp.funnels_id.entries()) {
+        //                 element.stages = await element.stages.sort((a, b) => a.pos - b.pos);
+        //             }
+        //         }
 
-                  this._LoggerService.debug({
-                message: `El Usuario ${user.email} - Ha obtenido su información de funnel builder inicial de un folder compartido `,
-                response: {
-                    user: {
-                        ...user
-                    },
-                    body: {
-                        data: { ..._Response.data }
-                    }
-                },
-                context: 'FunnelLibraryService - initial_byLibrary_sharedMe',
-            });
+        //         _Response = {
+        //             ok: true,
+        //             statusCode: 200,
+        //             data: { ...resp }
+        //         };
 
-            }
+        //           this._LoggerService.debug({
+        //         message: `El Usuario ${user.email} - Ha obtenido su información de funnel builder inicial de un folder compartido `,
+        //         response: {
+        //             user: {
+        //                 ...user
+        //             },
+        //             body: {
+        //                 data: { ..._Response.data }
+        //             }
+        //         },
+        //         context: 'FunnelLibraryService - initial_byLibrary_sharedMe',
+        //     });
 
-        } catch (error) {
-            _Response = error;
-            _Response.data = null
-        }
+        //     }
 
-        this._TransactionsService.commitTransaction(queryRunner);
+        // } catch (error) {
+        //     _Response = error;
+        //     _Response.data = null
+        // }
+
+        // this._TransactionsService.commitTransaction(queryRunner);
 
         return _Response;
     }
@@ -183,147 +185,150 @@ export class FunnelLibraryService {
 
         let _Response: _response_I<FunnelLibrary_et>;
 
-        let where = {
-            _id: funnelLibrary_id,
-            user_id: {
-                _id: user._id
-                // _id: "8730e4df-7246-44bf-83a4-7fc44a620012"
-            },
-            funnel_library_permision_id: {
-                user_id: {
-                    _id: user._id
-                    // _id: "8730e4df-7246-44bf-83a4-7fc44a620012"
-                },
-                permisionType: 0
-            }
-        }
+        // TODO Refactor by new structure
 
-        let args: _argsFind_I = {
-            findObject: {
-                where: {
-                    ...where
-                },
-                relations: [
-                    'user_id',
-                    'funnels_id',
-                    'config_step_id',
-                    'funnels_id.stages',
-                    'funnels_id.customizeProcess_step_id',
-                    'funnel_library_permision_id',
-                    'funnel_library_permision_id.user_id'
-                ],
+        // let where = {
+        //     _id: funnelLibrary_id,
+        //     user_id: {
+        //         _id: user._id
+        //         // _id: "8730e4df-7246-44bf-83a4-7fc44a620012"
+        //     },
+        //     funnel_library_permision_id: {
+        //         user_id: {
+        //             _id: user._id
+        //             // _id: "8730e4df-7246-44bf-83a4-7fc44a620012"
+        //         },
+        //         permisionType: 0
+        //     }
+        // }
 
-            },
-            populate: {
-                user_id: {
-                    select: [
-                        "_id",
-                        "name",
-                        "email",
-                    ]
-                }
-            }
-        }
+        // let args: _argsFind_I = {
+        //     findObject: {
+        //         where: {
+        //             ...where
+        //         },
+        //         relations: [
+        //             'user_id',
+        //             'funnels_id',
+        //             'config_step_id',
+        //             'funnels_id.stages',
+        //             'funnels_id.customizeProcess_step_id',
+        //             'funnel_library_permision_id',
+        //             'funnel_library_permision_id.user_id'
+        //         ],
 
-        let queryRunner = await this._TransactionsService.startTransaction();
+        //     },
+        //     populate: {
+        //         user_id: {
+        //             select: [
+        //                 "_id",
+        //                 "name",
+        //                 "email",
+        //             ]
+        //         }
+        //     }
+        // }
 
-
-            const resp_1: _response_I<FunnelLibrary_et> = await this._processData.process_getOne<FunnelLibrary_et>({
-                argsFind: args,
-                entity: FunnelLibrary_et,
-                queryRunner: queryRunner
-            }
-            ).then(r => {
-                return r;
-            }).catch( r => r );
-
-        try {
-            if(resp_1.statusCode != 200){
-
-                const resp_2 = await this.find_initialBy_library_sharedMe(funnelLibrary_id,user)
-
-                if(resp_2.statusCode !== 200) throw new HttpException(resp_2, resp_2.statusCode);
-
-                _Response = {
-                ...resp_2,
-                statusCode: 200
-            }
-
-            }
-
-            // Si el folder es personal entonces:
-            if(resp_1.statusCode === 200){
-
-                     this._LoggerService.log({
-                    message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial de una carpeta de su autoria `,
-                    response: {
-                        user: {
-                            ...user
-                        },
-                        body: {
-                            data: {
-                                funnelLibrary_id: funnelLibrary_id
-                            }
-                        }
-                    },
-                    context: 'FunnelLibraryService - initial_byLibrary',
-                });
+        // let queryRunner = await this._TransactionsService.startTransaction();
 
 
-            // Reorganización por posición
-            if (resp_1.data.funnels_id.length > 0) {
-                resp_1.data.funnels_id = await resp_1.data.funnels_id.sort((a, b) => a.pos - b.pos);
-                for (const [i, element] of resp_1.data.funnels_id.entries()) {
-                    element.stages = await element.stages.sort((a, b) => a.pos - b.pos);
-                }
-            }
+        //     const resp_1: _response_I<FunnelLibrary_et> = await this._processData.process_getOne<FunnelLibrary_et>({
+        //         argsFind: args,
+        //         entity: FunnelLibrary_et,
+        //         queryRunner: queryRunner
+        //     }
+        //     ).then(r => {
+        //         return r;
+        //     }).catch( r => r );
 
-            _Response = {
-                ...resp_1,
-                statusCode: 200
-            }
+        // try {
+        //     if(resp_1.statusCode != 200){
 
-            this._LoggerService.debug({
-                // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha obtenido su información de funnel builder inicial `,
-                message: `El Usuario ${user.email} - Ha obtenido su información de funnel builder inicial `,
-                response: {
-                    user: {
-                        ...user
-                    },
-                    body: {
-                        data: { ..._Response.data }
-                    }
-                },
-                context: 'FunnelLibraryService - initial_byLibrary',
-            });
+        //         const resp_2 = await this.find_initialBy_library_sharedMe(funnelLibrary_id,user)
 
-            }
-            // Si el folder es compartido
+        //         if(resp_2.statusCode !== 200) throw new HttpException(resp_2, resp_2.statusCode);
+
+        //         _Response = {
+        //         ...resp_2,
+        //         statusCode: 200
+        //     }
+
+        //     }
+
+        //     // Si el folder es personal entonces:
+        //     if(resp_1.statusCode === 200){
+
+        //              this._LoggerService.log({
+        //             message: `El Usuario ${user.email} - Ha solicitado su información de funnel builder inicial de una carpeta de su autoria `,
+        //             response: {
+        //                 user: {
+        //                     ...user
+        //                 },
+        //                 body: {
+        //                     data: {
+        //                         funnelLibrary_id: funnelLibrary_id
+        //                     }
+        //                 }
+        //             },
+        //             context: 'FunnelLibraryService - initial_byLibrary',
+        //         });
+
+
+        //     // Reorganización por posición
+        //     if (resp_1.data.funnels_id.length > 0) {
+        //         resp_1.data.funnels_id = await resp_1.data.funnels_id.sort((a, b) => a.pos - b.pos);
+        //         for (const [i, element] of resp_1.data.funnels_id.entries()) {
+        //             element.stages = await element.stages.sort((a, b) => a.pos - b.pos);
+        //         }
+        //     }
+
+        //     _Response = {
+        //         ...resp_1,
+        //         statusCode: 200
+        //     }
+
+        //     this._LoggerService.debug({
+        //         // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - Ha obtenido su información de funnel builder inicial `,
+        //         message: `El Usuario ${user.email} - Ha obtenido su información de funnel builder inicial `,
+        //         response: {
+        //             user: {
+        //                 ...user
+        //             },
+        //             body: {
+        //                 data: { ..._Response.data }
+        //             }
+        //         },
+        //         context: 'FunnelLibraryService - initial_byLibrary',
+        //     });
+
+        //     }
+        //     // Si el folder es compartido
 
 
 
-        } catch (error) {
+        // } catch (error) {
 
-            _Response = error;
-            _Response.data = null
+        //     _Response = error;
+        //     _Response.data = null
 
-            this._LoggerService.log({
-                // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
-                message: `El Usuario ${user.email} - No tiene información de embudos inicial ni compartida con este folder`,
-                response: {
-                    user: {
-                        ...user
-                    },
-                    body: {
-                        data: null
-                    }
-                },
-                context: 'FunnelLibraryService - initial_byLibrary',
-            });
+        //     this._LoggerService.log({
+        //         // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,
+        //         message: `El Usuario ${user.email} - No tiene información de embudos inicial ni compartida con este folder`,
+        //         response: {
+        //             user: {
+        //                 ...user
+        //             },
+        //             body: {
+        //                 data: null
+        //             }
+        //         },
+        //         context: 'FunnelLibraryService - initial_byLibrary',
+        //     });
 
-        }
+        // }
 
-        await this._TransactionsService.commitTransaction(queryRunner)
+        // await this._TransactionsService.commitTransaction(queryRunner)
+
         return _Response;
 
     }
