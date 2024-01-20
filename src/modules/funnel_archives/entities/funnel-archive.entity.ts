@@ -6,8 +6,6 @@ import { ConfigPlanner_et } from "../../planner/entities";
 import { User_et } from "../../users/entities";
 import { FunnelLibrary_et } from "../../funnel-library/entities";
 
-
-
 @Entity({
     name: "funnels_archive"
 })

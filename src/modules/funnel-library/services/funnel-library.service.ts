@@ -11,7 +11,7 @@ import { ConfigPlanner_et } from "../../planner/entities";
 
 import * as _ from "lodash";
 import { LibraryPermisions_et } from "../../library-permisions/entities";
-import { TransactionsService } from "../../../database/services/transactions.service";
+import { TransactionsService } from "../../../common/services/transactions.service";
 import { _LoggerService } from "../../../common/services";
 import { FunnelBuilderService } from ".";
 
@@ -333,10 +333,11 @@ export class FunnelLibraryService {
 
     }
 
-
     async create(CreateFunnelLibraryDto: CreateFunnelLibraryDto, user: AuthPayload_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<FunnelLibrary_et>> {
 
         let _Response: _response_I<FunnelLibrary_et>;
+
+        return _Response;
 
         let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
@@ -372,7 +373,6 @@ export class FunnelLibraryService {
                 body: {
                     ...data_funnelLibrary,
                     config_step_id: created_config,
-                    // _id: '3424934',
                 },
                 entity: FunnelLibrary_et,
                 queryRunner: queryRunner,
@@ -394,7 +394,6 @@ export class FunnelLibraryService {
                 body: {
                     ...data_funnelLibraryPermisions,
                     funnelLibrary_id: created_FunnelLibrary,
-                    // _id: '3424934',
                 },
                 entity: LibraryPermisions_et,
                 queryRunner: queryRunner,
@@ -412,16 +411,11 @@ export class FunnelLibraryService {
                 data: created_FunnelLibrary,
             }
 
-            // this._TransactionsService.commitTransaction(queryRunner);
             if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
-
-
 
         } catch (err) {
 
             _Response = err;
-
-            // this._TransactionsService.rollbackTransaction(queryRunner);
 
             if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
 

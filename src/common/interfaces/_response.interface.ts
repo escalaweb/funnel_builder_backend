@@ -14,7 +14,6 @@ export interface _paginatorModel_I {
 
 }
 
-
 export interface _response_I<T = any> {
 
     ok?: boolean;
@@ -26,7 +25,6 @@ export interface _response_I<T = any> {
     err?: any;
 
 }
-
 
 const type_message_default = [
     "global",

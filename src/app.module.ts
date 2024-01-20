@@ -1,19 +1,20 @@
 import { Module } from "@nestjs/common";
 import { CommonModule } from "./common/common.module";
 import { ConfigProjectModule } from "./config/config.module";
+
 import {
     AdminInternalModule,
     AuthModule,
+    CustomizeProcessModule,
+    FunnelArchivesModule,
     FunnelLibraryModule,
     FunnelsModule,
+    LibraryPermisionsModule,
     PlannerModule,
     TestModule,
     UsersModule
 } from "./modules";
 
-import { CustomizeProcessModule } from "./modules/customize-process/customize-process.module";
-import { LibraryPermisionsModule } from './modules/library-permisions/library-permisions.module';
-import { FunnelArchivesModule } from './modules/funnel_archives/funnel_archives.module';
 
 
 @Module({
@@ -21,10 +22,10 @@ import { FunnelArchivesModule } from './modules/funnel_archives/funnel_archives.
         ConfigProjectModule,
         CommonModule,
         AuthModule,
+        UsersModule,
         CustomizeProcessModule,
         FunnelLibraryModule,
         FunnelsModule,
-        UsersModule,
         TestModule,
         PlannerModule,
         AdminInternalModule,

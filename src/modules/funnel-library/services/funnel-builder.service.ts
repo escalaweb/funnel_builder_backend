@@ -4,7 +4,7 @@ import { Repository, DataSource, QueryRunner } from "typeorm";
 import { ProcessDataService, DateProcessService } from "../../../common/adapters";
 import { _response_I, _argsFind_I } from "../../../common/interfaces";
 import { LoggModel, _LoggerService } from "../../../common/services";
-import { TransactionsService } from "../../../database/services/transactions.service";
+import { TransactionsService } from "../../../common/services/transactions.service";
 import { AuthPayload_I } from "../../auth/interfaces";
 import { CustomizeProcess_et } from "../../customize-process/entities";
 import { FunnelBody_et, FunnelBody_stages_et } from "../../funnels/entities";

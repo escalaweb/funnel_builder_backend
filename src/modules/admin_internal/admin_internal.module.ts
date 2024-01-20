@@ -4,7 +4,7 @@ import { AdminInternalController } from './controllers/admin_internal.controller
 import { MigrationService } from './services/migration.service';
 import { Admin_Internal_Rel_Module } from './rel.module';
 import { Admin_FunnelBuilder_handler_Service } from './services/admin_funnelBuilder_handler.service';
-import { EntitiesModule } from '../../database/entities/entities.module';
+import { Db_Module } from '../../database/DB.module';
 
 @Module({
     controllers: [
@@ -16,7 +16,7 @@ import { EntitiesModule } from '../../database/entities/entities.module';
         Admin_FunnelBuilder_handler_Service
     ],
     imports: [
-        EntitiesModule,
+        Db_Module,
         Admin_Internal_Rel_Module
     ],
     exports: [

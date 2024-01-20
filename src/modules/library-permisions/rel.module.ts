@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { FunnelLibraryModule } from "../funnel-library/funnel-library.module";
 import { UsersModule } from "../users/users.module";
+import { FunnelLibraryModule } from "../funnel-library/funnel-library.module";
 
 
 @Module({
@@ -10,6 +10,7 @@ import { UsersModule } from "../users/users.module";
         UsersModule
     ],
     providers: [
+
 
     ],
     exports: [

@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
-import { USER_ENTITIES_MODULE } from '../../modules/users/entities/entities.module';
-import { CONFIGPLANNER_ENTITIES_MODULE } from '../../modules/planner/entities/entities.module';
-import { FUNNELS_ENTITIES_MODULE, FUNNEL_STAGES_ENTITIES_MODULE } from '../../modules/funnels/entities/entities.module';
-import { FUNNEL_ARCHIVE_ENTITIES_MODULE, FUNNEL_LIBRARY_ENTITIES_MODULE } from '../../modules/funnel-library/entities/entities.module';
-import { CUSTOMIZE_PROCESS_ENTITIES_MODULE } from '../../modules/customize-process/entities/entities.module';
-import { FUNNEL_LIBRARY_PERMISIONS_ENTITIES_MODULE } from '../../modules/library-permisions/entities/entities.module';
-import { TransactionsService } from '../services/transactions.service';
-
+import { USER_ENTITIES_MODULE } from '../modules/users/entities/entities.module';
+import { CONFIGPLANNER_ENTITIES_MODULE } from '../modules/planner/entities/entities.module';
+import { FUNNELS_ENTITIES_MODULE, FUNNEL_STAGES_ENTITIES_MODULE } from '../modules/funnels/entities/entities.module';
+import { FUNNEL_LIBRARY_ENTITIES_MODULE } from '../modules/funnel-library/entities/entities.module';
+import { CUSTOMIZE_PROCESS_ENTITIES_MODULE } from '../modules/customize-process/entities/entities.module';
+import { FUNNEL_LIBRARY_PERMISIONS_ENTITIES_MODULE } from '../modules/library-permisions/entities/entities.module';
+import { FUNNEL_ARCHIVE_ENTITIES_MODULE } from '../modules/funnel_archives/entities/entities.module';
 
 
 /**
@@ -35,11 +34,8 @@ import { TransactionsService } from '../services/transactions.service';
         CUSTOMIZE_PROCESS_ENTITIES_MODULE,
         FUNNEL_LIBRARY_PERMISIONS_ENTITIES_MODULE,
         FUNNEL_ARCHIVE_ENTITIES_MODULE,
-
-        TransactionsService
     ],
     providers: [
-        TransactionsService
     ]
 })
-export class EntitiesModule { }
+export class Db_Module { }

@@ -36,12 +36,6 @@ export class FunnelBody_et extends EntityKey_et {
     })
     metricsPorcents: FunnelMetricsPorcents_I[];
 
-    @OneToOne(() => CustomizeProcess_et, CustomizeProcess => CustomizeProcess.funnel_id, { cascade: true })
-    @JoinColumn({
-        name: 'customizeProcess_step_id'
-    })
-    customizeProcess_step_id: CustomizeProcess_et;
-
     @Column({
         type: "smallint",
         default: 0,
@@ -55,10 +49,6 @@ export class FunnelBody_et extends EntityKey_et {
     })
     timingMetrics?: Funnel_TimingMetrics_Type;
 
-    @ManyToOne(() => FunnelArchive_et, archive => archive.funnels_id, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'archives_id' }) // Esta columna se creará en la tabla de libros
-    archives_id?: FunnelArchive_et;
-
     @Column({
         type: 'varchar',
         default: new DateProcessService().setDate()
@@ -70,6 +60,16 @@ export class FunnelBody_et extends EntityKey_et {
         default: 0
     })
     updatedAt?: string;
+
+    @OneToOne(() => CustomizeProcess_et, CustomizeProcess => CustomizeProcess.funnel_id, { cascade: true })
+    @JoinColumn({
+        name: 'customizeProcess_step_id'
+    })
+    customizeProcess_step_id: CustomizeProcess_et;
+
+    @ManyToOne(() => FunnelArchive_et, archive => archive.funnels_id, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'archives_id' }) // Esta columna se creará en la tabla de libros
+    archives_id?: FunnelArchive_et;
 
 }
 

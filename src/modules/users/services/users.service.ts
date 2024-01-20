@@ -1,11 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { _argsFind_I, _argsPagination, _response_I } from '../../../common/interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, FindOneOptions, QueryRunner, Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { User_et } from '../entities';
-import { DateProcessService, ProcessDataService, _HttpService } from '../../../common/adapters';
-import { User_Escala_I, User_Escala_Request_I, User_I } from '../interfaces';
-import { TransactionsService } from '../../../database/services/transactions.service';
+import { ProcessDataService, _HttpService } from '../../../common/adapters';
+import { User_Escala_I, User_Escala_Request_I } from '../interfaces';
+import { TransactionsService } from '../../../common/services/transactions.service';
 import { AuthPayload_I } from '../../auth/interfaces';
 import { ConfigProjectService } from '../../../config/config.service';
 import { _Configuration_Keys } from '../../../config/config.keys';
@@ -16,12 +16,10 @@ export class UsersService {
 
     constructor(
 
-        @InjectRepository(User_et)
-        private readonly _Users_et_repository: Repository<User_et>,
+        // @InjectRepository(User_et)
+        // private readonly _Users_et_repository: Repository<User_et>,
 
         private readonly _processData: ProcessDataService,
-        private readonly _dateService: DateProcessService,
-        private readonly dataSource: DataSource,
 
         private readonly _HttpService: _HttpService,
 
@@ -31,7 +29,6 @@ export class UsersService {
     ) {
 
     }
-
 
     async getUsers_byOwner(user: AuthPayload_I, token: string, _prev_queryRunner?: QueryRunner): Promise<_response_I<AuthPayload_I[]>> {
 
@@ -129,7 +126,6 @@ export class UsersService {
         return _Response;
 
     }
-
 
     async delete_user(_id: string): Promise<_response_I<User_et>> {
 
@@ -275,7 +271,6 @@ export class UsersService {
             if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
 
         }
-
 
         return _Response;
 

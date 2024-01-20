@@ -1,6 +1,6 @@
 
 
-export * from "./entities.module";
+export * from "../DB.module";
 
 // export * from '../../modules/users/entities/user.entity';
 // export * from '../../modules/planner/entities/configPlanner.entity';

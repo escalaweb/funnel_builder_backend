@@ -13,17 +13,17 @@ export class CreateFunnelLibraryDto {
     })
     @IsNotEmpty({
         message(validationArguments) {
-            return `El nombre es requerido {{${validationArguments.property}}}`;
+            return `El parametro ${validationArguments.property} es requerido`;
         },
     })
     @IsString({
         message(validationArguments) {
-            return `El nombre debe ser un string {{${validationArguments.property}}}`;
+            return `El parametro ${validationArguments.property} debe ser un string`;
         },
     })
     @MinLength(1, {
         message(validationArguments) {
-            return `El nombre debe contener minimo 1 caracter {{${validationArguments.property}}}`;
+            return `El parametro ${validationArguments.property} debe contener minimo 1 caracter`;
         },
     })
     name: string;

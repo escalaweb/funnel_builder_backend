@@ -7,7 +7,8 @@ import {
     TimingMetricsFunnels1699631897253,
     PermisionsToShare1701888175900,
     InitPermisions1701898729627,
-    ActBase1704696750348
+    ActBase1704696750348,
+    ArchiveStructure1705681873345
 } from "./index"
 
 
@@ -35,5 +36,9 @@ export const _globalMigs: MigrationFunctionsModel_I[] = [
     {
         name: 'ActBase1704696750348',
         mig: new ActBase1704696750348()
+    },
+    {
+        name: 'ArchiveStructure1705681873345',
+        mig: new ArchiveStructure1705681873345()
     }
 ]

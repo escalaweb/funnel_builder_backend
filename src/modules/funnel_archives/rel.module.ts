@@ -1,4 +1,6 @@
-import { Module } from "@nestjs/common";
+import { Module } from '@nestjs/common';
+
+
 
 
 @Module({
@@ -12,4 +14,4 @@ import { Module } from "@nestjs/common";
     exports: [
     ]
 })
-export class FunnelLibrary_Rel_Module { }
+export class FunnelArchives_Rel_Module { }

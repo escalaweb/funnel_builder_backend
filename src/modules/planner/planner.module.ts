@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { PlannerController } from './controllers/planner.controller';
 import { Planner_Rel_Module } from './rel.module';
-import { EntitiesModule } from '../../database/entities/entities.module';
 import { PlannerService } from './services/planner.service';
+import { Db_Module } from '../../database/DB.module';
 
 
 
@@ -12,7 +12,7 @@ import { PlannerService } from './services/planner.service';
         PlannerService
     ],
     imports: [
-        EntitiesModule,
+        Db_Module,
         Planner_Rel_Module
     ],
     exports: [

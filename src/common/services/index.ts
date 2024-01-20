@@ -1,3 +1,5 @@
+export { TransactionsService } from './transactions.service';
+
 export { _LoggerService } from './_logger.service';
 
 export { ExeptionsHandlersService } from './exeptions-handlers.service';

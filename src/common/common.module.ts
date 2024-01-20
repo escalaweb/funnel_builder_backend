@@ -3,10 +3,11 @@ import { APP_FILTER } from '@nestjs/core';
 import { DateProcessService, ProcessDataService, _HttpService } from './adapters';
 import { HttpExceptionFilter } from './filters';
 import { MiddlewareModule } from './middlewares/middleware.module';
-import { CommonService, ExeptionsHandlersService, _LoggerService } from './services';
+import { CommonService, ExeptionsHandlersService, TransactionsService, _LoggerService } from './services';
 import { SocketsGateway } from './sockets/sockets.gateway';
 import { SocketsService } from './sockets/sockets.service';
 import { HttpModule } from '@nestjs/axios';
+
 
 
 @Global()
@@ -32,7 +33,8 @@ import { HttpModule } from '@nestjs/axios';
         SocketsGateway,
         SocketsService,
         ExeptionsHandlersService,
-        _LoggerService
+        _LoggerService,
+        TransactionsService
 
     ],
     exports: [
@@ -42,6 +44,7 @@ import { HttpModule } from '@nestjs/axios';
         DateProcessService,
         SocketsService,
         _LoggerService,
+        TransactionsService,
         ExeptionsHandlersService
     ]
 })

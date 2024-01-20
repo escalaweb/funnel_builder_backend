@@ -1,25 +1,22 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthPayload_I } from '../../auth/interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { ProcessDataService, DateProcessService } from '../../../common/adapters';
 import { _response_I, _argsFind_I } from '../../../common/interfaces';
-import { LoggModel, _LoggerService } from '../../../common/services';
+import { _LoggerService } from '../../../common/services';
 import { FunnelLibrary_et } from '../../funnel-library/entities';
 import { FunnelLibraryService } from '../../funnel-library/services/funnel-library.service';
-import { FunnelBody_et } from '../../funnels/entities';
 import { User_et } from '../../users/entities';
 import { UsersService } from '../../users/services/users.service';
 import { CustomizeProcess_et } from '../entities';
 
-import * as uuid from 'uuid';
 import * as _ from "lodash";
 
 @Injectable()
 export class CustomizeProcessService {
 
     constructor(
-
         @InjectRepository(FunnelLibrary_et)
         private readonly _FunnelLibrary_et_repository: Repository<FunnelLibrary_et>,
 

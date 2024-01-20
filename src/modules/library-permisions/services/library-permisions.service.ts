@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { AuthPayload_I } from '../../auth/interfaces';
 import { _argsFind_I, _response_I } from '../../../common/interfaces';
-import { TransactionsService } from '../../../database/services/transactions.service';
+import { TransactionsService } from '../../../common/services/transactions.service';
 import { DateProcessService, ProcessDataService } from '../../../common/adapters';
 import { LibraryPermisions_et } from '../entities';
 import { QueryRunner, Repository } from 'typeorm';

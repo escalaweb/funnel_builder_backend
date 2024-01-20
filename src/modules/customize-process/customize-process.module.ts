@@ -1,16 +1,18 @@
 import { Module } from '@nestjs/common';
 import { CustomizeProcessController } from './controllers/customize-process.controller';
 import { CustomizeProces_Rel_Module } from './rel.module';
-import { EntitiesModule } from '../../database/entities/entities.module';
 import { CustomizeProcessService } from './services/customize-process.service';
+import { Db_Module } from '../../database/DB.module';
 
 @Module({
     controllers: [CustomizeProcessController],
     providers: [
+
         CustomizeProcessService
     ],
     imports: [
-        EntitiesModule,
+        Db_Module,
+
         CustomizeProces_Rel_Module
     ],
     exports: [

@@ -9,7 +9,7 @@ import { FunnelLibraryService } from '../../funnel-library/services/funnel-libra
 import { HttpException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ProcessDataService, DateProcessService } from "../../../common/adapters";
-import { TransactionsService } from "../../../database/services/transactions.service";
+import { TransactionsService } from "../../../common/services/transactions.service";
 import { User_et } from "../../users/entities";
 import { UsersService } from "../../users/services/users.service";
 

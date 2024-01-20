@@ -1,23 +1,29 @@
-import { Module, forwardRef } from "@nestjs/common";
-import { AdminInternalModule } from "../admin_internal/admin_internal.module";
-import { FunnelLibraryModule } from "../funnel-library/funnel-library.module";
+import { Module } from "@nestjs/common";
+import { Users_Rel_Module } from "../users/rel.module";
+import { Db_Module } from "../../database/DB.module";
+import { Admin_Internal_Rel_Module } from "../admin_internal/rel.module";
+import { FunnelLibrary_Rel_Module } from "../funnel-library/rel.module";
+import { FunnelsService } from "./services";
 import { UsersModule } from "../users/users.module";
+import { FunnelLibraryModule } from "../funnel-library/funnel-library.module";
+import { AdminInternalModule } from "../admin_internal/admin_internal.module";
 
 
 @Module({
     controllers: [],
     imports: [
-        FunnelLibraryModule,
-        AdminInternalModule,
         UsersModule,
+        AdminInternalModule,
+        FunnelLibraryModule
     ],
     providers: [
 
     ],
     exports: [
-        FunnelLibraryModule,
+
+        UsersModule,
         AdminInternalModule,
-        UsersModule
+        FunnelLibraryModule
     ]
 })
-export class Funnels_Rel_Module {}
+export class Funnels_Rel_Module {  }

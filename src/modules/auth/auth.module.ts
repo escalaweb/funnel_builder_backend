@@ -7,7 +7,8 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 import { HttpModule } from "@nestjs/axios";
 import { AuthController } from "./controllers/auth.controller";
 import { Auth_Rel_Module } from "./rel.module";
-import { EntitiesModule } from "../../database/entities/entities.module";
+import { Db_Module } from "../../database/DB.module";
+import { UsersModule } from "../users/users.module";
 
 @Module({
     controllers: [
@@ -18,8 +19,9 @@ import { EntitiesModule } from "../../database/entities/entities.module";
 
     ],
     imports: [
-        EntitiesModule,
+        Db_Module,
         Auth_Rel_Module,
+        UsersModule,
         ConfigModule,
         HttpModule,
         PassportModule.register({

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { FunnelLibraryController } from './controllers/funnel-library.controller';
-import { EntitiesModule } from '../../database/entities/entities.module';
+import { Db_Module } from '../../database/DB.module';
 import { FunnelLibrary_Rel_Module } from './rel.module';
 import { FunnelBuilderService, FunnelLibraryService } from './services';
 
@@ -11,14 +11,15 @@ import { FunnelBuilderService, FunnelLibraryService } from './services';
     ],
     providers: [
         FunnelLibraryService,
-        FunnelBuilderService
+        FunnelBuilderService,
     ],
     imports: [
-        EntitiesModule,
+        Db_Module,
         FunnelLibrary_Rel_Module
     ],
     exports: [
-        FunnelLibraryService
+        FunnelLibraryService,
+        FunnelBuilderService,
     ]
 })
 export class FunnelLibraryModule { }
