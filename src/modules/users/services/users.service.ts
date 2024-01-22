@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { _argsFind_I, _argsPagination, _response_I } from '../../../common/interfaces';
+import { _argsFind_I, _argsPagination_I, _response_I } from '../../../common/interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryRunner, Repository } from 'typeorm';
 import { User_et } from '../entities';
@@ -284,7 +284,7 @@ export class UsersService {
 
         try {
 
-            const args: _argsPagination = {
+            const args: _argsPagination_I = {
                 findObject: {
                     relations: ['users']
                 },

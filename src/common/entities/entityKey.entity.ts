@@ -14,3 +14,11 @@ export class EntityKey_et {
 
 
 }
+
+export class DtoKey_et {
+
+    _id?: string;
+
+    __v?: number;
+
+}

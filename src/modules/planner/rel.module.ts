@@ -1,16 +1,19 @@
-import { Module } from "@nestjs/common";
-import { FunnelLibraryModule } from "../funnel-library/funnel-library.module";
+import { Module, forwardRef } from "@nestjs/common";
+import { FunnelLibraryModule } from '../funnel-library/funnel-library.module';
 
 @Module({
     controllers: [],
     imports: [
-        FunnelLibraryModule
+        forwardRef( () => FunnelLibraryModule )
+        // FunnelLibraryModule
+
     ],
     providers: [
 
     ],
     exports: [
         FunnelLibraryModule
+        //    forwardRef( () => FunnelLibraryModule )
 
     ]
 })

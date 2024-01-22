@@ -6,7 +6,7 @@ import { _Populate_I } from "./_responseFindParameters.interface";
 
 const Config = new ConfigService();
 
-export interface _argsPagination {
+export interface _argsPagination_I {
 
     findObject: {
         where?: any,

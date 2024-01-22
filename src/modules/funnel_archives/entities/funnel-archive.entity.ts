@@ -1,10 +1,11 @@
 import { Entity, Column, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
-import { EntityKey_et } from "../../../common/entities";
-import { DateProcessService } from '../../../common/adapters/dateProcess.service';
-import { FunnelBody_et } from "../../funnels/entities";
+
 import { ConfigPlanner_et } from "../../planner/entities";
-import { User_et } from "../../users/entities";
+import { DateProcessService } from '../../../common/adapters/dateProcess.service';
+import { EntityKey_et } from "../../../common/entities";
+import { FunnelBody_et } from "../../funnels/entities";
 import { FunnelLibrary_et } from "../../funnel-library/entities";
+import { User_et } from "../../users/entities";
 
 @Entity({
     name: "funnels_archive"
@@ -16,7 +17,7 @@ export class FunnelArchive_et extends EntityKey_et {
     })
     name?: string;
 
-        @Column({
+    @Column({
         type: 'varchar',
         default: new DateProcessService().setDate()
     })
@@ -32,7 +33,6 @@ export class FunnelArchive_et extends EntityKey_et {
         () => User_et, (user) => user.funnelLibrary_id,
         {
             onDelete: 'CASCADE',
-            // eager: true // Que cargue la siguiente relación siempre
         })
     @JoinColumn({ name: 'user_id' })
     user_id?: User_et;
@@ -41,10 +41,10 @@ export class FunnelArchive_et extends EntityKey_et {
     funnels_id?: FunnelBody_et[];
 
     @ManyToOne(() => FunnelLibrary_et, funnelLibrary => funnelLibrary.archives_id, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'funnelLibrary_id' }) // Esta columna se creará en la tabla de libros
+    @JoinColumn({ name: 'funnelLibrary_id' })
     funnelLibrary_id?: FunnelLibrary_et;
 
-    @OneToOne( () => ConfigPlanner_et, configStep => configStep.archives_id )
+    @OneToOne(() => ConfigPlanner_et, configStep => configStep.archives_id)
     @JoinColumn({
         name: 'config_step_id'
     })

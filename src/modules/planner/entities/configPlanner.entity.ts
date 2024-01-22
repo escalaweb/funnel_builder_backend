@@ -12,15 +12,15 @@ export class ConfigPlanner_et extends EntityKey_et {
         type: 'jsonb',
         nullable: true
     })
-    dash: CST_Dash_I;
+    dash?: CST_Dash_I;
 
     @Column({
         type: 'jsonb',
     })
-    toolsSettingsConfig: CST_ToolSettingsConfig_I[];
+    toolsSettingsConfig?: CST_ToolSettingsConfig_I[];
 
     @OneToOne(() => FunnelArchive_et, archive => archive.config_step_id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'archives_id' })
-    archives_id: FunnelArchive_et;
+    archives_id?: FunnelArchive_et;
 
 }

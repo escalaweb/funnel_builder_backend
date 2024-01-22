@@ -3,18 +3,14 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource, QueryRunner } from "typeorm";
 import { ProcessDataService, DateProcessService } from "../../../common/adapters";
 import { _response_I, _argsFind_I } from "../../../common/interfaces";
-import { LoggModel, _LoggerService } from "../../../common/services";
+import { _LoggerService } from "../../../common/services";
 import { TransactionsService } from "../../../common/services/transactions.service";
 import { AuthPayload_I } from "../../auth/interfaces";
 import { CustomizeProcess_et } from "../../customize-process/entities";
 import { FunnelBody_et, FunnelBody_stages_et } from "../../funnels/entities";
-import { UsersService } from "../../users/services/users.service";
 import { FunnelLibrary_et } from "../entities";
-import { FunnelLibraryService } from "./funnel-library.service";
 
 import * as _ from "lodash";
-import * as uuid from 'uuid';
-import { ConfigPlanner_et } from "../../planner/entities";
 
 
 @Injectable()

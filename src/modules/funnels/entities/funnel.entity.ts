@@ -68,8 +68,8 @@ export class FunnelBody_et extends EntityKey_et {
     customizeProcess_step_id: CustomizeProcess_et;
 
     @ManyToOne(() => FunnelArchive_et, archive => archive.funnels_id, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'archives_id' }) // Esta columna se creará en la tabla de libros
-    archives_id?: FunnelArchive_et;
+    @JoinColumn({ name: 'archives_id' })
+    archives_id: FunnelArchive_et;
 
 }
 

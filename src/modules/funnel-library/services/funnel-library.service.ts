@@ -1,19 +1,21 @@
+
+
+import { _LoggerService } from "../../../common/services";
+import { _relations_byFunnelLibrary } from "../constants";
+import { ConfigPlanner_et } from "../../planner/entities";
+import { CreateFunnelLibraryDto } from "../dto";
+import { DataSource, QueryRunner, Repository } from "typeorm";
+import { FunnelBuilderService } from ".";
+import { FunnelLibrary_et } from "../entities";
 import { HttpException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, Not, QueryRunner, Repository } from "typeorm";
-import { ProcessDataService, DateProcessService } from "../../../common/adapters";
-
-import { FunnelLibrary_et } from "../entities";
-import { _argsFindMany_I, _argsFind_I, _argsPagination, _response_I } from "../../../common/interfaces";
-import { CreateFunnelLibraryDto } from "../dto";
-import { AuthPayload_I } from "../../auth/interfaces/_jwt-payload.interface";
-import { ConfigPlanner_et } from "../../planner/entities";
-
-import * as _ from "lodash";
 import { LibraryPermisions_et } from "../../library-permisions/entities";
+import { ProcessDataService, DateProcessService } from "../../../common/adapters";
 import { TransactionsService } from "../../../common/services/transactions.service";
-import { _LoggerService } from "../../../common/services";
-import { FunnelBuilderService } from ".";
+import * as _ from "lodash";
+
+import { _argsFindMany_I, _argsFind_I, _argsPagination_I, _response_I } from "../../../common/interfaces";
+import { AuthPayload_I } from "../../auth/interfaces/_jwt-payload.interface";
 
 @Injectable()
 export class FunnelLibraryService {
@@ -63,7 +65,6 @@ export class FunnelLibraryService {
             }
 
         } catch (error) {
-            console.log(error);
             _Response = error;
             this._TransactionsService.rollbackTransaction(queryRunner);
         }
@@ -208,13 +209,7 @@ export class FunnelLibraryService {
         //             ...where
         //         },
         //         relations: [
-        //             'user_id',
-        //             'funnels_id',
-        //             'config_step_id',
-        //             'funnels_id.stages',
-        //             'funnels_id.customizeProcess_step_id',
-        //             'funnel_library_permision_id',
-        //             'funnel_library_permision_id.user_id'
+        //         ..._relations_byFunnelLibrary
         //         ],
 
         //     },
@@ -240,6 +235,7 @@ export class FunnelLibraryService {
         //     ).then(r => {
         //         return r;
         //     }).catch( r => r );
+
 
         // try {
         //     if(resp_1.statusCode != 200){
@@ -337,8 +333,6 @@ export class FunnelLibraryService {
 
         let _Response: _response_I<FunnelLibrary_et>;
 
-        return _Response;
-
         let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
         try {
@@ -432,7 +426,9 @@ export class FunnelLibraryService {
         let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
         try {
+
             // TODO mejorar la información que viene de este query
+            // TODO Implementar la paginación a futuro
             const args: _argsFindMany_I = {
                 findObject: {
                     where: {
@@ -442,7 +438,6 @@ export class FunnelLibraryService {
                         'user_id',
                         'funnelLibrary_id',
                         'funnelLibrary_id.user_id',
-                        'funnelLibrary_id.funnels_id',
                     ],
                     select: {
                         user_id: {
@@ -454,50 +449,50 @@ export class FunnelLibraryService {
                 },
             }
 
-            await this._processData.process_getAll<LibraryPermisions_et>({
+            let resp = await this._processData.process_getAll<LibraryPermisions_et>({
                 argsFindMany: args,
                 entity: LibraryPermisions_et,
                 queryRunner: queryRunner
-            }).then(async (resp) => {
+            });
 
-                let aux_resp = resp.data.map(res => {
+            let aux_resp = resp.data.map(res => {
 
-                    let aux_item: FunnelLibrary_et = structuredClone(res.funnelLibrary_id)
+                let aux_item: FunnelLibrary_et = structuredClone(res.funnelLibrary_id)
 
-                    if (aux_item.user_id._id === user._id) {
-                        return null;
-                    } else {
+                if (aux_item.user_id._id === user._id) {
+                    return null;
+                } else {
 
-                        return aux_item
-                    }
-
-                });
-
-                aux_resp = aux_resp.filter(res => res !== null);
-
-                _Response = structuredClone(resp);
-
-                _Response = {
-                    ..._Response,
-                    data: [...aux_resp],
-                    statusCode: (aux_resp.length > 0) ? 200 : 404,
-                    message: [
-                        {
-                            text: (aux_resp.length > 0) ? 'Carpetas de embudos compartidas conmigo' : 'No hay carpetas de embudos compartidas conmigo',
-                            type: 'global'
-                        }
-                    ]
+                    return aux_item
                 }
 
             });
 
+            aux_resp = aux_resp.filter(res => res !== null);
+
+            _Response = structuredClone(resp);
+
+            _Response = {
+                ..._Response,
+                data: [...aux_resp],
+                statusCode: (aux_resp.length > 0) ? 200 : 404,
+                message: [
+                    {
+                        text: (aux_resp.length > 0) ? 'Carpetas de embudos compartidas conmigo' : 'No hay carpetas de embudos compartidas conmigo',
+                        type: 'global'
+                    }
+                ]
+            }
 
             if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
 
         } catch (error) {
+
             _Response = error;
             if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
+
         }
+
         return _Response;
 
     }
@@ -506,23 +501,19 @@ export class FunnelLibraryService {
 
         let _Response: _response_I<FunnelLibrary_et[]>;
 
-
         let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
         try {
 
-            const args: _argsPagination = {
+            // TODO mejorar la información que viene de este query
+            // TODO Implementar la paginación a futuro
+            const args: _argsPagination_I = {
                 findObject: {
                     where: {
                         "user_id._id": user._id
                     },
                     relations: [
-                        'user_id',
-                        'funnels_id',
-                        'config_step_id',
-                        'funnels_id.stages',
-                        'funnels_id.customizeProcess_step_id',
-                        'funnel_library_permision_id'
+                        ..._relations_byFunnelLibrary
                     ],
                     select: {
                         user_id: {
@@ -540,19 +531,18 @@ export class FunnelLibraryService {
                 },
             }
 
-            await this._processData.process_getAll<FunnelLibrary_et>({
+            const resp = await this._processData.process_getAll<FunnelLibrary_et>({
                 argsFindMany: args,
                 entity: FunnelLibrary_et,
                 queryRunner: queryRunner
-            }).then(async (resp) => {
-
-                _Response = structuredClone(resp);
-
             });
+
+            _Response = structuredClone(resp);
 
             if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
 
         } catch (error) {
+            console.log(error);
             _Response = error;
             if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
         }
@@ -560,76 +550,71 @@ export class FunnelLibraryService {
 
     }
 
-    async findAll(page: number = 1, user: AuthPayload_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<FunnelLibrary_et[]>> {
+    // async findAll(page: number = 1, user: AuthPayload_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<FunnelLibrary_et[]>> {
 
-        let _Response: _response_I<FunnelLibrary_et[]>;
-
-
-        let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
-
-        try {
-
-            const args: _argsPagination = {
-                findObject: {
-                    where: {
-                        "user_id._id": user._id
-                    },
-                    relations: [
-                        'user_id',
-                        'funnels_id',
-                        'config_step_id',
-                        'funnels_id.stages',
-                        'funnels_id.customizeProcess_step_id',
-                        'funnel_library_permision_id'
-                    ],
-                    // select: {
-                    //     user_id: {
-                    //         _id: true,
-                    //         name: true,
-                    //         email: true
-                    //     }
-
-                    // },
-
-                },
-                options: {
-                    page: page,
-                    limit: 12,
-                    // limit: this._configP._get(_Configuration_Keys.DEFAULT_LIMIT),
-                    route: '/',
-                },
-                populate: {
-                    user_id: {
-                        select: [
-                            "_id",
-                            "name",
-                            "email",
-                        ]
-                    },
-
-                }
-            }
-
-            await this._processData.process_getAll_paginate<FunnelLibrary_et>({
-                argsFindMany: { ...args },
-                entity: FunnelLibrary_et,
-                queryRunner: queryRunner
-            }).then(async (resp) => {
-
-                _Response = structuredClone(resp);
-
-            });
+    //     let _Response: _response_I<FunnelLibrary_et[]>;
 
 
-            if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
+    //     let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
-        } catch (error) {
-            _Response = error;
-            if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
-        }
-        return _Response;
+    //     try {
 
-    }
+    //         const args: _argsPagination_I = {
+    //             findObject: {
+    //                 where: {
+    //                     "user_id._id": user._id
+    //                 },
+    //                 relations: [
+    //                     ..._relations_byFunnelLibrary
+    //                 ],
+    //                 // select: {
+    //                 //     user_id: {
+    //                 //         _id: true,
+    //                 //         name: true,
+    //                 //         email: true
+    //                 //     }
+
+    //                 // },
+
+    //             },
+    //             options: {
+    //                 page: page,
+    //                 limit: 12,
+    //                 // limit: this._configP._get(_Configuration_Keys.DEFAULT_LIMIT),
+    //                 route: '/',
+    //             },
+    //             populate: {
+    //                 user_id: {
+    //                     select: [
+    //                         "_id",
+    //                         "name",
+    //                         "email",
+    //                     ]
+    //                 },
+
+    //             }
+    //         }
+
+    //         await this._processData.process_getAll_paginate<FunnelLibrary_et>({
+    //             argsFindMany: { ...args },
+    //             entity: FunnelLibrary_et,
+    //             queryRunner: queryRunner
+    //         }).then(async (resp) => {
+
+    //             _Response = structuredClone(resp);
+
+    //         });
+
+
+    //         if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
+
+    //     } catch (error) {
+    //         _Response = error;
+    //         if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
+    //     }
+    //     return _Response;
+
+    // }
 
     async findOne(_id: string, user: AuthPayload_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<FunnelLibrary_et>> {
 
@@ -647,13 +632,7 @@ export class FunnelLibraryService {
                         }
                     },
                     relations: [
-                        'user_id',
-                        'funnels_id',
-                        'config_step_id',
-                        'funnels_id.stages',
-                        'funnels_id.customizeProcess_step_id',
-                        'funnel_library_permision_id',
-                        'funnel_library_permision_id.user_id'
+                        ..._relations_byFunnelLibrary
                     ],
 
                 },
@@ -711,7 +690,9 @@ export class FunnelLibraryService {
                     where: {
                         "user_id._id": user._id
                     },
-                    relations: ['user_id', 'config_step_id', 'funnels_id', 'funnels_id.stages', 'funnels_id'],
+                    relations: [
+                        ..._relations_byFunnelLibrary
+                    ],
 
                 },
                 populate: {

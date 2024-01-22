@@ -1,4 +1,4 @@
-import { MigrationFunctionsModel_I, MigrationModel_I } from "../interfaces/_migrationModel.interface";
+import { MigrationFunctionsModel_I } from "../interfaces/_migrationModel.interface";
 
 
 import {
@@ -8,7 +8,9 @@ import {
     PermisionsToShare1701888175900,
     InitPermisions1701898729627,
     ActBase1704696750348,
-    ArchiveStructure1705681873345
+    SetupArchives1705682884526,
+    ReformatDataByArchives1705794742714,
+    // ArchiveStructure1705681873345
 } from "./index"
 
 
@@ -38,7 +40,13 @@ export const _globalMigs: MigrationFunctionsModel_I[] = [
         mig: new ActBase1704696750348()
     },
     {
-        name: 'ArchiveStructure1705681873345',
-        mig: new ArchiveStructure1705681873345()
-    }
+        name: 'SetupArchives1705682884526',
+        mig: new SetupArchives1705682884526()
+    },
+    {
+        name: 'ReformatDataByArchives1705794742714',
+        mig: new ReformatDataByArchives1705794742714()
+    },
+
+
 ]

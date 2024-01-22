@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { _argsUpdate } from '../interfaces/responseUpdate.interface';
 import { Repository } from 'typeorm';
-import { _argsPagination, _paginateByArray_I } from '../interfaces/_responsePaginator.interface';
+import { _argsPagination_I, _paginateByArray_I } from '../interfaces/_responsePaginator.interface';
 import { Pagination } from 'nestjs-typeorm-paginate';
 
 import * as _ from 'lodash';

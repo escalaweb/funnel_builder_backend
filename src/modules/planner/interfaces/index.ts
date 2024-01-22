@@ -13,8 +13,8 @@ export interface CST_Dash_I {
 
 
 
-const type_array_default = [
-    "user_invitation",
+export const CST_ActionSettings_Type_Default = [
+ "user_invitation",
     "user_roles_customization",
     "date_format",
     "time_zone",
@@ -40,10 +40,10 @@ const type_array_default = [
     "tag_manager",
     "import_facebook_campaigns",
     "zapier",
+    "calendly",
     "integrations_other_tools",
-
 ] as const;
-export type CST_ActionSettings_Type = typeof type_array_default[number];
+export type CST_ActionSettings_Type = typeof CST_ActionSettings_Type_Default[number];
 
 export interface CST_ActionsSettings_I {
 
