@@ -7,5 +7,6 @@ export const _relations_byFunnelLibrary: string[] = [
     'archives_id.funnels_id',
     'archives_id.funnels_id.stages',
     'archives_id.funnels_id.customizeProcess_step_id',
-    'funnel_library_permision_id'
+    'funnel_library_permision_id',
+    'funnel_library_permision_id.user_id'
 ]

@@ -16,6 +16,7 @@ export class ConfigPlanner_et extends EntityKey_et {
 
     @Column({
         type: 'jsonb',
+        // nullable: true
     })
     toolsSettingsConfig?: CST_ToolSettingsConfig_I[];
 

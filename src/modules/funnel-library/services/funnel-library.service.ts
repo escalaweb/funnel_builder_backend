@@ -16,6 +16,9 @@ import * as _ from "lodash";
 
 import { _argsFindMany_I, _argsFind_I, _argsPagination_I, _response_I } from "../../../common/interfaces";
 import { AuthPayload_I } from "../../auth/interfaces/_jwt-payload.interface";
+import { PlannerService } from "../../planner/services/planner.service";
+import { FunnelArchivesService } from "../../funnel_archives/services/funnel_archives.service";
+import { FunnelArchive_et } from '../../funnel_archives/entities/funnel-archive.entity';
 
 @Injectable()
 export class FunnelLibraryService {
@@ -28,17 +31,21 @@ export class FunnelLibraryService {
         @InjectRepository(ConfigPlanner_et)
         private readonly _ConfigPlanner_et_repository: Repository<ConfigPlanner_et>,
 
+        @InjectRepository(FunnelArchive_et)
+        private readonly _FunnelArchive_et_repository: Repository<FunnelArchive_et>,
+
         @InjectRepository(LibraryPermisions_et)
         private readonly _LibraryPermisions_et_repository: Repository<LibraryPermisions_et>,
 
         private readonly _processData: ProcessDataService,
         private readonly _dateService: DateProcessService,
 
+        private readonly _funnelBuilderService: FunnelBuilderService,
+        private readonly _plannerService: PlannerService,
+        private readonly _FunnelsArchivesService: FunnelArchivesService,
+
         private readonly _LoggerService: _LoggerService,
         private readonly _TransactionsService: TransactionsService,
-
-        private readonly _funnelBuilderService: FunnelBuilderService,
-
         private readonly dataSource: DataSource,
 
     ) {
@@ -209,7 +216,14 @@ export class FunnelLibraryService {
         //             ...where
         //         },
         //         relations: [
-        //         ..._relations_byFunnelLibrary
+        //             'user_id',
+        // 'archives_id',
+        // 'archives_id.config_step_id',
+        // 'archives_id.funnels_id',
+        // 'archives_id.funnels_id.stages',
+        // 'archives_id.funnels_id.customizeProcess_step_id',
+        // 'funnel_library_permision_id',
+        // 'funnel_library_permision_id.user_id'
         //         ],
 
         //     },
@@ -329,7 +343,7 @@ export class FunnelLibraryService {
 
     }
 
-    async create(CreateFunnelLibraryDto: CreateFunnelLibraryDto, user: AuthPayload_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<FunnelLibrary_et>> {
+    async create_folder(CreateFunnelLibraryDto: CreateFunnelLibraryDto, user: AuthPayload_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<FunnelLibrary_et>> {
 
         let _Response: _response_I<FunnelLibrary_et>;
 
@@ -337,52 +351,58 @@ export class FunnelLibraryService {
 
         try {
 
-            let data_funnelLibraryPermisions: LibraryPermisions_et = this._LibraryPermisions_et_repository.create({
+            let data_funnelLibraryPermisions = this._LibraryPermisions_et_repository.create({
                 elementsEffect: 'all',
                 permisionType: 0,
                 user_id: user,
                 updatedAt: this._dateService.setDate(),
             });
 
-            let data_funnelLibrary: FunnelLibrary_et = this._FunnelLibrary_et_repository.create({
+            let data_funnelLibrary = this._FunnelLibrary_et_repository.create({
                 ...CreateFunnelLibraryDto,
                 __v: 0,
                 user_id: user,
-
             });
-
-            let data_configStep: ConfigPlanner_et = this._ConfigPlanner_et_repository.create({
-                __v: 0,
-                dash: null,
-                toolsSettingsConfig: [],
-            });
-
-            let created_config = await this._processData.process_create<ConfigPlanner_et>({
-                body: data_configStep,
-                entity: ConfigPlanner_et,
-                queryRunner: queryRunner,
-            }).then(({ data }) => data);
 
             let created_FunnelLibrary = await this._processData.process_create<FunnelLibrary_et>({
-                body: {
-                    ...data_funnelLibrary,
-                    config_step_id: created_config,
-                },
+                body: data_funnelLibrary,
                 entity: FunnelLibrary_et,
                 queryRunner: queryRunner,
-            }).then(({ data }) => data);
+            })
+                .then(({ data }) => data)
 
-            await this._processData.process_create<ConfigPlanner_et>({
-                body: {
-                    ...created_config,
-                    funnelLibrary_id: {
-                        ...created_FunnelLibrary,
-                        config_step_id: null
-                    }
-                },
+            let data_configPlanner = this._ConfigPlanner_et_repository.create({
+                dash: {},
+                toolsSettingsConfig: [],
+                archives_id: null,
+                // __v: 0
+            })
+
+            let created_config = await this._processData.process_create<ConfigPlanner_et>({
+                body: data_configPlanner,
                 entity: ConfigPlanner_et,
                 queryRunner: queryRunner,
             }).then(({ data }) => data);
+
+            let data_archive = this._FunnelArchive_et_repository.create({
+                name: 'Archivo 1',
+                config_step_id: created_config,
+                funnelLibrary_id: created_FunnelLibrary,
+                user_id: user,
+                __v: 0,
+            });
+
+            let created_archive = await this._processData.process_create<FunnelArchive_et>({
+                body: data_archive,
+                entity: FunnelArchive_et,
+                queryRunner: queryRunner,
+            }).then(({ data }) => data);
+
+
+            created_config = await this._plannerService.create_configsPlanner({
+                ...created_config,
+                archives_id: created_archive
+            }, user, queryRunner).then(({ data }) => data);
 
             await this._processData.process_create<LibraryPermisions_et>({
                 body: {
@@ -408,6 +428,8 @@ export class FunnelLibraryService {
             if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
 
         } catch (err) {
+
+            console.log('err', err);
 
             _Response = err;
 
@@ -438,6 +460,12 @@ export class FunnelLibraryService {
                         'user_id',
                         'funnelLibrary_id',
                         'funnelLibrary_id.user_id',
+                        'funnelLibrary_id.archives_id',
+                        'funnelLibrary_id.archives_id.config_step_id',
+                        'funnelLibrary_id.archives_id.funnels_id',
+                        'funnelLibrary_id.archives_id.funnels_id.stages',
+                        'funnelLibrary_id.archives_id.funnels_id.customizeProcess_step_id',
+
                     ],
                     select: {
                         user_id: {
@@ -513,7 +541,14 @@ export class FunnelLibraryService {
                         "user_id._id": user._id
                     },
                     relations: [
-                        ..._relations_byFunnelLibrary
+                        'user_id',
+                        'archives_id',
+                        'archives_id.config_step_id',
+                        'archives_id.funnels_id',
+                        'archives_id.funnels_id.stages',
+                        'archives_id.funnels_id.customizeProcess_step_id',
+                        'funnel_library_permision_id',
+                        'funnel_library_permision_id.user_id'
                     ],
                     select: {
                         user_id: {
@@ -565,7 +600,14 @@ export class FunnelLibraryService {
     //                     "user_id._id": user._id
     //                 },
     //                 relations: [
-    //                     ..._relations_byFunnelLibrary
+    //                         'user_id',
+    // 'archives_id',
+    // 'archives_id.config_step_id',
+    // 'archives_id.funnels_id',
+    // 'archives_id.funnels_id.stages',
+    // 'archives_id.funnels_id.customizeProcess_step_id',
+    // 'funnel_library_permision_id',
+    // 'funnel_library_permision_id.user_id'
     //                 ],
     //                 // select: {
     //                 //     user_id: {
@@ -632,7 +674,14 @@ export class FunnelLibraryService {
                         }
                     },
                     relations: [
-                        ..._relations_byFunnelLibrary
+                        'user_id',
+                        'archives_id',
+                        'archives_id.config_step_id',
+                        'archives_id.funnels_id',
+                        'archives_id.funnels_id.stages',
+                        'archives_id.funnels_id.customizeProcess_step_id',
+                        'funnel_library_permision_id',
+                        'funnel_library_permision_id.user_id'
                     ],
 
                 },
@@ -691,7 +740,14 @@ export class FunnelLibraryService {
                         "user_id._id": user._id
                     },
                     relations: [
-                        ..._relations_byFunnelLibrary
+                        'user_id',
+                        'archives_id',
+                        'archives_id.config_step_id',
+                        'archives_id.funnels_id',
+                        'archives_id.funnels_id.stages',
+                        'archives_id.funnels_id.customizeProcess_step_id',
+                        'funnel_library_permision_id',
+                        'funnel_library_permision_id.user_id'
                     ],
 
                 },

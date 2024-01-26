@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
-import { FunnelArchivesService } from './services/funnel_archives.service';
 import { FunnelArchivesController } from './controllers/funnel_archives.controller';
-import { FunnelArchives_Rel_Module } from './rel.module';
+import { FunnelArchives_exportModule } from './funnel_archives_export.module';
+import { Planner_exportModule } from '../planner/planner_export.module';
 
 @Module({
     controllers: [
         FunnelArchivesController
     ],
     imports: [
-        FunnelArchives_Rel_Module
+        FunnelArchives_exportModule,
+
     ],
     providers: [
-        FunnelArchivesService
     ]
 })
 export class FunnelArchivesModule {  }

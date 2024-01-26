@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { ProcessDataService } from '../../../common/adapters';
 import { ConfigPlanner_et } from '../entities';
 import { FunnelLibraryService } from '../../funnel-library/services/funnel-library.service';
@@ -25,7 +25,6 @@ export class PlannerService {
         private readonly _LoggerService: _LoggerService,
         private readonly dataSource: DataSource,
 
-        private readonly _funnelLibraryService: FunnelLibraryService,
 
         private readonly _processData: ProcessDataService,
 
@@ -36,15 +35,11 @@ export class PlannerService {
     }
 
     // TODO refactorizar para el uso de DTo
-    async create_configsPlanner(createPlannerDto: CreatePlannerDto, user: AuthPayload_I): Promise<_response_I<ConfigPlanner_et>> {
+    async create_configsPlanner(data_planner: ConfigPlanner_et, user: AuthPayload_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<ConfigPlanner_et>> {
 
         let _Response: _response_I<ConfigPlanner_et>;
 
-        let queryRunner = await this._TransactionsService.startTransaction();
-
-        const data_planner: ConfigPlanner_et = {
-            ...createPlannerDto[0],
-        }
+        let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
         try {
 
@@ -56,8 +51,6 @@ export class PlannerService {
                 __v: 0
             })
 
-            console.log('configPlanner', configPlanner);
-
             const resp = await this._processData.process_create<ConfigPlanner_et>({
                 body: configPlanner,
                 entity: ConfigPlanner_et,
@@ -66,10 +59,12 @@ export class PlannerService {
 
             _Response = resp;
 
+            if (!_prev_queryRunner) this._TransactionsService.commitTransaction(queryRunner);
+
         } catch (error) {
 
             _Response = error;
-            this._TransactionsService.rollbackTransaction(queryRunner);
+            if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
 
         }
 

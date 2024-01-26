@@ -14,7 +14,7 @@ export class LibraryPermisionsController {
     async findOne_byId(@Param('libraryPermision_id') libraryPermision_id: string, @Request() req: any) {
 
         const user: AuthPayload_I = req.user;
-        let resp = await this.libraryPermisionsService.findOne_byId(libraryPermision_id, user);
+        let resp = this.libraryPermisionsService.findOne_byId(libraryPermision_id, user);
         return resp;
 
     }
@@ -23,7 +23,7 @@ export class LibraryPermisionsController {
     async findOne_byLibraryId(@Param('funnelLibrary_id') funnelLibrary_id: string, @Request() req: any) {
 
         const user: AuthPayload_I = req.user;
-        return await this.libraryPermisionsService.findAll_byLibraryId(funnelLibrary_id, user);
+        return this.libraryPermisionsService.findAll_byLibraryId(funnelLibrary_id, user);
 
     }
 
@@ -32,7 +32,7 @@ export class LibraryPermisionsController {
 
         const user: AuthPayload_I = req.user;
         const token: string = req.headers.authorization.replace('Bearer ', '');
-        return await this.libraryPermisionsService.createPermisions_toLibrary(libraryPermisions, funnelLibrary_id, user, token);
+        return this.libraryPermisionsService.createPermisions_toLibrary(libraryPermisions, funnelLibrary_id, user, token);
 
      }
 

@@ -72,12 +72,14 @@ export class LibraryPermisionsService {
                 queryRunner: queryRunner
             });
 
+            console.log('funnelLibrary', funnelLibrary);
+
             for (const [i, item] of libraryPermisions.newPermisions.entries()) {
 
                 const userOfPermision: User_et = avaiableUsers.find(u => u.email === item.email);
                 const prev_permision: LibraryPermisions_et = funnelLibrary.funnel_library_permision_id.find(p => p.user_id.email === item.email) || null;
 
-                let newPermision: LibraryPermisions_et = this._LibraryPermisions_et_repository.create({
+                const newPermision = this._LibraryPermisions_et_repository.create({
                     ...prev_permision,
                     elementsEffect: 'all',
                     permisionType: item.permisionType,
@@ -90,11 +92,11 @@ export class LibraryPermisionsService {
                     body: newPermision,
                     entity: LibraryPermisions_et,
                     queryRunner: queryRunner
-                }).then(resp => {
+                }).then(resp =>
                     // _Response.data.push(resp.data);
-                    if (resp.data) aux_permGuardado.push(resp.data);
+                    resp.data && aux_permGuardado.push(resp.data)
 
-                });
+                );
 
             }
             _Response = {
@@ -114,6 +116,7 @@ export class LibraryPermisionsService {
         } catch (error) {
 
             _Response = error;
+            console.log('error', error);
             if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
 
         }

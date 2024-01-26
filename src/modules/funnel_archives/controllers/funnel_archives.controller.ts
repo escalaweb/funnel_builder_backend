@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, ParseUUIDPipe, Put } from '@nestjs/common';
 import { FunnelArchivesService } from '../services/funnel_archives.service';
 import { CreateFunnelArchiveDto } from '../dto/create-funnel_archive.dto';
 import { UpdateFunnelArchiveDto } from '../dto/update-funnel_archive.dto';
@@ -11,29 +11,42 @@ import { AuthPayload_I } from '../../auth/interfaces';
 export class FunnelArchivesController {
     constructor(private readonly funnelArchivesService: FunnelArchivesService) { }
 
-    @Post()
-    create(@Body() createFunnelArchiveDto: CreateFunnelArchiveDto, @Request() req: any) {
+    @Post('create/:funnelLibrary_id')
+    async create(@Body() createFunnelArchiveDto: any, @Param('funnelLibrary_id') funnelLibrary_id: string, @Request() req: any) {
+
         const user: AuthPayload_I = req.user;
-        return this.funnelArchivesService.create(createFunnelArchiveDto, user);
+        return await this.funnelArchivesService.create_archive({
+            ...createFunnelArchiveDto,
+            funnelLibrary_id
+        }, user);
     }
 
-    @Get()
-    findAll() {
-        return this.funnelArchivesService.findAll();
+    @Post('clone/:funnelLibrary_id/:funnel_archive')
+    async clone(@Param('funnelLibrary_id') funnelLibrary_id: string, @Param('funnel_archive') funnel_archive: string, @Request() req: any) {
+
+        const user: AuthPayload_I = req.user;
+       return await this.funnelArchivesService.clone(funnelLibrary_id, funnel_archive, user);
+
     }
 
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.funnelArchivesService.findOne(+id);
+    // @Get()
+    // findAll() {
+    //     return this.funnelArchivesService.findAll();
+    // }
+
+    // @Get(':id')
+    // findOne(@Param('id') id: string) {
+    //     return this.funnelArchivesService.findOne(+id);
+    // }
+
+    @Put(':funnelLibrary_id/:funnel_archive')
+    async update(@Param('funnelLibrary_id') funnelLibrary_id: string, @Param('funnel_archive') funnel_archive: string, @Body() body: any, @Request() req: any) {
+        const user: AuthPayload_I = req.user;
+        return await this.funnelArchivesService.update(funnelLibrary_id, funnel_archive, body, user);
     }
 
-    @Patch(':id')
-    update(@Param('id') id: string, @Body() updateFunnelArchiveDto: UpdateFunnelArchiveDto) {
-        return this.funnelArchivesService.update(+id, updateFunnelArchiveDto);
-    }
-
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.funnelArchivesService.remove(+id);
-    }
+    // @Delete(':id')
+    // remove(@Param('id') id: string) {
+    //     return this.funnelArchivesService.remove(+id);
+    // }
 }

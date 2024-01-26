@@ -12,7 +12,7 @@ export class PlannerController {
 
     @Post()
     @Auth()
-    create(@Body() createPlannerDto: CreatePlannerDto, @Request() req: any) {
+    create(@Body() createPlannerDto: any, @Request() req: any) {
 
         const user: AuthPayload_I = req.user;
 
