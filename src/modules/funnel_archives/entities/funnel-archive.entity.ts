@@ -6,6 +6,7 @@ import { EntityKey_et } from "../../../common/entities";
 import { FunnelBody_et } from "../../funnels/entities";
 import { FunnelLibrary_et } from "../../funnel-library/entities";
 import { User_et } from "../../users/entities";
+import { PermisionsRequest_et } from "../../permisions-requests/entities/permisions-request.entity";
 
 @Entity({
     name: "funnels_archive"
@@ -49,5 +50,16 @@ export class FunnelArchive_et extends EntityKey_et {
         name: 'config_step_id'
     })
     config_step_id?: ConfigPlanner_et;
+
+    // @OneToMany(
+    //     () => PermisionsRequest_et,
+    //     ( permision_request ) => {
+    //         permision_request.archive_id
+    //     },
+    //     {
+    //         cascade: true
+    //     }
+    // )
+    // permision_request_id?: PermisionsRequest_et
 
 }

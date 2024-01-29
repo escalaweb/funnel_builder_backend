@@ -10,27 +10,27 @@ import {
     FunnelLibraryModule,
     FunnelsModule,
     LibraryPermisionsModule,
+    PermisionsRequestsModule,
     PlannerModule,
     TestModule,
     UsersModule
 } from "./modules";
 
-
-
 @Module({
     imports: [
-        ConfigProjectModule,
-        CommonModule,
+        AdminInternalModule,
         AuthModule,
-        UsersModule,
+        CommonModule,
+        ConfigProjectModule,
         CustomizeProcessModule,
+        FunnelArchivesModule,
         FunnelLibraryModule,
         FunnelsModule,
-        TestModule,
-        PlannerModule,
-        AdminInternalModule,
         LibraryPermisionsModule,
-        FunnelArchivesModule,
+        PermisionsRequestsModule,
+        PlannerModule,
+        TestModule,
+        UsersModule,
     ],
 })
 export class AppModule { }

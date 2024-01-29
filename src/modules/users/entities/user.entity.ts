@@ -3,6 +3,7 @@ import { EntityKey_et, _blank_dateTypeModel, _init_dateTypeModel } from "../../.
 import { DateProcessService } from "../../../common/adapters";
 import { FunnelLibrary_et } from "../../funnel-library/entities";
 import { LibraryPermisions_et } from "../../library-permisions/entities/library-permision.entity";
+import { PermisionsRequest_et } from "../../permisions-requests/entities/permisions-request.entity";
 
 
 
@@ -27,12 +28,6 @@ export class User_et extends EntityKey_et {
         type: "varchar",
      })
     name?: string;
-
-    // @Column({
-    //     type: "varchar",
-    //     nullable: true
-    //  })
-    // test2?: string;
 
     @Column({
         type: "varchar",
@@ -72,6 +67,28 @@ export class User_et extends EntityKey_et {
         }
     )
     funnel_library_permisions_id?: LibraryPermisions_et
+
+    @OneToMany(
+        () => PermisionsRequest_et,
+        ( permision_request ) => {
+            permision_request.requested_by
+        },
+        {
+            cascade: true
+        }
+    )
+    permisions_requested_by_id?: PermisionsRequest_et
+
+    @OneToMany(
+        () => PermisionsRequest_et,
+        ( permision_request ) => {
+            permision_request.served_by
+        },
+        {
+            cascade: true
+        }
+    )
+    permisions_served_by_id?: PermisionsRequest_et
 
 
 

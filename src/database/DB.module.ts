@@ -6,6 +6,7 @@ import { FUNNEL_LIBRARY_ENTITIES_MODULE } from '../modules/funnel-library/entiti
 import { CUSTOMIZE_PROCESS_ENTITIES_MODULE } from '../modules/customize-process/entities/entities.module';
 import { FUNNEL_LIBRARY_PERMISIONS_ENTITIES_MODULE } from '../modules/library-permisions/entities/entities.module';
 import { FUNNEL_ARCHIVE_ENTITIES_MODULE } from '../modules/funnel_archives/entities/entities.module';
+import { PERMISIONS_REQUEST_ENTITIES_MODULE } from '../modules/permisions-requests/entities/entities.module';
 
 
 /**
@@ -23,7 +24,8 @@ import { FUNNEL_ARCHIVE_ENTITIES_MODULE } from '../modules/funnel_archives/entit
         FUNNEL_LIBRARY_ENTITIES_MODULE,
         CUSTOMIZE_PROCESS_ENTITIES_MODULE,
         FUNNEL_LIBRARY_PERMISIONS_ENTITIES_MODULE,
-        FUNNEL_ARCHIVE_ENTITIES_MODULE
+        FUNNEL_ARCHIVE_ENTITIES_MODULE,
+        PERMISIONS_REQUEST_ENTITIES_MODULE
     ],
     exports: [
         USER_ENTITIES_MODULE,
@@ -34,6 +36,7 @@ import { FUNNEL_ARCHIVE_ENTITIES_MODULE } from '../modules/funnel_archives/entit
         CUSTOMIZE_PROCESS_ENTITIES_MODULE,
         FUNNEL_LIBRARY_PERMISIONS_ENTITIES_MODULE,
         FUNNEL_ARCHIVE_ENTITIES_MODULE,
+        PERMISIONS_REQUEST_ENTITIES_MODULE
     ],
     providers: [
     ]

@@ -120,8 +120,8 @@ export class LibraryPermisionsService {
             if (!_prev_queryRunner) this._TransactionsService.rollbackTransaction(queryRunner);
 
         }
-
         return _Response;
+
     }
 
     async findAll_byLibraryId(funnelLibrary_id: string, user: AuthPayload_I, _prev_queryRunner?: QueryRunner): Promise<_response_I<LibraryPermisions_et[]>> {

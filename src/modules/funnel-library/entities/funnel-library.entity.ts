@@ -4,6 +4,7 @@ import { DateProcessService } from "../../../common/adapters";
 import { User_et } from "../../users/entities";
 import { LibraryPermisions_et } from "../../library-permisions/entities";
 import { FunnelArchive_et } from "../../funnel_archives/entities/funnel-archive.entity";
+import { PermisionsRequest_et } from "../../permisions-requests/entities/permisions-request.entity";
 
 
 @Entity({
@@ -42,5 +43,16 @@ export class FunnelLibrary_et extends EntityKey_et {
 
     @OneToMany( () => LibraryPermisions_et, permisions => permisions.funnelLibrary_id , { cascade: true })
     funnel_library_permision_id?: LibraryPermisions_et[]
+
+    @OneToMany(
+        () => PermisionsRequest_et,
+        ( permision_request ) => {
+            permision_request.funnelLibrary_id
+        },
+        {
+            cascade: true
+        }
+    )
+    permision_request_id?: PermisionsRequest_et
 
 }

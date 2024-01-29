@@ -16,16 +16,16 @@ export class FunnelLibraryController {
 
     }
 
-     @Get('initial/shared_me/:funnelLibrary_id')
-    find_initialBy_library_sharedMe(@Request() req: any, @Param('funnelLibrary_id', ParseUUIDPipe) funnelLibrary_id: string) {
+     @Get('initial/shared_me/:funnelLibrary_id/:archive_id')
+    find_initialBy_library_sharedMe(@Request() req: any, @Param('funnelLibrary_id', ParseUUIDPipe) funnelLibrary_id: string, @Param('archive_id', ParseUUIDPipe) archive_id: string) {
         const user: AuthPayload_I = req.user;
-        return this.funnelLibraryService.find_initialBy_library_sharedMe(funnelLibrary_id, user);
+        return this.funnelLibraryService.find_initialBy_library_sharedMe(funnelLibrary_id, archive_id, user);
     }
 
-    @Get('initial/:funnelLibrary_id')
-    find_initialBy_libraryId(@Request() req: any, @Param('funnelLibrary_id', ParseUUIDPipe) funnelLibrary_id: string) {
+    @Get('initial/:funnelLibrary_id/:archive_id')
+    find_initialBy_libraryId(@Request() req: any, @Param('funnelLibrary_id', ParseUUIDPipe) funnelLibrary_id: string, @Param('archive_id', ParseUUIDPipe) archive_id: string) {
         const user: AuthPayload_I = req.user;
-        return this.funnelLibraryService.find_initialBy_libraryId(funnelLibrary_id, user);
+        return this.funnelLibraryService.find_initialBy_libraryId(funnelLibrary_id, archive_id, user);
     }
 
     @Post()
@@ -34,10 +34,10 @@ export class FunnelLibraryController {
         return this.funnelLibraryService.create_folder(createFunnelLibraryDto, user);
     }
 
-    @Post(":id")
-    save_single_folderState(@Body() folderState: any,@Param('id', ParseUUIDPipe) id: string, @Request() req: any) {
+    @Post(":funnelLibrary_id/:archive_id")
+    save_single_folderState(@Body() body: any,@Param('funnelLibrary_id', ParseUUIDPipe) funnelLibrary_id: string, @Param('archive_id', ParseUUIDPipe) archive_id: string, @Request() req: any) {
         const user: AuthPayload_I = req.user;
-        return this.funnelLibraryService.save_single_folderState(id, folderState, user);
+        return this.funnelLibraryService.save_single_folderState(funnelLibrary_id, archive_id, body, user);
     }
 
     @Get()

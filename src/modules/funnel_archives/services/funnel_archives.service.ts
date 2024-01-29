@@ -43,8 +43,6 @@ export class FunnelArchivesService {
 
         let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
-        // const funnelLibrary_id = ;
-
         try {
 
             /*        let archive = this._FunnelArchive_et_repository.create({

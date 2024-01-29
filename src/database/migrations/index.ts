@@ -1,5 +1,4 @@
-
-
+export { PermisionsRequestsTable1706539980970 } from "./1706539980970-permisionsRequests_table";
 export { ActBase1704696750348 } from "./1704696750348-actBase";
 export { InitPermisions1701898729627 } from "./1701898729627-initPermisions";
 export { PermisionsToShare1701888175900 } from "./1701888175900-PermisionsToShare";

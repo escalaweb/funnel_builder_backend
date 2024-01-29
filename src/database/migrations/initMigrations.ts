@@ -10,6 +10,8 @@ import {
     ActBase1704696750348,
     SetupArchives1705682884526,
     ReformatDataByArchives1705794742714,
+    PermisionsRequestsTable1706539980970
+
     // ArchiveStructure1705681873345
 } from "./index"
 
@@ -46,6 +48,10 @@ export const _globalMigs: MigrationFunctionsModel_I[] = [
     {
         name: 'ReformatDataByArchives1705794742714',
         mig: new ReformatDataByArchives1705794742714()
+    },
+    {
+        name: 'PermisionsRequestsTable1706539980970',
+        mig: new PermisionsRequestsTable1706539980970()
     },
 
 
