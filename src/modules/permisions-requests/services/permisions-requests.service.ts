@@ -183,10 +183,10 @@ export class PermisionsRequestsService {
 
             if (resp.statusCode === 404) {
 
-
                 _Response = {
                     ok: false,
                     statusCode: 404,
+                    data: [],
                     message: [
                         {
                             text: 'No se encontraron resultados',
@@ -195,7 +195,8 @@ export class PermisionsRequestsService {
                     ]
                 };
 
-                throw _Response
+                throw _Response;
+
             }
 
             _Response = {

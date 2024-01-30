@@ -25,20 +25,10 @@ export class PermisionsRequestsController {
         return this.permisionsRequestsService.findAll(funnel_library, user);
     }
 
-    // @Get(':funnel_library')
-    // findOne(@Param('funnel_library') funnel_library: string) {
-
-    // }
-
     @Put(':permision_request')
     update(@Param('permision_request') permision_request: string, @Body() updatePermisionsRequestDto: UpdatePermisionsRequestDto, @Request() req: any) {
             const user: AuthPayload_I = req.user;
         return this.permisionsRequestsService.update(permision_request, updatePermisionsRequestDto, user);
     }
-
-    // @Delete(':id')
-    // remove(@Param('id') id: string) {
-    //     return this.permisionsRequestsService.remove(+id);
-    // }
 
 }
