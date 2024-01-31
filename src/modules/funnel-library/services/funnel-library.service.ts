@@ -287,7 +287,6 @@ export class FunnelLibraryService {
 
         let queryRunner = await this._TransactionsService.startTransaction();
 
-
         const resp_1: _response_I<FunnelLibrary_et> = await this._processData.process_getOne<FunnelLibrary_et>({
             argsFind: args,
             entity: FunnelLibrary_et,
@@ -299,11 +298,10 @@ export class FunnelLibraryService {
 
 
         try {
+
             if (resp_1.statusCode != 200) {
 
                 const resp_2 = await this.find_initialBy_library_sharedMe(funnelLibrary_id, archive_id, user)
-
-                console.log('resp_2', resp_2);
 
                 if (resp_2.statusCode !== 200) throw new HttpException(resp_2, resp_2.statusCode);
 
@@ -405,7 +403,7 @@ export class FunnelLibraryService {
         } catch (error) {
 
             _Response = error;
-            _Response.data = null
+            // _Response.data = null
 
             this._LoggerService.log({
                 // message: `El Usuario ${user.email} - u: ${user.username_id} - t: ${user.tenant_id} - No tiene información de embudos inicial `,

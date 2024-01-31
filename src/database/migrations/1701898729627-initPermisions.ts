@@ -15,10 +15,6 @@ export class InitPermisions1701898729627 implements MigrationInterface {
             const funnelLibraryId = funnelLibrary._id; // Asegúrate de obtener el ID correcto
             const user_id = funnelLibrary.user_id; // Asegúrate de obtener el ID correcto
             const date = funnelLibrary.updatedAt; // Asegúrate de obtener la fecha correcta
-
-
-            console.log('INSERT INTO library_permisions ("elementsEffect", "permisionType", "funnelLibrary_id", "user_id", "updatedAt") VALUES ($1, $2, $3, $4, $5)', [elementsEffect, permisionType, funnelLibraryId, user_id, date]);
-
             await queryRunner.query(
                 'INSERT INTO library_permisions ("elementsEffect", "permisionType", "funnelLibrary_id", "user_id", "updatedAt") VALUES ($1, $2, $3, $4, $5)', [elementsEffect, permisionType, funnelLibraryId, user_id, date]
             );

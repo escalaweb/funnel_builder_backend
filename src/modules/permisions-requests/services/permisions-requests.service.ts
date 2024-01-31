@@ -71,27 +71,6 @@ export class PermisionsRequestsService {
                 throw _Response
             }
 
-            /*     const args2: _argsFind_I = {
-                    findObject: {
-                        where: {
-                            'permisionType': 1,
-                            'funnelLibrary_id._id': createPermisionsRequestDto.funnelLibrary_id,
-                            "user_id._id": user._id
-                        },
-                        relations: [
-                            'funnelLibrary_id',
-                            'user_id'
-                        ]
-                    },
-                }
-                let created_archive = await this._processData.process_getOne<FunnelArchive_et>({
-                    argsFind: args1,
-                    entity: FunnelArchive_et,
-                    queryRunner: queryRunner,
-                }).then(({ data }) => data) || null;
-
-                console.log('created_FunnelLibrary', created_FunnelLibrary); */
-
             const permision_request = this._PermisionsRequest_et_repository.create({
                 funnelLibrary_id: created_FunnelLibrary.funnelLibrary_id,
                 requested_by: user,
@@ -160,6 +139,8 @@ export class PermisionsRequestsService {
                         'served_by',
                         'funnelLibrary_id',
                         'funnelLibrary_id.user_id',
+                        // 'funnelLibrary_id.funnel_library_permision_id',
+                        // 'funnelLibrary_id.funnel_library_permision_id.user_id',
                     ],
                     select: {
                         "requested_by": {
@@ -195,7 +176,7 @@ export class PermisionsRequestsService {
                     ]
                 };
 
-                throw _Response;
+                throw _Response
 
             }
 
@@ -227,7 +208,7 @@ export class PermisionsRequestsService {
                 findObject: {
                     where: {
                         '_id': permision_request,
-                        'answered': false,
+                        // 'answered': false,
                         'funnelLibrary_id': {
                             'user_id': {
                                 '_id': user._id

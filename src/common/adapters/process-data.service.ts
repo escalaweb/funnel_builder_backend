@@ -232,8 +232,6 @@ export class ProcessDataService {
 
         return new Promise(async (resolve, reject) => {
 
-            console.log('dato update', updateBody);
-
             await Model.update(_id, { ...updateBody }).then(async (resp) => {
 
                 let _resp: _response_I<T> = {

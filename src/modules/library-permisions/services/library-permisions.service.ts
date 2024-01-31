@@ -72,8 +72,6 @@ export class LibraryPermisionsService {
                 queryRunner: queryRunner
             });
 
-            console.log('funnelLibrary', funnelLibrary);
-
             for (const [i, item] of libraryPermisions.newPermisions.entries()) {
 
                 const userOfPermision: User_et = avaiableUsers.find(u => u.email === item.email);
@@ -131,7 +129,6 @@ export class LibraryPermisionsService {
         let queryRunner = await this._TransactionsService.startTransaction(_prev_queryRunner);
 
         // TODO arreglar la data que retorna y la función de populate
-
         try {
 
             let args: _argsFindMany_I = {
@@ -180,7 +177,6 @@ export class LibraryPermisionsService {
 
                 let aux: LibraryPermisions_et[] = response.data;
 
-                // Validar que los permisos sean del mismo tenant correspondiente
                 aux = aux.filter(r => r.user_id.tenant_id === user.tenant_id);
 
                 aux = aux.map(r => {

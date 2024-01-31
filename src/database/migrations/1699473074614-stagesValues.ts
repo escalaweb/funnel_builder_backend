@@ -7,9 +7,6 @@ export class StagesValues1699473074614 implements MigrationInterface {
     public async up(queryRunner?: QueryRunner): Promise<void> {
         // Renombrar columna `value` a `metrics` y cambiar su estructura
         // Actualizar la estructura de la columna `metrics` para que el contenido anterior sea ahora `metrics.goal_value.value`
-
-        console.log('hola');
-
         await queryRunner.query(`
       UPDATE "stages_funnel"
     SET "value" = jsonb_build_object(
